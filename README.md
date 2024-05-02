@@ -1,6 +1,6 @@
 # Rulebricks – Node SDK
 
-[![npm shield](https://img.shields.io/npm/v/@flatfile/api)](https://www.npmjs.com/package/@flatfile/api)
+[![npm shield](https://img.shields.io/npm/v/@rulebricks/api)](https://www.npmjs.com/package/@rulebricks/api)
 
 The Rulebricks Node.js library provides convenient access to the Rulebricks API from JavaScript/TypeScript.
 
@@ -19,15 +19,21 @@ yarn add @rulebricks/api
 ## Usage
 
 ```typescript
-import { RulebricksClient } from "@rulebricks/api";
+import { RulebricksClient } from '@rulebricks/api';
 
-async function main() {
-    const rulebricks = new RulebricksClient({
-        // This is the "Secret Key" that can be found on the API tab
-        // of the Rulebricks dashboard.
-        base_url: "YOUR_API_KEY",
-    });
-}
+const rulebricks = new RulebricksClient({
+  apiKey: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
+});
+
+let result = rulebricks.rules.solve('tJOCd8XXXX', {
+  customer_id: 'anc39as3',
+  purchase_history: ['t-shirt', 'mug'],,
+  account_age_days: 4,
+  last_purchase_days_ago: 3,
+  email_subscription: false,
+});
+
+console.log(result);
 ```
 
 ## Handling errors
