@@ -23,10 +23,6 @@ import { RulebricksClient } from '@rulebricks/api';
 
 const rulebricks = new RulebricksClient({
   apiKey: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
-});
-
-const rulebricks = new RulebricksClient({
-  apiKey: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
   environment: 'https://rulebricks.com',
 });
 
