@@ -19,14 +19,14 @@ yarn add @rulebricks/api
 ## Usage
 
 ```typescript
-import { RulebricksClient } from '@rulebricks/api';
+import { RulebricksClient } from "@rulebricks/api";
 
 async function main() {
-  const rulebricks = new RulebricksClient({
-    // This is usually the environment specific "Secret Key" that can be found
-    // on the Getting Started page in the Flatfile dashboard.
-    token: 'YOUR_API_KEY',
-  });
+    const rulebricks = new RulebricksClient({
+        // This is the "Secret Key" that can be found on the API tab
+        // of the Rulebricks dashboard.
+        base_url: "YOUR_API_KEY",
+    });
 }
 ```
 
@@ -36,23 +36,24 @@ When the API returns a non-success status code (4xx or 5xx response), a subclass
 
 ```ts
 try {
-  await client.agents.get("environment-id", "agent-id");
+    // ...
 } catch (err) {
-  if (err instanceof RulebricksApiError) {
-    console.log(err.statusCode); // 400
-    console.log(err.message); // "BadRequestError"
-    console.log(err.body); // list of errors
-  }
+    if (err instanceof RulebricksApiError) {
+        console.log(err.statusCode); // 400
+        console.log(err.message); // "BadRequestError"
+        console.log(err.body); // list of errors
+    }
 }
 ```
 
 Error codes are as followed:
 
-| Status Code | Error Type                 |
-| ----------- | -------------------------- |
-| 400         | `BadRequestError`          |
-| 404         | `NotFoundError`            |
-
+| Status Code | Error Type            |
+| ----------- | --------------------- |
+| 400         | `BadRequestError`     |
+| 404         | `NotFoundError`       |
+| 429         | `RateLimitError`      |
+| 500         | `InternalServerError` |
 
 ## Contributing
 

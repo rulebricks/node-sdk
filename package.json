@@ -1,10 +1,19 @@
 {
     "name": "@rulebricks/api",
-    "version": "1.8.5",
+    "version": "0.0.2",
     "private": false,
     "repository": "https://github.com/rulebricks/node-sdk",
     "main": "./index.js",
     "types": "./index.d.ts",
+    "license": "MIT",
+    "author": "Rulebricks",
+    "description": "Rulebricks API – Node SDK",
+    "keywords": [
+        "rulebricks",
+        "javascript",
+        "rule engine",
+        "sdk"
+    ],
     "scripts": {
         "format": "prettier --write 'src/**/*.ts'",
         "build": "tsc",
