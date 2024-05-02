@@ -25,15 +25,26 @@ const rulebricks = new RulebricksClient({
   apiKey: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
 });
 
-let result = rulebricks.rules.solve('tJOCd8XXXX', {
+const rulebricks = new RulebricksClient({
+  apiKey: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
+  environment: 'https://rulebricks.com',
+});
+
+rulebricks.rules.solve('tJOCd8XXXX', {
   customer_id: 'anc39as3',
   purchase_history: ['t-shirt', 'mug'],,
   account_age_days: 4,
   last_purchase_days_ago: 3,
   email_subscription: false,
+}, {
+  // Request options (Optional, leave empty for default values)
+  // timeoutInSeconds: 10, (Optional: Use this to override the default timeout in seconds)
+  // maxRetries: 3, (Optional: Use this to override the default number of retries)
+}).then((result) => {
+  console.log(result);
+}).catch((err) => {
+  console.error(err);
 });
-
-console.log(result);
 ```
 
 ## Handling errors
@@ -57,7 +68,6 @@ Error codes are as followed:
 | Status Code | Error Type            |
 | ----------- | --------------------- |
 | 400         | `BadRequestError`     |
-| 404         | `NotFoundError`       |
 | 429         | `RateLimitError`      |
 | 500         | `InternalServerError` |
 
