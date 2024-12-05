@@ -23,10 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RulebricksApiTimeoutError = exports.RulebricksApiError = exports.RulebricksClient = exports.RulebricksApi = void 0;
+exports.RulebricksApiTimeoutError = exports.RulebricksApiError = exports.RulebricksApiClient = exports.RulebricksApi = void 0;
 exports.RulebricksApi = __importStar(require("./api"));
 var Client_1 = require("./Client");
-Object.defineProperty(exports, "RulebricksClient", { enumerable: true, get: function () { return Client_1.RulebricksClient; } });
+Object.defineProperty(exports, "RulebricksApiClient", { enumerable: true, get: function () { return Client_1.RulebricksApiClient; } });
 var errors_1 = require("./errors");
 Object.defineProperty(exports, "RulebricksApiError", { enumerable: true, get: function () { return errors_1.RulebricksApiError; } });
 Object.defineProperty(exports, "RulebricksApiTimeoutError", { enumerable: true, get: function () { return errors_1.RulebricksApiTimeoutError; } });

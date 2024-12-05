@@ -23,8 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.list = exports.parallelSolve = exports.bulkSolve = exports.solve = void 0;
+exports.parallelSolve = exports.bulkSolve = exports.solve = void 0;
 exports.solve = __importStar(require("./solve"));
 exports.bulkSolve = __importStar(require("./bulkSolve"));
 exports.parallelSolve = __importStar(require("./parallelSolve"));
-exports.list = __importStar(require("./list"));

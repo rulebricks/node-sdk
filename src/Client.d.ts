@@ -4,7 +4,12 @@
 import * as core from "./core";
 import { Rules } from "./api/resources/rules/client/Client";
 import { Flows } from "./api/resources/flows/client/Client";
-export declare namespace RulebricksClient {
+import { Decisions } from "./api/resources/decisions/client/Client";
+import { Assets } from "./api/resources/assets/client/Client";
+import { Users } from "./api/resources/users/client/Client";
+import { Tests } from "./api/resources/tests/client/Client";
+import { Values } from "./api/resources/values/client/Client";
+export declare namespace RulebricksApiClient {
     interface Options {
         environment: core.Supplier<string>;
         apiKey: core.Supplier<string>;
@@ -14,11 +19,21 @@ export declare namespace RulebricksClient {
         maxRetries?: number;
     }
 }
-export declare class RulebricksClient {
-    protected readonly _options: RulebricksClient.Options;
-    constructor(_options: RulebricksClient.Options);
+export declare class RulebricksApiClient {
+    protected readonly _options: RulebricksApiClient.Options;
+    constructor(_options: RulebricksApiClient.Options);
     protected _rules: Rules | undefined;
     get rules(): Rules;
     protected _flows: Flows | undefined;
     get flows(): Flows;
+    protected _decisions: Decisions | undefined;
+    get decisions(): Decisions;
+    protected _assets: Assets | undefined;
+    get assets(): Assets;
+    protected _users: Users | undefined;
+    get users(): Users;
+    protected _tests: Tests | undefined;
+    get tests(): Tests;
+    protected _values: Values | undefined;
+    get values(): Values;
 }

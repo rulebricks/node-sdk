@@ -12,6 +12,9 @@ export declare namespace Flows {
         maxRetries?: number;
     }
 }
+/**
+ * Operations for executing flows, which are sequences of rules and external actions
+ */
 export declare class Flows {
     protected readonly _options: Flows.Options;
     constructor(_options: Flows.Options);

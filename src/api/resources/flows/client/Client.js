@@ -44,6 +44,9 @@ const RulebricksApi = __importStar(require("../../.."));
 const serializers = __importStar(require("../../../../serialization"));
 const url_join_1 = __importDefault(require("url-join"));
 const errors = __importStar(require("../../../../errors"));
+/**
+ * Operations for executing flows, which are sequences of rules and external actions
+ */
 class Flows {
     constructor(_options) {
         this._options = _options;
@@ -63,7 +66,7 @@ class Flows {
     execute(slug, request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/flow/${slug}`),
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/flows/${slug}`),
                 method: "POST",
                 headers: {
                     "x-api-key": yield core.Supplier.get(this._options.apiKey),

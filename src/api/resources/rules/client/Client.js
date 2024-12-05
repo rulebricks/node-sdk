@@ -44,6 +44,9 @@ const RulebricksApi = __importStar(require("../../.."));
 const serializers = __importStar(require("../../../../serialization"));
 const url_join_1 = __importDefault(require("url-join"));
 const errors = __importStar(require("../../../../errors"));
+/**
+ * Operations for efficiently executing individual rules in different formats
+ */
 class Rules {
     constructor(_options) {
         this._options = _options;
@@ -177,7 +180,7 @@ class Rules {
         });
     }
     /**
-     * Executes multiple rules in parallel based on a provided mapping of rule slugs to payloads.
+     * Executes multiple rules or flows in parallel based on a provided mapping of rule/flow slugs to payloads.
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
@@ -190,7 +193,7 @@ class Rules {
      *             "email": "jdoe@acme.co"
      *         },
      *         "offers": {
-     *             "rule": "OvmsYwn",
+     *             "flow": "OvmsYwn",
      *             "customer_id": "12345",
      *             "last_purchase_days_ago": 30,
      *             "selected_plan": "premium"
@@ -233,102 +236,6 @@ class Rules {
                             body: _response.error.body,
                         });
                 }
-            }
-            switch (_response.error.reason) {
-                case "non-json":
-                    throw new errors.RulebricksApiError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.rawBody,
-                    });
-                case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
-                case "unknown":
-                    throw new errors.RulebricksApiError({
-                        message: _response.error.errorMessage,
-                    });
-            }
-        });
-    }
-    /**
-     * List all rules in the organization.
-     *
-     * @example
-     *     await rulebricksApi.rules.list()
-     */
-    list(requestOptions) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/list"),
-                method: "GET",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
-                contentType: "application/json",
-                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
-                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
-            });
-            if (_response.ok) {
-                return yield serializers.rules.list.Response.parseOrThrow(_response.body, {
-                    unrecognizedObjectKeys: "passthrough",
-                    allowUnrecognizedUnionMembers: true,
-                    allowUnrecognizedEnumValues: true,
-                    breadcrumbsPrefix: ["response"],
-                });
-            }
-            if (_response.error.reason === "status-code") {
-                throw new errors.RulebricksApiError({
-                    statusCode: _response.error.statusCode,
-                    body: _response.error.body,
-                });
-            }
-            switch (_response.error.reason) {
-                case "non-json":
-                    throw new errors.RulebricksApiError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.rawBody,
-                    });
-                case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
-                case "unknown":
-                    throw new errors.RulebricksApiError({
-                        message: _response.error.errorMessage,
-                    });
-            }
-        });
-    }
-    /**
-     * Get the rule execution usage of your organization.
-     *
-     * @example
-     *     await rulebricksApi.rules.usage()
-     */
-    usage(requestOptions) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/usage"),
-                method: "GET",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
-                contentType: "application/json",
-                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
-                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
-            });
-            if (_response.ok) {
-                return yield serializers.UsageResponse.parseOrThrow(_response.body, {
-                    unrecognizedObjectKeys: "passthrough",
-                    allowUnrecognizedUnionMembers: true,
-                    allowUnrecognizedEnumValues: true,
-                    breadcrumbsPrefix: ["response"],
-                });
-            }
-            if (_response.error.reason === "status-code") {
-                throw new errors.RulebricksApiError({
-                    statusCode: _response.error.statusCode,
-                    body: _response.error.body,
-                });
             }
             switch (_response.error.reason) {
                 case "non-json":
