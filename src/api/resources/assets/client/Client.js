@@ -266,12 +266,60 @@ class Assets {
         });
     }
     /**
+     * List all rules in the organization.
+     *
+     * @example
+     *     await rulebricksApi.assets.listRules()
+     */
+    listRules(requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/rules/list"),
+                method: "GET",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.assets.listRules.Response.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                throw new errors.RulebricksApiError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.body,
+                });
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
      * List all flows in the organization.
      *
      * @example
-     *     await rulebricksApi.assets.list()
+     *     await rulebricksApi.assets.listFlows()
      */
-    list(requestOptions) {
+    listFlows(requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             const _response = yield core.fetcher({
                 url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/flows/list"),

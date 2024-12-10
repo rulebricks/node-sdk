@@ -26,13 +26,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ListResponseItem = void 0;
-const core = __importStar(require("../../../../core"));
-exports.ListResponseItem = core.serialization.object({
-    id: core.serialization.string().optional(),
-    name: core.serialization.string().optional(),
-    description: core.serialization.string().optional(),
-    published: core.serialization.boolean().optional(),
-    slug: core.serialization.string().optional(),
-    updatedAt: core.serialization.property("updated_at", core.serialization.string().optional()),
+exports.CreateRuleTestRequest = void 0;
+const core = __importStar(require("../../../../../core"));
+exports.CreateRuleTestRequest = core.serialization.object({
+    name: core.serialization.string(),
+    request: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
+    response: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
+    critical: core.serialization.boolean(),
 });

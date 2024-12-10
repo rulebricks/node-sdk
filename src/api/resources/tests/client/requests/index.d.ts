@@ -1,1 +1,2 @@
-export { CreateTestRequest } from "./CreateTestRequest";
+export { CreateRuleTestRequest } from "./CreateRuleTestRequest";
+export { CreateFlowTestRequest } from "./CreateFlowTestRequest";

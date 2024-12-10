@@ -4,7 +4,7 @@
 import * as serializers from "../../..";
 import * as RulebricksApi from "../../../../api";
 import * as core from "../../../../core";
-export declare const Response: core.serialization.Schema<serializers.tests.listTests.Response.Raw, RulebricksApi.ListTestsResponseItem[]>;
+export declare const Response: core.serialization.Schema<serializers.tests.listRuleTests.Response.Raw, RulebricksApi.ListRuleTestsResponseItem[]>;
 export declare namespace Response {
-    type Raw = serializers.ListTestsResponseItem.Raw[];
+    type Raw = serializers.ListRuleTestsResponseItem.Raw[];
 }

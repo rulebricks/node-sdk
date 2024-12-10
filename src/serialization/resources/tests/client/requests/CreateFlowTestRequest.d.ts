@@ -4,8 +4,8 @@
 import * as serializers from "../../../..";
 import * as RulebricksApi from "../../../../../api";
 import * as core from "../../../../../core";
-export declare const CreateTestRequest: core.serialization.Schema<serializers.CreateTestRequest.Raw, RulebricksApi.CreateTestRequest>;
-export declare namespace CreateTestRequest {
+export declare const CreateFlowTestRequest: core.serialization.Schema<serializers.CreateFlowTestRequest.Raw, RulebricksApi.CreateFlowTestRequest>;
+export declare namespace CreateFlowTestRequest {
     interface Raw {
         name: string;
         request: Record<string, unknown>;

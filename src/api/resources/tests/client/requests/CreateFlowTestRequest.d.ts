@@ -14,7 +14,7 @@
  *         critical: true
  *     }
  */
-export interface CreateTestRequest {
+export interface CreateFlowTestRequest {
     /** The name of the test. */
     name: string;
     /** The request object for the test. */

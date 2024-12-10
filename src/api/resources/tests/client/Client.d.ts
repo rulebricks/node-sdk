@@ -20,22 +20,22 @@ export declare class Tests {
     protected readonly _options: Tests.Options;
     constructor(_options: Tests.Options);
     /**
-     * Retrieves a list of tests associated with the flow identified by the slug.
+     * Retrieves a list of tests associated with the rule identified by the slug.
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.listTests("slug")
+     *     await rulebricksApi.tests.listRuleTests("slug")
      */
-    listTests(slug: string, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.ListTestsResponseItem[]>;
+    listRuleTests(slug: string, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.ListRuleTestsResponseItem[]>;
     /**
-     * Adds a new test to the test suite of a flow identified by the slug.
+     * Adds a new test to the test suite of a rule identified by the slug.
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.createTest("slug", {
+     *     await rulebricksApi.tests.createRuleTest("slug", {
      *         name: "Test 3",
      *         request: {
      *             "param1": "value1"
@@ -46,14 +46,51 @@ export declare class Tests {
      *         critical: true
      *     })
      */
-    createTest(slug: string, request: RulebricksApi.CreateTestRequest, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.CreateTestResponse>;
+    createRuleTest(slug: string, request: RulebricksApi.CreateRuleTestRequest, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.CreateRuleTestResponse>;
+    /**
+     * Deletes a test from the test suite of a rule identified by the slug.
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.tests.deleteRuleTest("slug", "testId")
+     */
+    deleteRuleTest(slug: string, testId: string, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.DeleteRuleTestResponse>;
+    /**
+     * Retrieves a list of tests associated with the flow identified by the slug.
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.tests.listFlowTests("slug")
+     */
+    listFlowTests(slug: string, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.ListFlowTestsResponseItem[]>;
+    /**
+     * Adds a new test to the test suite of a flow identified by the slug.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.tests.createFlowTest("slug", {
+     *         name: "Test 3",
+     *         request: {
+     *             "param1": "value1"
+     *         },
+     *         response: {
+     *             "status": "success"
+     *         },
+     *         critical: true
+     *     })
+     */
+    createFlowTest(slug: string, request: RulebricksApi.CreateFlowTestRequest, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.CreateFlowTestResponse>;
     /**
      * Deletes a test from the test suite of a flow identified by the slug.
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.deleteTest("slug", "testId")
+     *     await rulebricksApi.tests.deleteFlowTest("slug", "testId")
      */
-    deleteTest(slug: string, testId: string, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.DeleteTestResponse>;
+    deleteFlowTest(slug: string, testId: string, requestOptions?: Tests.RequestOptions): Promise<RulebricksApi.DeleteFlowTestResponse>;
 }

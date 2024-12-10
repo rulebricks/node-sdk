@@ -4,8 +4,8 @@
 import * as serializers from "../../..";
 import * as RulebricksApi from "../../../../api";
 import * as core from "../../../../core";
-export declare const ListTestsResponseItem: core.serialization.ObjectSchema<serializers.ListTestsResponseItem.Raw, RulebricksApi.ListTestsResponseItem>;
-export declare namespace ListTestsResponseItem {
+export declare const CreateRuleTestResponse: core.serialization.ObjectSchema<serializers.CreateRuleTestResponse.Raw, RulebricksApi.CreateRuleTestResponse>;
+export declare namespace CreateRuleTestResponse {
     interface Raw {
         id: string;
         name: string;

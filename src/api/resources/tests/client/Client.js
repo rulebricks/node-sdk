@@ -52,14 +52,198 @@ class Tests {
         this._options = _options;
     }
     /**
+     * Retrieves a list of tests associated with the rule identified by the slug.
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.tests.listRuleTests("slug")
+     */
+    listRuleTests(slug, requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/rules/${slug}/tests`),
+                method: "GET",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.tests.listRuleTests.Response.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                switch (_response.error.statusCode) {
+                    case 404:
+                        throw new RulebricksApi.NotFoundError(_response.error.body);
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
+     * Adds a new test to the test suite of a rule identified by the slug.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.tests.createRuleTest("slug", {
+     *         name: "Test 3",
+     *         request: {
+     *             "param1": "value1"
+     *         },
+     *         response: {
+     *             "status": "success"
+     *         },
+     *         critical: true
+     *     })
+     */
+    createRuleTest(slug, request, requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/rules/${slug}/tests`),
+                method: "POST",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                body: yield serializers.CreateRuleTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.CreateRuleTestResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                switch (_response.error.statusCode) {
+                    case 400:
+                        throw new RulebricksApi.BadRequestError(_response.error.body);
+                    case 404:
+                        throw new RulebricksApi.NotFoundError(_response.error.body);
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
+     * Deletes a test from the test suite of a rule identified by the slug.
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.tests.deleteRuleTest("slug", "testId")
+     */
+    deleteRuleTest(slug, testId, requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/rules/${slug}/tests/${testId}`),
+                method: "DELETE",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.DeleteRuleTestResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                switch (_response.error.statusCode) {
+                    case 404:
+                        throw new RulebricksApi.NotFoundError(_response.error.body);
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
      * Retrieves a list of tests associated with the flow identified by the slug.
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.listTests("slug")
+     *     await rulebricksApi.tests.listFlowTests("slug")
      */
-    listTests(slug, requestOptions) {
+    listFlowTests(slug, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             const _response = yield core.fetcher({
                 url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/flows/${slug}/tests`),
@@ -73,7 +257,7 @@ class Tests {
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
             });
             if (_response.ok) {
-                return yield serializers.tests.listTests.Response.parseOrThrow(_response.body, {
+                return yield serializers.tests.listFlowTests.Response.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -115,7 +299,7 @@ class Tests {
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.createTest("slug", {
+     *     await rulebricksApi.tests.createFlowTest("slug", {
      *         name: "Test 3",
      *         request: {
      *             "param1": "value1"
@@ -126,7 +310,7 @@ class Tests {
      *         critical: true
      *     })
      */
-    createTest(slug, request, requestOptions) {
+    createFlowTest(slug, request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             const _response = yield core.fetcher({
                 url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/flows/${slug}/tests`),
@@ -136,12 +320,12 @@ class Tests {
                     "X-Fern-Language": "JavaScript",
                 },
                 contentType: "application/json",
-                body: yield serializers.CreateTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                body: yield serializers.CreateFlowTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
             });
             if (_response.ok) {
-                return yield serializers.CreateTestResponse.parseOrThrow(_response.body, {
+                return yield serializers.CreateFlowTestResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -184,9 +368,9 @@ class Tests {
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.deleteTest("slug", "testId")
+     *     await rulebricksApi.tests.deleteFlowTest("slug", "testId")
      */
-    deleteTest(slug, testId, requestOptions) {
+    deleteFlowTest(slug, testId, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             const _response = yield core.fetcher({
                 url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/flows/${slug}/tests/${testId}`),
@@ -200,7 +384,7 @@ class Tests {
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
             });
             if (_response.ok) {
-                return yield serializers.DeleteTestResponse.parseOrThrow(_response.body, {
+                return yield serializers.DeleteFlowTestResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,

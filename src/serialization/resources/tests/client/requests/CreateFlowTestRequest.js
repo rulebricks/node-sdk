@@ -26,16 +26,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateTestResponse = void 0;
-const core = __importStar(require("../../../../core"));
-exports.CreateTestResponse = core.serialization.object({
-    id: core.serialization.string(),
+exports.CreateFlowTestRequest = void 0;
+const core = __importStar(require("../../../../../core"));
+exports.CreateFlowTestRequest = core.serialization.object({
     name: core.serialization.string(),
     request: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
     response: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
     critical: core.serialization.boolean(),
-    error: core.serialization.boolean(),
-    success: core.serialization.boolean(),
-    testState: core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional(),
-    lastExecuted: core.serialization.date().optional(),
 });

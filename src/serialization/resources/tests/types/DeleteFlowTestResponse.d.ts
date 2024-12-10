@@ -4,8 +4,8 @@
 import * as serializers from "../../..";
 import * as RulebricksApi from "../../../../api";
 import * as core from "../../../../core";
-export declare const DeleteTestResponse: core.serialization.ObjectSchema<serializers.DeleteTestResponse.Raw, RulebricksApi.DeleteTestResponse>;
-export declare namespace DeleteTestResponse {
+export declare const DeleteFlowTestResponse: core.serialization.ObjectSchema<serializers.DeleteFlowTestResponse.Raw, RulebricksApi.DeleteFlowTestResponse>;
+export declare namespace DeleteFlowTestResponse {
     interface Raw {
         id: string;
         name: string;

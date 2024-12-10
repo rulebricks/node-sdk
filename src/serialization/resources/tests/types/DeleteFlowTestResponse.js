@@ -26,9 +26,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteTestResponse = void 0;
+exports.DeleteFlowTestResponse = void 0;
 const core = __importStar(require("../../../../core"));
-exports.DeleteTestResponse = core.serialization.object({
+exports.DeleteFlowTestResponse = core.serialization.object({
     id: core.serialization.string(),
     name: core.serialization.string(),
     request: core.serialization.record(core.serialization.string(), core.serialization.unknown()),

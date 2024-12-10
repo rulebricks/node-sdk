@@ -73,12 +73,19 @@ export declare class Assets {
      */
     importRule(request: RulebricksApi.ImportRuleRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ImportRuleResponse>;
     /**
+     * List all rules in the organization.
+     *
+     * @example
+     *     await rulebricksApi.assets.listRules()
+     */
+    listRules(requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ListRulesResponseItem[]>;
+    /**
      * List all flows in the organization.
      *
      * @example
-     *     await rulebricksApi.assets.list()
+     *     await rulebricksApi.assets.listFlows()
      */
-    list(requestOptions?: Assets.RequestOptions): Promise<void>;
+    listFlows(requestOptions?: Assets.RequestOptions): Promise<void>;
     /**
      * Get the rule execution usage of your organization.
      *
