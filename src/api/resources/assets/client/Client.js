@@ -45,7 +45,7 @@ const serializers = __importStar(require("../../../../serialization"));
 const url_join_1 = __importDefault(require("url-join"));
 const errors = __importStar(require("../../../../errors"));
 /**
- * Administrative operations for managing rules/flows, and monitoring usage
+ * Administrative operations for managing rules, flows, folders, and usage
  */
 class Assets {
     constructor(_options) {
@@ -266,13 +266,20 @@ class Assets {
         });
     }
     /**
-     * List all rules in the organization.
+     * List all rules in the organization. Optionally filter by folder name or ID.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.assets.listRules()
+     *     await rulebricksApi.assets.listRules({})
      */
-    listRules(requestOptions) {
+    listRules(request = {}, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { folder } = request;
+            const _queryParams = {};
+            if (folder != null) {
+                _queryParams["folder"] = folder;
+            }
             const _response = yield core.fetcher({
                 url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/rules/list"),
                 method: "GET",
@@ -281,6 +288,7 @@ class Assets {
                     "X-Fern-Language": "JavaScript",
                 },
                 contentType: "application/json",
+                queryParameters: _queryParams,
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
             });
@@ -293,10 +301,17 @@ class Assets {
                 });
             }
             if (_response.error.reason === "status-code") {
-                throw new errors.RulebricksApiError({
-                    statusCode: _response.error.statusCode,
-                    body: _response.error.body,
-                });
+                switch (_response.error.statusCode) {
+                    case 400:
+                        throw new RulebricksApi.BadRequestError(_response.error.body);
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
             }
             switch (_response.error.reason) {
                 case "non-json":
@@ -388,6 +403,184 @@ class Assets {
                     statusCode: _response.error.statusCode,
                     body: _response.error.body,
                 });
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
+     * Retrieve all rule folders for the authenticated user.
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.assets.listFolders()
+     */
+    listFolders(requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/folders"),
+                method: "GET",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.assets.listFolders.Response.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                switch (_response.error.statusCode) {
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
+     * Create a new rule folder or update an existing one for the authenticated user.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.assets.upsertFolder({
+     *         name: "Marketing Rules",
+     *         description: "Rules for marketing automation workflows"
+     *     })
+     */
+    upsertFolder(request, requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/folders"),
+                method: "POST",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                body: yield serializers.UpsertFolderRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.UpsertFolderResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                switch (_response.error.statusCode) {
+                    case 400:
+                        throw new RulebricksApi.BadRequestError(_response.error.body);
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
+            }
+            switch (_response.error.reason) {
+                case "non-json":
+                    throw new errors.RulebricksApiError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.rawBody,
+                    });
+                case "timeout":
+                    throw new errors.RulebricksApiTimeoutError();
+                case "unknown":
+                    throw new errors.RulebricksApiError({
+                        message: _response.error.errorMessage,
+                    });
+            }
+        });
+    }
+    /**
+     * Delete a specific rule folder for the authenticated user. This does not delete the rules within the folder.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.assets.deleteFolder({
+     *         id: "abc123"
+     *     })
+     */
+    deleteFolder(request, requestOptions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const _response = yield core.fetcher({
+                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/folders"),
+                method: "DELETE",
+                headers: {
+                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
+                    "X-Fern-Language": "JavaScript",
+                },
+                contentType: "application/json",
+                body: yield serializers.DeleteFolderRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+                maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+            });
+            if (_response.ok) {
+                return yield serializers.DeleteFolderResponse.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
+            }
+            if (_response.error.reason === "status-code") {
+                switch (_response.error.statusCode) {
+                    case 400:
+                        throw new RulebricksApi.BadRequestError(_response.error.body);
+                    case 404:
+                        throw new RulebricksApi.NotFoundError(_response.error.body);
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
             }
             switch (_response.error.reason) {
                 case "non-json":

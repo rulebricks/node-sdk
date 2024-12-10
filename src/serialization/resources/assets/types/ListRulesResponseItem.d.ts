@@ -8,10 +8,12 @@ export declare const ListRulesResponseItem: core.serialization.ObjectSchema<seri
 export declare namespace ListRulesResponseItem {
     interface Raw {
         id?: string | null;
+        created_at?: string | null;
         name?: string | null;
         description?: string | null;
-        published?: boolean | null;
         slug?: string | null;
-        updated_at?: string | null;
+        folder?: serializers.ListRulesResponseItemFolder.Raw | null;
+        request_schema?: Record<string, unknown> | null;
+        response_schema?: Record<string, unknown> | null;
     }
 }

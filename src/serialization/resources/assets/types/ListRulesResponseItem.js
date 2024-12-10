@@ -25,14 +25,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListRulesResponseItem = void 0;
 const core = __importStar(require("../../../../core"));
 exports.ListRulesResponseItem = core.serialization.object({
     id: core.serialization.string().optional(),
+    createdAt: core.serialization.property("created_at", core.serialization.date().optional()),
     name: core.serialization.string().optional(),
     description: core.serialization.string().optional(),
-    published: core.serialization.boolean().optional(),
     slug: core.serialization.string().optional(),
-    updatedAt: core.serialization.property("updated_at", core.serialization.string().optional()),
+    folder: core.serialization
+        .lazyObject(() => __awaiter(void 0, void 0, void 0, function* () { return (yield Promise.resolve().then(() => __importStar(require("../../..")))).ListRulesResponseItemFolder; }))
+        .optional(),
+    requestSchema: core.serialization.property("request_schema", core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional()),
+    responseSchema: core.serialization.property("response_schema", core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional()),
 });

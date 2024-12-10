@@ -16,5 +16,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./DeleteRuleResponse"), exports);
 __exportStar(require("./ImportRuleResponse"), exports);
+__exportStar(require("./ListRulesResponseItemFolder"), exports);
 __exportStar(require("./ListRulesResponseItem"), exports);
 __exportStar(require("./UsageResponse"), exports);
+__exportStar(require("./ListFoldersResponseItem"), exports);
+__exportStar(require("./UpsertFolderResponse"), exports);
+__exportStar(require("./DeleteFolderResponse"), exports);

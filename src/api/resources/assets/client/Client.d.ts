@@ -14,7 +14,7 @@ export declare namespace Assets {
     }
 }
 /**
- * Administrative operations for managing rules/flows, and monitoring usage
+ * Administrative operations for managing rules, flows, folders, and usage
  */
 export declare class Assets {
     protected readonly _options: Assets.Options;
@@ -73,12 +73,14 @@ export declare class Assets {
      */
     importRule(request: RulebricksApi.ImportRuleRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ImportRuleResponse>;
     /**
-     * List all rules in the organization.
+     * List all rules in the organization. Optionally filter by folder name or ID.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.assets.listRules()
+     *     await rulebricksApi.assets.listRules({})
      */
-    listRules(requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ListRulesResponseItem[]>;
+    listRules(request?: RulebricksApi.ListRulesRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ListRulesResponseItem[]>;
     /**
      * List all flows in the organization.
      *
@@ -93,4 +95,36 @@ export declare class Assets {
      *     await rulebricksApi.assets.usage()
      */
     usage(requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.UsageResponse>;
+    /**
+     * Retrieve all rule folders for the authenticated user.
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.assets.listFolders()
+     */
+    listFolders(requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ListFoldersResponseItem[]>;
+    /**
+     * Create a new rule folder or update an existing one for the authenticated user.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.assets.upsertFolder({
+     *         name: "Marketing Rules",
+     *         description: "Rules for marketing automation workflows"
+     *     })
+     */
+    upsertFolder(request: RulebricksApi.UpsertFolderRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.UpsertFolderResponse>;
+    /**
+     * Delete a specific rule folder for the authenticated user. This does not delete the rules within the folder.
+     * @throws {@link RulebricksApi.BadRequestError}
+     * @throws {@link RulebricksApi.NotFoundError}
+     * @throws {@link RulebricksApi.InternalServerError}
+     *
+     * @example
+     *     await rulebricksApi.assets.deleteFolder({
+     *         id: "abc123"
+     *     })
+     */
+    deleteFolder(request: RulebricksApi.DeleteFolderRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.DeleteFolderResponse>;
 }
