@@ -46,6 +46,6 @@ exports.ListRulesResponseItem = core.serialization.object({
     folder: core.serialization
         .lazyObject(() => __awaiter(void 0, void 0, void 0, function* () { return (yield Promise.resolve().then(() => __importStar(require("../../..")))).ListRulesResponseItemFolder; }))
         .optional(),
-    requestSchema: core.serialization.property("request_schema", core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional()),
-    responseSchema: core.serialization.property("response_schema", core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional()),
+    requestSchema: core.serialization.property("request_schema", core.serialization.list(core.serialization.unknown()).optional()),
+    responseSchema: core.serialization.property("response_schema", core.serialization.list(core.serialization.unknown()).optional()),
 });

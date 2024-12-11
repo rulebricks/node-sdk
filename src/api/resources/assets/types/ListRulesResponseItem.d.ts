@@ -16,7 +16,7 @@ export interface ListRulesResponseItem {
     /** The folder containing this rule */
     folder?: RulebricksApi.ListRulesResponseItemFolder;
     /** The published request schema for the rule. */
-    requestSchema?: Record<string, unknown>;
+    requestSchema?: unknown[];
     /** The published response schema for the rule. */
-    responseSchema?: Record<string, unknown>;
+    responseSchema?: unknown[];
 }

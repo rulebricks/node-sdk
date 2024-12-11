@@ -13,7 +13,7 @@ export declare namespace ListRulesResponseItem {
         description?: string | null;
         slug?: string | null;
         folder?: serializers.ListRulesResponseItemFolder.Raw | null;
-        request_schema?: Record<string, unknown> | null;
-        response_schema?: Record<string, unknown> | null;
+        request_schema?: unknown[] | null;
+        response_schema?: unknown[] | null;
     }
 }
