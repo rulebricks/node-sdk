@@ -2,7 +2,7 @@
     "compilerOptions": {
         "extendedDiagnostics": true,
         "strict": true,
-        "target": "ES6",
+        "target": "ES2017",
         "module": "CommonJS",
         "moduleResolution": "node",
         "esModuleInterop": true,
@@ -11,7 +11,8 @@
         "allowJs": true,
         "outDir": "dist",
         "rootDir": "src",
-        "baseUrl": "src"
+        "baseUrl": "src",
+        "lib": ["ES2017"]
     },
     "include": ["src"],
     "exclude": []
