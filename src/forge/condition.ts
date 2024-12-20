@@ -1,6 +1,4 @@
-import type { Rule } from './rule.js';
-import { RuleCondition } from './types.js';
-import { OperatorResult } from './operators.js';
+import { Rule, RuleCondition, OperatorResult } from './types.js';
 
 export class Condition {
   private condition: RuleCondition;
@@ -9,7 +7,12 @@ export class Condition {
     this.condition = {
       request: {},
       response: {},
-      enabled: true
+      settings: {
+        enabled: true,
+        groupId: null,
+        priority: 0,
+        schedule: []
+      }
     };
   }
 
@@ -30,17 +33,23 @@ export class Condition {
   }
 
   setPriority(priority: number): Condition {
-    this.condition.priority = priority;
+    if (this.condition.settings) {
+      this.condition.settings.priority = priority;
+    }
     return this;
   }
 
   enable(): Condition {
-    this.condition.enabled = true;
+    if (this.condition.settings) {
+      this.condition.settings.enabled = true;
+    }
     return this;
   }
 
   disable(): Condition {
-    this.condition.enabled = false;
+    if (this.condition.settings) {
+      this.condition.settings.enabled = false;
+    }
     return this;
   }
 

@@ -1,4 +1,6 @@
-import { RulebricksClient } from '../client';
+import { RulebricksApi } from '@rulebricks/api';
+
+export type OperatorResult = [string, any[]];
 
 export enum DynamicValueType {
   STRING = 'STRING',
@@ -17,12 +19,26 @@ export enum RuleType {
   LIST = 'LIST'
 }
 
+export interface Rule {
+  id: string;
+  setName(name: string): Rule;
+  setDescription(description: string): Rule;
+  setFolder(folderName: string, createIfMissing?: boolean): Rule;
+  setFolderId(folderId: string): Rule;
+  setAlias(alias: string): Rule;
+  when(conditions: Record<string, OperatorResult>): any;
+  any(conditions: Record<string, OperatorResult>): any;
+}
+
 export interface RuleCondition {
   request: Record<string, { op: string; args: any[] }>;
   response: Record<string, { value: any }>;
-  settings?: Record<string, any>;
-  enabled?: boolean;
-  priority?: number;
+  settings: {
+    enabled: boolean;
+    groupId?: string | null;
+    priority: number;
+    schedule: any[];
+  };
   any?: boolean;
 }
 

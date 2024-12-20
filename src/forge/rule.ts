@@ -1,55 +1,9 @@
-import type { RulebricksClient } from '../client.js';
-import { RuleCondition, RuleType, Field, RuleTest, RuleSettings } from './types.js';
-import { BooleanField, NumberField, StringField, DateField, ListField, OperatorResult } from './operators.js';
+import { RulebricksApi } from '@rulebricks/api';
+import { RuleCondition, RuleType, Field, RuleTest, RuleSettings, Rule as RuleInterface, OperatorResult } from './types.js';
+import { BooleanField, NumberField, StringField, DateField, ListField } from './operators.js';
+import { Condition } from './condition.js';
 
-export class Condition {
-  private condition: RuleCondition;
-
-  constructor(private rule: Rule) {
-    this.condition = {
-      request: {},
-      response: {},
-      enabled: true
-    };
-  }
-
-  setRequest(conditions: Record<string, OperatorResult>): void {
-    this.condition.request = Object.entries(conditions).reduce((acc, [key, value]) => {
-      const [operator, args] = value;
-      acc[key] = { op: operator, args };
-      return acc;
-    }, {} as Record<string, { op: string; args: any[] }>);
-  }
-
-  then(responses: Record<string, any>): Rule {
-    this.condition.response = Object.entries(responses).reduce((acc, [key, value]) => {
-      acc[key] = { value };
-      return acc;
-    }, {} as Record<string, { value: any }>);
-    return this.rule;
-  }
-
-  setPriority(priority: number): Condition {
-    this.condition.priority = priority;
-    return this;
-  }
-
-  enable(): Condition {
-    this.condition.enabled = true;
-    return this;
-  }
-
-  disable(): Condition {
-    this.condition.enabled = false;
-    return this;
-  }
-
-  getCondition(): RuleCondition {
-    return this.condition;
-  }
-}
-
-export class Rule {
+export class Rule implements RuleInterface {
   private _id: string;
   private name: string = '';
   private description: string = '';
@@ -65,7 +19,7 @@ export class Rule {
     published: false
   };
   private accessGroups: string[] = [];
-  private workspace?: RulebricksClient;
+  private workspace?: RulebricksApi;
   private conditions: RuleCondition[] = [];
   private fields: Record<string, Field> = {};
   private responseFields: Record<string, Field> = {};
@@ -77,7 +31,7 @@ export class Rule {
   private updatedAt: string;
   private updatedBy: string = 'Rulebricks Forge SDK';
 
-  constructor(rulebricksClient?: RulebricksClient) {
+  constructor(rulebricksClient?: RulebricksApi) {
     this._id = this.generateUUID();
     this.workspace = rulebricksClient;
     this.createdAt = new Date().toISOString();
@@ -111,7 +65,7 @@ export class Rule {
     return RuleType.STRING; // Default fallback
   }
 
-  setWorkspace(client: RulebricksClient): Rule {
+  setWorkspace(client: RulebricksApi): Rule {
     this.workspace = client;
     return this;
   }
