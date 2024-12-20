@@ -186,26 +186,9 @@ class Assets {
      *
      * @example
      *     await rulebricksApi.assets.importRule({
-     *         id: "id",
-     *         createdAt: new Date("2024-01-15T09:30:00.000Z"),
-     *         slug: "slug",
-     *         updatedAt: new Date("2024-01-15T09:30:00.000Z"),
-     *         testRequest: {
+     *         rule: {
      *             "key": "value"
-     *         },
-     *         name: "name",
-     *         description: "description",
-     *         requestSchema: [],
-     *         responseSchema: [],
-     *         sampleRequest: {
-     *             "key": "value"
-     *         },
-     *         sampleResponse: {
-     *             "key": "value"
-     *         },
-     *         conditions: [],
-     *         published: true,
-     *         history: []
+     *         }
      *     })
      */
     importRule(request, requestOptions) {
@@ -223,7 +206,7 @@ class Assets {
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
             });
             if (_response.ok) {
-                return yield serializers.ImportRuleResponse.parseOrThrow(_response.body, {
+                return yield serializers.assets.importRule.Response.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -330,6 +313,7 @@ class Assets {
     }
     /**
      * List all flows in the organization.
+     * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
      *     await rulebricksApi.assets.listFlows()
@@ -348,13 +332,23 @@ class Assets {
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
             });
             if (_response.ok) {
-                return;
+                return yield serializers.assets.listFlows.Response.parseOrThrow(_response.body, {
+                    unrecognizedObjectKeys: "passthrough",
+                    allowUnrecognizedUnionMembers: true,
+                    allowUnrecognizedEnumValues: true,
+                    breadcrumbsPrefix: ["response"],
+                });
             }
             if (_response.error.reason === "status-code") {
-                throw new errors.RulebricksApiError({
-                    statusCode: _response.error.statusCode,
-                    body: _response.error.body,
-                });
+                switch (_response.error.statusCode) {
+                    case 500:
+                        throw new RulebricksApi.InternalServerError(_response.error.body);
+                    default:
+                        throw new errors.RulebricksApiError({
+                            statusCode: _response.error.statusCode,
+                            body: _response.error.body,
+                        });
+                }
             }
             switch (_response.error.reason) {
                 case "non-json":

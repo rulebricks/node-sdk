@@ -1,6 +1,13 @@
-# Rulebricks – Node SDK
+![Banner](banner.png)
 
-[![npm shield](https://img.shields.io/npm/v/@rulebricks/api)](https://www.npmjs.com/package/@rulebricks/api)
+<p>
+    <a href="https://www.npmjs.com/package/@rulebricks/api" alt="npm shield">
+        <img src="https://img.shields.io/npm/v/@rulebricks/api" /></a>
+    <a href="https://github.com/rulebricks/node-sdk" alt="License">
+        <img src="https://img.shields.io/github/license/rulebricks/node-sdk" /></a>
+</p>
+
+## Documentation
 
 The Rulebricks Node.js library provides convenient access to the Rulebricks API from JavaScript/TypeScript.
 

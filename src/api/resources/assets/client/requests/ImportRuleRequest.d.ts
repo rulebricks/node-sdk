@@ -4,41 +4,12 @@
 /**
  * @example
  *     {
- *         id: "id",
- *         createdAt: new Date("2024-01-15T09:30:00.000Z"),
- *         slug: "slug",
- *         updatedAt: new Date("2024-01-15T09:30:00.000Z"),
- *         testRequest: {
+ *         rule: {
  *             "key": "value"
- *         },
- *         name: "name",
- *         description: "description",
- *         requestSchema: [],
- *         responseSchema: [],
- *         sampleRequest: {
- *             "key": "value"
- *         },
- *         sampleResponse: {
- *             "key": "value"
- *         },
- *         conditions: [],
- *         published: true,
- *         history: []
+ *         }
  *     }
  */
 export interface ImportRuleRequest {
-    id: string;
-    createdAt: Date;
-    slug: string;
-    updatedAt: Date;
-    testRequest: Record<string, unknown>;
-    name: string;
-    description: string;
-    requestSchema: unknown[];
-    responseSchema: unknown[];
-    sampleRequest: Record<string, unknown>;
-    sampleResponse: Record<string, unknown>;
-    conditions: unknown[];
-    published: boolean;
-    history: unknown[];
+    /** The rule data to import. */
+    rule: Record<string, unknown>;
 }

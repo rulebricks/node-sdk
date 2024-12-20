@@ -49,29 +49,12 @@ export declare class Assets {
      *
      * @example
      *     await rulebricksApi.assets.importRule({
-     *         id: "id",
-     *         createdAt: new Date("2024-01-15T09:30:00.000Z"),
-     *         slug: "slug",
-     *         updatedAt: new Date("2024-01-15T09:30:00.000Z"),
-     *         testRequest: {
+     *         rule: {
      *             "key": "value"
-     *         },
-     *         name: "name",
-     *         description: "description",
-     *         requestSchema: [],
-     *         responseSchema: [],
-     *         sampleRequest: {
-     *             "key": "value"
-     *         },
-     *         sampleResponse: {
-     *             "key": "value"
-     *         },
-     *         conditions: [],
-     *         published: true,
-     *         history: []
+     *         }
      *     })
      */
-    importRule(request: RulebricksApi.ImportRuleRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ImportRuleResponse>;
+    importRule(request: RulebricksApi.ImportRuleRequest, requestOptions?: Assets.RequestOptions): Promise<Record<string, unknown>>;
     /**
      * List all rules in the organization. Optionally filter by folder name or ID.
      * @throws {@link RulebricksApi.BadRequestError}
@@ -83,11 +66,12 @@ export declare class Assets {
     listRules(request?: RulebricksApi.ListRulesRequest, requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ListRulesResponseItem[]>;
     /**
      * List all flows in the organization.
+     * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
      *     await rulebricksApi.assets.listFlows()
      */
-    listFlows(requestOptions?: Assets.RequestOptions): Promise<void>;
+    listFlows(requestOptions?: Assets.RequestOptions): Promise<RulebricksApi.ListFlowsResponseItem[]>;
     /**
      * Get the rule execution usage of your organization.
      *

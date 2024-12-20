@@ -26,8 +26,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ImportRuleRequest = void 0;
-const core = __importStar(require("../../../../../core"));
-exports.ImportRuleRequest = core.serialization.object({
-    rule: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
-});
+exports.Response = void 0;
+const core = __importStar(require("../../../../core"));
+exports.Response = core.serialization.record(core.serialization.string(), core.serialization.unknown());
