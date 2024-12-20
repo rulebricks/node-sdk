@@ -1,5 +1,4 @@
 import { Rule } from './forge/rule';
-import fetch from 'node-fetch';
 import type { Response } from 'node-fetch';
 
 export interface DynamicValueResponse {
@@ -33,10 +32,19 @@ export interface RulebricksClient {
 export class RulebricksSDK implements RulebricksClient {
   private apiKey: string;
   private baseUrl: string;
+  private fetchInstance: any;
 
-  constructor(apiKey: string, baseUrl: string = 'https://rulebricks.com/api/v1') {
-    this.apiKey = apiKey;
-    this.baseUrl = baseUrl;
+  constructor(options: { apiKey: string; baseUrl?: string }) {
+    this.apiKey = options.apiKey;
+    this.baseUrl = options.baseUrl || 'https://rulebricks.com';
+    this.fetchInstance = null;
+  }
+
+  private async initFetch() {
+    if (!this.fetchInstance) {
+      this.fetchInstance = (await import('node-fetch')).default;
+    }
+    return this.fetchInstance;
   }
 
   private async request<T>(
@@ -44,7 +52,9 @@ export class RulebricksSDK implements RulebricksClient {
     path: string,
     body?: Record<string, any>
   ): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
+    const fetch = await this.initFetch();
+    const url = new URL(path, this.baseUrl);
+    const response = await fetch(url.toString(), {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -72,28 +82,28 @@ export class RulebricksSDK implements RulebricksClient {
 
   assets = {
     importRule: async (rule: Record<string, any>): Promise<void> => {
-      await this.request('POST', '/assets/rules', rule);
+      await this.request('POST', '/api/v1/admin/rules/import', { rule });
     },
     exportRule: async (ruleId: string): Promise<Record<string, any>> => {
-      return this.request('GET', `/assets/rules/${ruleId}`);
+      return this.request('GET', `/api/v1/admin/rules/export`, { id: ruleId });
     },
     listFolders: async (): Promise<any[]> => {
-      return this.request('GET', '/assets/folders');
+      return this.request('GET', '/api/v1/admin/folders/list');
     },
     upsertFolder: async (folder: Record<string, any>): Promise<any> => {
-      return this.request('POST', '/assets/folders', folder);
+      return this.request('POST', '/api/v1/admin/folders/upsert', folder);
     },
     listRules: async (): Promise<any[]> => {
-      return this.request('GET', '/assets/rules');
+      return this.request('GET', '/api/v1/admin/rules/list');
     },
     deleteRule: async (params: { id: string }): Promise<void> => {
-      await this.request('DELETE', `/assets/rules/${params.id}`);
+      await this.request('DELETE', `/api/v1/admin/rules/delete`, { id: params.id });
     }
   };
 
   rules = {
     solve: async (params: { slug: string; request: Record<string, any> }): Promise<Record<string, any>> => {
-      return this.request('POST', `/rules/${params.slug}/solve`, params.request);
+      return this.request('POST', `/api/v1/rules/${params.slug}/solve`, params.request);
     }
   };
 
@@ -106,6 +116,6 @@ export class RulebricksSDK implements RulebricksClient {
 }
 
 export function configure(apiKey: string, baseUrl?: string): RulebricksClient {
-  const sdk = new RulebricksSDK(apiKey, baseUrl);
+  const sdk = new RulebricksSDK({ apiKey, baseUrl });
   return sdk;
 }

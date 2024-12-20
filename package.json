@@ -3,8 +3,15 @@
     "version": "0.1.5",
     "private": false,
     "repository": "https://github.com/rulebricks/node-sdk",
-    "main": "./index.js",
-    "types": "./index.d.ts",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
     "license": "MIT",
     "author": "Rulebricks",
     "description": "Rulebricks API – Node SDK",

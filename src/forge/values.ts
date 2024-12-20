@@ -1,5 +1,5 @@
-import { RulebricksClient, DynamicValueResponse } from '../client';
-import { DynamicValueType, DynamicValueNotFoundError } from './types';
+import { RulebricksClient, DynamicValueResponse } from '../client.js';
+import { DynamicValueType, DynamicValueNotFoundError } from './types.js';
 
 export class DynamicValue {
   private _rb_type = 'globalValue';

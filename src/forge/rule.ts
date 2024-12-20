@@ -1,6 +1,6 @@
-import type { RulebricksClient } from '../client';
-import { RuleCondition, RuleType, Field, RuleTest, RuleSettings } from './types';
-import { BooleanField, NumberField, StringField, DateField, ListField, OperatorResult } from './operators';
+import type { RulebricksClient } from '../client.js';
+import { RuleCondition, RuleType, Field, RuleTest, RuleSettings } from './types.js';
+import { BooleanField, NumberField, StringField, DateField, ListField, OperatorResult } from './operators.js';
 
 export class Condition {
   private condition: RuleCondition;
@@ -15,7 +15,8 @@ export class Condition {
 
   setRequest(conditions: Record<string, OperatorResult>): void {
     this.condition.request = Object.entries(conditions).reduce((acc, [key, value]) => {
-      acc[key] = { op: value.operator, args: value.args };
+      const [operator, args] = value;
+      acc[key] = { op: operator, args };
       return acc;
     }, {} as Record<string, { op: string; args: any[] }>);
   }
@@ -55,7 +56,7 @@ export class Rule {
   private folder: string = '';
   private folderId: string = '';
   private alias: string = '';
-  private slug: string = '';
+  public slug: string = '';
   private settings: RuleSettings = {
     testing: false,
     schemaValidation: false,

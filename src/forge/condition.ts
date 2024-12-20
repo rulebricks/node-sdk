@@ -1,6 +1,6 @@
-import type { Rule } from './rule';
-import { RuleCondition } from './types';
-import { OperatorResult } from './operators';
+import type { Rule } from './rule.js';
+import { RuleCondition } from './types.js';
+import { OperatorResult } from './operators.js';
 
 export class Condition {
   private condition: RuleCondition;
@@ -15,7 +15,8 @@ export class Condition {
 
   setRequest(conditions: Record<string, OperatorResult>): void {
     this.condition.request = Object.entries(conditions).reduce((acc, [key, value]) => {
-      acc[key] = { op: value.operator, args: value.args };
+      const [op, args] = value;
+      acc[key] = { op, args };
       return acc;
     }, {} as Record<string, { op: string; args: any[] }>);
   }

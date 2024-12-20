@@ -2,8 +2,8 @@
     "compilerOptions": {
         "extendedDiagnostics": true,
         "strict": true,
-        "target": "ES2017",
-        "module": "CommonJS",
+        "target": "ES2020",
+        "module": "ES2020",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "skipLibCheck": true,
@@ -12,8 +12,8 @@
         "outDir": "dist",
         "rootDir": "src",
         "baseUrl": "src",
-        "lib": ["ES2017"]
+        "lib": ["ES2020"]
     },
     "include": ["src"],
-    "exclude": []
+    "exclude": ["node_modules"]
 }
