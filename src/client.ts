@@ -2,7 +2,21 @@ import { Rule } from './forge/rule';
 import fetch from 'node-fetch';
 import type { Response } from 'node-fetch';
 
+export interface DynamicValueResponse {
+  id: string;
+  name: string;
+  type: {
+    value: string;
+  };
+}
+
+export interface ValuesClient {
+  listDynamicValues(): Promise<DynamicValueResponse[]>;
+  update(params: { request: Record<string, any> }): Promise<void>;
+}
+
 export interface RulebricksClient {
+  values: ValuesClient;
   assets: {
     importRule: (rule: Record<string, any>) => Promise<void>;
     exportRule: (ruleId: string) => Promise<Record<string, any>>;
@@ -43,8 +57,18 @@ export class RulebricksSDK implements RulebricksClient {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json() as T;
+    return data;
   }
+
+  values: ValuesClient = {
+    listDynamicValues: async (): Promise<DynamicValueResponse[]> => {
+      return this.request<DynamicValueResponse[]>('GET', '/values');
+    },
+    update: async (params: { request: Record<string, any> }): Promise<void> => {
+      await this.request<void>('POST', '/values', params.request);
+    }
+  };
 
   assets = {
     importRule: async (rule: Record<string, any>): Promise<void> => {
