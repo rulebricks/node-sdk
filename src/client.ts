@@ -17,7 +17,7 @@ export interface ValuesClient {
 export interface RulebricksClient {
   values: ValuesClient;
   assets: {
-    importRule: (rule: Record<string, any>) => Promise<void>;
+    importRule: (rule: { rule: Record<string, any> }) => Promise<void>;
     exportRule: (ruleId: string) => Promise<Record<string, any>>;
     listFolders: () => Promise<any[]>;
     upsertFolder: (folder: Record<string, any>) => Promise<any>;
@@ -36,7 +36,7 @@ export class RulebricksSDK implements RulebricksClient {
 
   constructor(options: { apiKey: string; baseUrl?: string }) {
     this.apiKey = options.apiKey;
-    this.baseUrl = options.baseUrl || 'https://rulebricks.com';
+    this.baseUrl = options.baseUrl || 'https://rulebricks.com/api/v1';
     this.fetchInstance = null;
   }
 
@@ -53,12 +53,15 @@ export class RulebricksSDK implements RulebricksClient {
     body?: Record<string, any>
   ): Promise<T> {
     const fetch = await this.initFetch();
-    const url = new URL(path, this.baseUrl);
-    const response = await fetch(url.toString(), {
+    // Remove /api/v1 prefix if it exists in the path since it's already in baseUrl
+    const normalizedPath = path.startsWith('/api/v1') ? path.substring(7) : path;
+    const url = `${this.baseUrl}${normalizedPath}`;
+    const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`
+        'x-api-key': this.apiKey,
+        'X-Fern-Language': 'TypeScript'
       },
       body: body ? JSON.stringify(body) : undefined
     });
@@ -81,23 +84,23 @@ export class RulebricksSDK implements RulebricksClient {
   };
 
   assets = {
-    importRule: async (rule: Record<string, any>): Promise<void> => {
-      await this.request('POST', '/api/v1/admin/rules/import', { rule });
+    importRule: async (params: { rule: Record<string, any> }): Promise<void> => {
+      await this.request('POST', '/admin/rules/import', params);
     },
     exportRule: async (ruleId: string): Promise<Record<string, any>> => {
-      return this.request('GET', `/api/v1/admin/rules/export`, { id: ruleId });
+      return this.request('GET', '/admin/rules/export', { id: ruleId });
     },
     listFolders: async (): Promise<any[]> => {
-      return this.request('GET', '/api/v1/admin/folders/list');
+      return this.request('GET', '/admin/folders/list');
     },
     upsertFolder: async (folder: Record<string, any>): Promise<any> => {
-      return this.request('POST', '/api/v1/admin/folders/upsert', folder);
+      return this.request('POST', '/admin/folders/upsert', folder);
     },
     listRules: async (): Promise<any[]> => {
-      return this.request('GET', '/api/v1/admin/rules/list');
+      return this.request('GET', '/admin/rules/list');
     },
     deleteRule: async (params: { id: string }): Promise<void> => {
-      await this.request('DELETE', `/api/v1/admin/rules/delete`, { id: params.id });
+      await this.request('DELETE', '/admin/rules/delete', { id: params.id });
     }
   };
 

@@ -303,12 +303,14 @@ export class Rule {
     return this.testSuite.find(t => t.name === name);
   }
 
-  async update(): Promise<Rule> {
+  async update(): Promise<void> {
     if (!this.workspace) {
-      throw new Error("A Rulebricks client is required to push a rule to the workspace");
+      throw new Error('Workspace not set. Call setWorkspace() before updating the rule.');
     }
-    await this.workspace.assets.importRule(this.toDict());
-    return this.fromWorkspace(this.id);
+
+    const ruleData = this.toDict();
+    console.log('Rule data being sent:', JSON.stringify(ruleData, null, 2));
+    await this.workspace.assets.importRule({ rule: ruleData });
   }
 
   async publish(): Promise<Rule> {
@@ -317,7 +319,7 @@ export class Rule {
     }
     const ruleDict = this.toDict();
     ruleDict._publish = true;
-    await this.workspace.assets.importRule(ruleDict);
+    await this.workspace.assets.importRule({ rule: ruleDict });
     return this.fromWorkspace(this.id);
   }
 
