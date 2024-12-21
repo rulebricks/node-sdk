@@ -13,27 +13,31 @@ The Rulebricks Node.js library provides convenient access to the Rulebricks API 
 
 ## Documentation
 
-API reference documentation is available [here](https://rulebricks.com/docs).
+Find detailed examples of using this SDK in our [examples repository](https://github.com/rulebricks/examples).
+General API reference documentation is available on our User Guide [here](https://rulebricks.com/docs).
 
 ## Installation
 
 ```
-npm install --save @rulebricks/api
+npm install --save @rulebricks/sdk
 # or
-yarn add @rulebricks/api
+yarn add @rulebricks/sdk
 ```
 
 ## Usage
 
 ```typescript
-import { RulebricksClient } from '@rulebricks/api';
+import { RulebricksApiClient } from "@rulebricks/sdk";
+import "dotenv/config";
 
-const rulebricks = new RulebricksClient({
-  apiKey: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
-  environment: 'https://rulebricks.com',
+// Initialize the Rulebricks client
+const rb = new RulebricksApiClient({
+  environment: process.env.RULEBRICKS_ENVIRONMENT || "https://rulebricks.com",
+  apiKey:
+    process.env.RULEBRICKS_API_KEY || "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
 });
 
-rulebricks.rules.solve('tJOCd8XXXX', {
+rb.rules.solve('tJOCd8XXXX', {
   customer_id: 'anc39as3',
   purchase_history: ['t-shirt', 'mug'],,
   account_age_days: 4,
