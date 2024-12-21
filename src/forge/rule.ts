@@ -1,56 +1,239 @@
 import { RulebricksApiClient } from "../Client.js";
-import { RuleType, Field, RuleTest, RuleSettings, OperatorResult } from "./types.js";
+import { RuleType, Field, RuleSettings, OperatorResult } from "./types.js";
 import { BooleanField, NumberField, StringField, DateField, ListField } from "./operators.js";
 
+export class RuleTest {
+    id: string;
+    name: string;
+    request: Record<string, any>;
+    response: Record<string, any>;
+    critical: boolean;
+    lastExecuted: string | null;
+    testState: string | null;
+    error: string | null;
+    success: boolean | null;
+
+    constructor() {
+        this.id = this.generateId();
+        this.name = "Untitled Test";
+        this.request = {};
+        this.response = {};
+        this.critical = false;
+        this.lastExecuted = null;
+        this.testState = null;
+        this.error = null;
+        this.success = null;
+    }
+
+    private generateId(): string {
+        return Array.from(
+            { length: 21 },
+            () => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 62)]
+        ).join("");
+    }
+
+    setName(name: string): RuleTest {
+        this.name = name;
+        return this;
+    }
+
+    expect(request: Record<string, any>, response: Record<string, any>): RuleTest {
+        this.request = request;
+        this.response = response;
+        return this;
+    }
+
+    isCritical(critical: boolean = true): RuleTest {
+        this.critical = critical;
+        return this;
+    }
+
+    toDict(): Record<string, any> {
+        return {
+            id: this.id,
+            name: this.name,
+            request: this.request,
+            response: this.response,
+            critical: this.critical,
+            lastExecuted: this.lastExecuted,
+            testState: this.testState,
+            error: this.error,
+            success: this.success,
+        };
+    }
+
+    static fromJSON(data: string | Record<string, any>): RuleTest {
+        const jsonData = typeof data === "string" ? JSON.parse(data) : data;
+
+        if (typeof jsonData !== "object") {
+            throw new Error("Input must be a dictionary or JSON object");
+        }
+
+        const test = new RuleTest();
+        test.id = jsonData.id || test.generateId();
+        test.name = jsonData.name || "Untitled Test";
+        test.request = jsonData.request || {};
+        test.response = jsonData.response || {};
+        test.critical = jsonData.critical || false;
+        test.lastExecuted = jsonData.lastExecuted || null;
+        test.testState = jsonData.testState || null;
+        test.error = jsonData.error || null;
+        test.success = jsonData.success || null;
+
+        return test;
+    }
+}
+
 export class Condition {
-    request: Record<string, { op: string; args: any[] }> = {};
-    response: Record<string, { value: any }> = {};
-    settings: {
+    private index: number | null;
+    private conditions: Record<string, [string, any[]]>;
+    public request: Record<string, { op: string; args: any[] }> = {};
+    public response: Record<string, { value: any }> = {};
+    public settings: {
         enabled: boolean;
         groupId?: string | null;
         priority: number;
         schedule: any[];
         or?: boolean;
-    } = {
-        enabled: true,
-        groupId: null,
-        priority: 0,
-        schedule: [],
-        or: false,
     };
 
-    constructor(private rule: Rule) {}
+    constructor(
+        private rule: Rule,
+        conditions: Record<string, [string, any[]]> = {},
+        index: number | null = null,
+        settings: Partial<Condition["settings"]> = {}
+    ) {
+        this.index = index;
+        this.conditions = conditions;
+        this.settings = {
+            enabled: true,
+            groupId: null,
+            priority: 0,
+            schedule: [],
+            or: false,
+            ...settings,
+        };
+    }
 
-    setRequest(conditions: Record<string, OperatorResult>): Condition {
-        this.request = Object.entries(conditions).reduce((acc, [key, value]) => {
-            const [op, args] = value;
-            acc[key] = { op, args };
-            return acc;
-        }, {} as Record<string, { op: string; args: any[] }>);
+    // Helper to process dynamic values
+    private processDynamicValues(arg: any): any {
+        if (arg && typeof arg === "object" && arg.$rb) {
+            return arg;
+        } else if (Array.isArray(arg)) {
+            return arg.map((item) => this.processDynamicValues(item));
+        } else if (arg && typeof arg === "object") {
+            return Object.entries(arg).reduce((acc, [key, value]) => {
+                acc[key] = this.processDynamicValues(value);
+                return acc;
+            }, {} as Record<string, any>);
+        }
+        return arg;
+    }
+
+    when(conditions: Record<string, [string, any[]]>): Condition {
+        for (const [fieldName, [operator, args]] of Object.entries(conditions)) {
+            if (!(fieldName in this.rule.fields)) {
+                throw new Error(`Field '${fieldName}' is not defined in request schema`);
+            }
+
+            if (this.index !== null) {
+                // Editing existing condition
+                this.rule.conditions[this.index].request[fieldName] = {
+                    op: operator,
+                    args: args.map((arg) => this.processDynamicValues(arg)),
+                };
+            } else {
+                // Creating new condition
+                this.conditions[fieldName] = [operator, args];
+            }
+        }
         return this;
     }
 
-    then(responses: Record<string, any>): Rule {
-        this.response = Object.entries(responses).reduce((acc, [key, value]) => {
-            acc[key] = { value };
-            return acc;
-        }, {} as Record<string, { value: any }>);
-        return this.rule;
+    then(responses: Record<string, any>): Rule | Condition {
+        for (const [fieldName, value] of Object.entries(responses)) {
+            if (!(fieldName in this.rule.responseFields)) {
+                throw new Error(`Field '${fieldName}' is not defined in response schema`);
+            }
+        }
+
+        if (this.index !== null) {
+            // Editing existing condition
+            for (const [fieldName, value] of Object.entries(responses)) {
+                this.rule.conditions[this.index].response[fieldName] = {
+                    value: this.processDynamicValues(value),
+                };
+            }
+            return this;
+        } else {
+            // Creating new condition
+            this.response = responses;
+            const condition = {
+                request: {},
+                response: {},
+                settings: this.settings,
+            };
+
+            // Process conditions
+            for (const [fieldName, [operator, args]] of Object.entries(this.conditions)) {
+                (condition.request as Record<string, any>)[fieldName] = {
+                    op: operator,
+                    args: args.map((arg) => this.processDynamicValues(arg)),
+                };
+            }
+
+            // Process responses
+            for (const [fieldName, value] of Object.entries(this.response)) {
+                (condition.response as Record<string, any>)[fieldName] = {
+                    value: this.processDynamicValues(value),
+                };
+            }
+
+            this.rule.conditions.push(condition as Condition);
+            return this.rule;
+        }
     }
 
     setPriority(priority: number): Condition {
         this.settings.priority = priority;
+        if (this.index !== null) {
+            this.rule.conditions[this.index].settings.priority = priority;
+        }
         return this;
     }
 
     enable(): Condition {
         this.settings.enabled = true;
+        if (this.index !== null) {
+            this.rule.conditions[this.index].settings.enabled = true;
+        }
         return this;
     }
 
     disable(): Condition {
         this.settings.enabled = false;
+        if (this.index !== null) {
+            this.rule.conditions[this.index].settings.enabled = false;
+        }
         return this;
+    }
+
+    delete(): void {
+        if (this.index !== null) {
+            this.rule.conditions.splice(this.index, 1);
+        }
+    }
+
+    toString(): string {
+        return this.index !== null ? `<Condition: Row ${this.index}>` : "<Condition: New>";
+    }
+
+    [Symbol.toStringTag](): string {
+        return this.toString();
+    }
+
+    [Symbol.for("nodejs.util.inspect.custom")]() {
+        return this.toString();
     }
 
     toJSON(): Record<string, any> {
@@ -78,8 +261,8 @@ export class Rule {
     private sampleResponse: Record<string, any> = {};
     public testRequest: Record<string, any> = {};
     private testSuite: RuleTest[] = [];
-    private fields: Record<string, Field> = {};
-    private responseFields: Record<string, Field> = {};
+    public fields: Record<string, Field> = {};
+    public responseFields: Record<string, Field> = {};
     public conditions: Condition[] = [];
     private groups: Record<string, any> = {};
     private publishedRequestSchema: any[] | null = null;
@@ -137,10 +320,25 @@ export class Rule {
         return this;
     }
 
-    setFolder(folderName: string, createIfMissing: boolean = false): Rule {
+    async setFolder(folderName: string, createIfMissing: boolean = false): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to set a folder by name");
         }
+        const folders = await this.workspace.assets.listFolders();
+        let folder = folders.find((f) => f.name === folderName);
+
+        if (!folder && createIfMissing) {
+            if (folders.some((f) => f.name === folderName)) {
+                throw new Error("Folder name conflicts with an existing folder");
+            }
+            folder = await this.workspace.assets.upsertFolder({ name: folderName });
+        }
+
+        if (!folder) {
+            throw new Error(`Folder '${folderName}' not found and createIfMissing is false`);
+        }
+
+        this.folderId = folder.id || null;
         return this;
     }
 
@@ -149,19 +347,29 @@ export class Rule {
         return this;
     }
 
-    setAlias(alias: string): Rule {
+    async setAlias(alias: string): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to set an alias");
         }
+
         if (alias.length < 3) {
             throw new Error("Alias must be at least 3 characters long");
         }
+
         if (alias.includes("/") || alias.includes("\\") || alias.includes(" ")) {
             throw new Error("Alias cannot contain slashes or spaces");
         }
-        if (!/^[a-zA-Z0-9\-_]+$/.test(alias)) {
+
+        const validChars = /^[a-zA-Z0-9\-_]+$/;
+        if (!validChars.test(alias)) {
             throw new Error("Alias cannot contain special characters");
         }
+
+        const rules = await this.workspace.assets.listRules();
+        if (rules.some((r) => r.slug === alias)) {
+            throw new Error("Alias conflicts with an existing rule");
+        }
+
         this.slug = alias;
         return this;
     }
@@ -216,13 +424,26 @@ export class Rule {
         return this;
     }
 
-    addAccessGroup(groupName: string, createIfMissing: boolean = false): Rule {
+    async addAccessGroup(groupName: string, createIfMissing: boolean = false): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to manage access groups");
         }
+
+        const existingGroups = await this.workspace.users.listGroups();
+        let group = existingGroups.find((g) => g.name === groupName);
+
+        if (!group && !createIfMissing) {
+            throw new Error(`User group '${groupName}' not found and createIfMissing is False`);
+        }
+
+        if (!group && createIfMissing) {
+            group = await this.workspace.users.createGroup({ name: groupName });
+        }
+
         if (!this.accessGroups.includes(groupName)) {
             this.accessGroups.push(groupName);
         }
+
         return this;
     }
 
@@ -264,18 +485,82 @@ export class Rule {
         return field;
     }
 
+    findConditions(conditions: Record<string, [string, any[]]>): Condition[] {
+        return this.conditions
+            .map((condition, index) => {
+                let matchesAll = Object.entries(conditions).every(([field, [operator, args]]) => {
+                    const request = condition.request[field];
+                    if (!request) return false;
+
+                    if (request.op !== operator) return false;
+
+                    // Handle dynamic values
+                    const requestArgs = request.args.map((arg) =>
+                        typeof arg === "object" && arg.$rb ? arg.name.toUpperCase() : String(arg)
+                    );
+
+                    const searchArgs = args.map((arg) =>
+                        typeof arg === "object" && arg.$rb ? arg.name.toUpperCase() : String(arg)
+                    );
+
+                    return JSON.stringify(requestArgs) === JSON.stringify(searchArgs);
+                });
+                if (matchesAll) {
+                    const convertedRequest: Record<string, [string, any[]]> = {};
+                    for (const [field, value] of Object.entries(condition.request)) {
+                        convertedRequest[field] = [value.op, value.args];
+                    }
+                    return new Condition(this, convertedRequest, index, condition.settings);
+                }
+                return null;
+            })
+            .filter((condition): condition is Condition => condition !== null);
+    }
+
+    // Helper method to get proper field instances
+    private getField(name: string, type: string): BooleanField | NumberField | StringField | DateField | ListField {
+        const field = this.fields[name];
+        if (!field) {
+            throw new Error(`Field '${name}' not found in request schema`);
+        }
+
+        const expectedType = this.getFieldType(
+            field as BooleanField | NumberField | StringField | DateField | ListField
+        );
+        if (expectedType !== type) {
+            throw new Error(`Field '${name}' is not a ${type.toLowerCase()} field`);
+        }
+
+        return field as BooleanField | NumberField | StringField | DateField | ListField;
+    }
+
+    getBooleanField(name: string): BooleanField {
+        return this.getField(name, RuleType.BOOLEAN) as BooleanField;
+    }
+
+    getNumberField(name: string): NumberField {
+        return this.getField(name, RuleType.NUMBER) as NumberField;
+    }
+
+    getStringField(name: string): StringField {
+        return this.getField(name, RuleType.STRING) as StringField;
+    }
+
+    getDateField(name: string): DateField {
+        return this.getField(name, RuleType.DATE) as DateField;
+    }
+
+    getListField(name: string): ListField {
+        return this.getField(name, RuleType.LIST) as ListField;
+    }
+
     when(conditions: Record<string, OperatorResult> = {}): Condition {
-        const condition = new Condition(this);
-        condition.setRequest(conditions);
-        this.conditions.push(condition);
+        const condition = new Condition(this, conditions);
         return condition;
     }
 
     any(conditions: Record<string, OperatorResult>): Condition {
-        const condition = new Condition(this);
-        condition.setRequest(conditions);
-        condition.settings.or = true;
-        this.conditions.push(condition);
+        const condition = new Condition(this, conditions, null, { or: true });
         return condition;
     }
 
@@ -287,20 +572,24 @@ export class Rule {
         return this.conditions.length;
     }
 
-    addTest(test: RuleTest): void {
+    addTest(test: RuleTest): Rule {
         const existingTest = this.findTestById(test.id);
         if (existingTest) {
-            Object.assign(existingTest, test);
+            Object.assign(existingTest, {
+                name: test.name,
+                request: test.request,
+                response: test.response,
+                critical: test.critical,
+            });
         } else {
             this.testSuite.push(test);
         }
+        return this;
     }
 
-    removeTest(testId: string): void {
-        const test = this.findTestById(testId);
-        if (test) {
-            this.testSuite = this.testSuite.filter((t) => t.id !== testId);
-        }
+    removeTest(testId: string): Rule {
+        this.testSuite = this.testSuite.filter((t) => t.id !== testId);
+        return this;
     }
 
     findTestById(testId: string): RuleTest | undefined {
@@ -311,32 +600,33 @@ export class Rule {
         return this.testSuite.find((t) => t.name === name);
     }
 
-    async update(): Promise<void> {
+    async update(): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("Workspace not set. Call setWorkspace() before updating the rule.");
         }
         const ruleData = this.toDict();
         await this.workspace.assets.importRule({ rule: ruleData });
+        return this;
     }
 
     async publish(): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to publish a rule");
         }
-        const ruleDict = this.toDict();
-        ruleDict._publish = true;
-        await this.workspace.assets.importRule({ rule: ruleDict });
-        return this.fromWorkspace(this.id);
+        const ruleData = this.toDict();
+        ruleData._publish = true;
+        await this.workspace.assets.importRule({ rule: ruleData });
+        return this;
     }
 
     async fromWorkspace(ruleId: string): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to load a rule from the workspace");
         }
-        const ruleData = await this.workspace.assets.exportRule({
-            id: ruleId,
-        });
-        return Rule.fromJSON(ruleData);
+        const ruleData = await this.workspace.assets.exportRule({ id: ruleId });
+        const rule = Rule.fromJSON(ruleData);
+        Object.assign(this, rule);
+        return this;
     }
 
     toDict(): Record<string, any> {
@@ -401,10 +691,7 @@ export class Rule {
             requestSchema: fields,
             responseSchema: responseFields,
             conditions: this.conditions,
-            testSuite: this.testSuite.map((test) => ({
-                ...test,
-                id: test.id || this.generateUUID(),
-            })),
+            testSuite: this.testSuite.map((test) => test.toDict()),
             published_requestSchema: this.publishedRequestSchema,
             published_responseSchema: this.publishedResponseSchema,
             published_conditions: this.publishedConditions,
@@ -495,14 +782,7 @@ export class Rule {
         });
 
         // Convert test suite
-        rule.testSuite = jsonData.testSuite.map((test: any) => ({
-            id: test.id || rule.generateUUID(),
-            name: test.name,
-            description: test.description,
-            request: test.request,
-            response: test.response,
-            critical: test.critical,
-        }));
+        rule.testSuite = (jsonData.testSuite || []).map((testData: any) => RuleTest.fromJSON(testData));
 
         return rule;
     }
@@ -530,7 +810,7 @@ export class Rule {
             // Add response
             const responseStr = Object.entries(condition.response)
                 .map(([key, value]) => `${key}: ${value.value}`)
-                .join("\n");
+                .join(", ");
             row.push(responseStr || "-");
 
             rows.push(row);

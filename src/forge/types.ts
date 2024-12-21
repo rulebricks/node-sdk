@@ -43,15 +43,6 @@ export interface OperatorDef {
     skipTypecheck?: boolean;
 }
 
-export interface RuleTest {
-    id: string;
-    name: string;
-    request: Record<string, any>;
-    response: Record<string, any>;
-    critical?: boolean;
-    description?: string;
-}
-
 export interface RuleSettings {
     testing?: boolean;
     schemaValidation?: boolean;

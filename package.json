@@ -1,5 +1,5 @@
 {
-    "name": "@rulebricks/api",
+    "name": "@rulebricks/sdk",
     "version": "1.0.0",
     "private": false,
     "repository": "https://github.com/rulebricks/node-sdk",
