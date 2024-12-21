@@ -1,8 +1,8 @@
 ![Banner](banner.png)
 
 <p>
-    <a href="https://www.npmjs.com/package/@rulebricks/api" alt="npm shield">
-        <img src="https://img.shields.io/npm/v/@rulebricks/api" /></a>
+    <a href="https://www.npmjs.com/package/@rulebricks/sdk" alt="npm shield">
+        <img src="https://img.shields.io/npm/v/@rulebricks/sdk" /></a>
     <a href="https://github.com/rulebricks/node-sdk" alt="License">
         <img src="https://img.shields.io/github/license/rulebricks/node-sdk" /></a>
 </p>
