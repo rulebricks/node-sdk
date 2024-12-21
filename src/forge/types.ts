@@ -1,47 +1,25 @@
 export type OperatorResult = [string, any[]];
 
 export enum DynamicValueType {
-    STRING = "STRING",
-    NUMBER = "NUMBER",
-    BOOLEAN = "BOOLEAN",
-    DATE = "DATE",
-    LIST = "LIST",
-    OBJECT = "OBJECT",
+    STRING = "string",
+    NUMBER = "number",
+    BOOLEAN = "boolean",
+    DATE = "date",
+    LIST = "list",
+    OBJECT = "object",
 }
 
 export enum RuleType {
-    BOOLEAN = "BOOLEAN",
-    NUMBER = "NUMBER",
-    STRING = "STRING",
-    DATE = "DATE",
-    LIST = "LIST",
-}
-
-export interface Rule {
-    id: string;
-    setName(name: string): Rule;
-    setDescription(description: string): Rule;
-    setFolder(folderName: string, createIfMissing?: boolean): Rule;
-    setFolderId(folderId: string): Rule;
-    setAlias(alias: string): Rule;
-    when(conditions: Record<string, OperatorResult>): any;
-    any(conditions: Record<string, OperatorResult>): any;
-}
-
-export interface RuleCondition {
-    request: Record<string, { op: string; args: any[] }>;
-    response: Record<string, { value: any }>;
-    settings: {
-        enabled: boolean;
-        groupId?: string | null;
-        priority: number;
-        schedule: any[];
-    };
-    any?: boolean;
+    BOOLEAN = "boolean",
+    NUMBER = "number",
+    STRING = "string",
+    DATE = "date",
+    LIST = "list",
 }
 
 export interface Field {
     name: string;
+    key?: string;
     description: string;
     defaultValue: any;
     operators: Record<string, OperatorDef>;
@@ -68,18 +46,19 @@ export interface OperatorDef {
 export interface RuleTest {
     id: string;
     name: string;
-    description?: string;
     request: Record<string, any>;
-    expectedResponse: Record<string, any>;
-    enabled?: boolean;
+    response: Record<string, any>;
+    critical?: boolean;
+    description?: string;
 }
 
 export interface RuleSettings {
     testing?: boolean;
     schemaValidation?: boolean;
-    requireAllProperties?: boolean;
-    schemaLocked?: boolean;
-    or?: boolean;
+    allProperties?: boolean;
+    lockSchema?: boolean;
+    approver?: string;
+    requiresApproval?: boolean;
 }
 
 export class TypeMismatchError extends Error {

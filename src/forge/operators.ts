@@ -95,7 +95,7 @@ export class BooleanField implements Field {
         };
     }
 
-    equals(value: boolean | DynamicValue): [string, any[]] {
+    equals(value: boolean | DynamicValue): OperatorResult {
         const opName = value ? "is true" : "is false";
         return [opName, []];
     }
@@ -206,31 +206,31 @@ export class NumberField implements Field {
         };
     }
 
-    equals(value: number | DynamicValue): [string, any[]] {
+    equals(value: number | DynamicValue): OperatorResult {
         return ["equals", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    not_equals(value: number | DynamicValue): [string, any[]] {
+    not_equals(value: number | DynamicValue): OperatorResult {
         return ["does not equal", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    greater_than(value: number | DynamicValue): [string, any[]] {
+    greater_than(value: number | DynamicValue): OperatorResult {
         return ["greater than", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    less_than(value: number | DynamicValue): [string, any[]] {
+    less_than(value: number | DynamicValue): OperatorResult {
         return ["less than", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    greater_than_or_equal(value: number | DynamicValue): [string, any[]] {
+    greater_than_or_equal(value: number | DynamicValue): OperatorResult {
         return ["greater than or equal to", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    less_than_or_equal(value: number | DynamicValue): [string, any[]] {
+    less_than_or_equal(value: number | DynamicValue): OperatorResult {
         return ["less than or equal to", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    between(start: number | DynamicValue, end: number | DynamicValue): [string, any[]] {
+    between(start: number | DynamicValue, end: number | DynamicValue): OperatorResult {
         const startArg = new Argument(start, DynamicValueType.NUMBER);
         const endArg = new Argument(end, DynamicValueType.NUMBER);
         if (!(start instanceof DynamicValue) && !(end instanceof DynamicValue)) {
@@ -242,11 +242,11 @@ export class NumberField implements Field {
         return ["between", [startArg.toDict(), endArg.toDict()]];
     }
 
-    not_between(start: number | DynamicValue, end: number | DynamicValue): [string, any[]] {
+    not_between(start: number | DynamicValue, end: number | DynamicValue): OperatorResult {
         const startArg = new Argument(start, DynamicValueType.NUMBER);
         const endArg = new Argument(end, DynamicValueType.NUMBER);
         if (!(start instanceof DynamicValue) && !(end instanceof DynamicValue)) {
-            const op = this.operators["not between"];
+            const op = this.operators["not_between"];
             if (op.validate && !op.validate([start, end])) {
                 throw new Error(`Invalid range for not between: start (${start}) must be less than end (${end})`);
             }
@@ -254,47 +254,250 @@ export class NumberField implements Field {
         return ["not between", [startArg.toDict(), endArg.toDict()]];
     }
 
-    is_even(): [string, any[]] {
+    is_even(): OperatorResult {
         return ["is even", []];
     }
 
-    is_odd(): [string, any[]] {
+    is_odd(): OperatorResult {
         return ["is odd", []];
     }
 
-    is_positive(): [string, any[]] {
+    is_positive(): OperatorResult {
         return ["is positive", []];
     }
 
-    is_negative(): [string, any[]] {
+    is_negative(): OperatorResult {
         return ["is negative", []];
     }
 
-    is_zero(): [string, any[]] {
+    is_zero(): OperatorResult {
         return ["is zero", []];
     }
 
-    is_not_zero(): [string, any[]] {
+    is_not_zero(): OperatorResult {
         return ["is not zero", []];
     }
 
-    is_multiple_of(value: number | DynamicValue): [string, any[]] {
+    is_multiple_of(value: number | DynamicValue): OperatorResult {
         return ["is a multiple of", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    is_not_multiple_of(value: number | DynamicValue): [string, any[]] {
+    is_not_multiple_of(value: number | DynamicValue): OperatorResult {
         return ["is not a multiple of", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
     }
 
-    is_power_of(base: number | DynamicValue): [string, any[]] {
-        const baseArg = new Argument(base, DynamicValueType.NUMBER);
+    is_power_of(base: number | DynamicValue): OperatorResult {
         if (!(base instanceof DynamicValue)) {
-            const op = this.operators["is a power of"];
+            const op = this.operators["is_power_of"];
             if (op.validate && !op.validate([base])) {
                 throw new Error(`Invalid base for is power of: ${base}. Base must be positive.`);
             }
         }
-        return ["is a power of", [baseArg.toDict()]];
+        return ["is a power of", [new Argument(base, DynamicValueType.NUMBER).toDict()]];
+    }
+}
+
+export class DateField implements Field {
+    public readonly type = RuleType.DATE;
+    public readonly operators: Record<string, OperatorDef>;
+    public readonly defaultValue: Date;
+    public readonly name: string;
+    public readonly description: string;
+
+    constructor(name: string, description: string = "", defaultValue: Date | null = null) {
+        this.name = name;
+        this.description = description;
+        this.defaultValue = defaultValue || new Date();
+        this.operators = {
+            any: { name: "any", args: [], description: "Match any date value", skipTypecheck: true },
+            is_past: { name: "is in the past", args: [], description: "Date is in the past" },
+            is_future: { name: "is in the future", args: [], description: "Date is in the future" },
+            days_ago: {
+                name: "days ago",
+                args: [{ name: "days", type: "number", description: "Number of days ago that the date is equal to" }],
+            },
+            less_than_days_ago: {
+                name: "is less than N days ago",
+                args: [
+                    {
+                        name: "days",
+                        type: "number",
+                        description: "Number of days ago that the date is less than or equal to",
+                    },
+                ],
+            },
+            more_than_days_ago: {
+                name: "is more than N days ago",
+                args: [
+                    {
+                        name: "days",
+                        type: "number",
+                        description: "Number of days ago that the date is more than or equal to",
+                    },
+                ],
+            },
+            days_from_now: {
+                name: "days from now",
+                args: [
+                    { name: "days", type: "number", description: "Number of days from now that the date is equal to" },
+                ],
+            },
+            less_than_days_from_now: {
+                name: "is less than N days from now",
+                args: [
+                    {
+                        name: "days",
+                        type: "number",
+                        description: "Number of days from now that the date is less than or equal to",
+                    },
+                ],
+            },
+            more_than_days_from_now: {
+                name: "is more than N days from now",
+                args: [
+                    {
+                        name: "days",
+                        type: "number",
+                        description: "Number of days from now that the date is more than or equal to",
+                    },
+                ],
+            },
+            is_today: { name: "is today", args: [], description: "Date is today" },
+            is_this_week: { name: "is this week", args: [], description: "Date is in the current week" },
+            is_this_month: { name: "is this month", args: [], description: "Date is in the current month" },
+            is_this_year: { name: "is this year", args: [], description: "Date is in the current year" },
+            is_next_week: { name: "is next week", args: [], description: "Date is in the next week" },
+            is_next_month: { name: "is next month", args: [], description: "Date is in the next month" },
+            is_next_year: { name: "is next year", args: [], description: "Date is in the next year" },
+            is_last_week: { name: "is last week", args: [], description: "Date is in the previous week" },
+            is_last_month: { name: "is last month", args: [], description: "Date is in the previous month" },
+            is_last_year: { name: "is last year", args: [], description: "Date is in the previous year" },
+            after: {
+                name: "after",
+                args: [{ name: "date", type: "date", description: "Date that value must be after" }],
+            },
+            on_or_after: {
+                name: "on or after",
+                args: [{ name: "date", type: "date", description: "Date that value must be on or after" }],
+            },
+            before: {
+                name: "before",
+                args: [{ name: "date", type: "date", description: "Date that value must be before" }],
+            },
+            on_or_before: {
+                name: "on or before",
+                args: [{ name: "date", type: "date", description: "Date that value must be on or before" }],
+            },
+            between: {
+                name: "between",
+                args: [
+                    { name: "start", type: "date", description: "Date that value must be after", placeholder: "From" },
+                    { name: "end", type: "date", description: "Date that value must be before", placeholder: "To" },
+                ],
+            },
+            not_between: {
+                name: "not between",
+                args: [
+                    { name: "start", type: "date", description: "Date that value must be before", placeholder: "From" },
+                    { name: "end", type: "date", description: "Date that value must be after", placeholder: "To" },
+                ],
+            },
+        };
+    }
+
+    is_past(): OperatorResult {
+        return ["is in the past", []];
+    }
+
+    is_future(): OperatorResult {
+        return ["is in the future", []];
+    }
+
+    days_ago(days: number | DynamicValue): OperatorResult {
+        return ["days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    less_than_days_ago(days: number | DynamicValue): OperatorResult {
+        return ["is less than N days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    more_than_days_ago(days: number | DynamicValue): OperatorResult {
+        return ["is more than N days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    days_from_now(days: number | DynamicValue): OperatorResult {
+        return ["days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    less_than_days_from_now(days: number | DynamicValue): OperatorResult {
+        return ["is less than N days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    more_than_days_from_now(days: number | DynamicValue): OperatorResult {
+        return ["is more than N days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_today(): OperatorResult {
+        return ["is today", []];
+    }
+
+    is_this_week(): OperatorResult {
+        return ["is this week", []];
+    }
+
+    is_this_month(): OperatorResult {
+        return ["is this month", []];
+    }
+
+    is_this_year(): OperatorResult {
+        return ["is this year", []];
+    }
+
+    is_next_week(): OperatorResult {
+        return ["is next week", []];
+    }
+
+    is_next_month(): OperatorResult {
+        return ["is next month", []];
+    }
+
+    is_next_year(): OperatorResult {
+        return ["is next year", []];
+    }
+
+    is_last_week(): OperatorResult {
+        return ["is last week", []];
+    }
+
+    is_last_month(): OperatorResult {
+        return ["is last month", []];
+    }
+
+    is_last_year(): OperatorResult {
+        return ["is last year", []];
+    }
+
+    after(date: Date | string | DynamicValue): OperatorResult {
+        return ["after", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    }
+
+    on_or_after(date: Date | string | DynamicValue): OperatorResult {
+        return ["on or after", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    }
+
+    before(date: Date | string | DynamicValue): OperatorResult {
+        return ["before", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    }
+
+    on_or_before(date: Date | string | DynamicValue): OperatorResult {
+        return ["on or before", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    }
+
+    between(start: Date | string | DynamicValue, end: Date | string | DynamicValue): OperatorResult {
+        return [
+            "between",
+            [new Argument(start, DynamicValueType.DATE).toDict(), new Argument(end, DynamicValueType.DATE).toDict()],
+        ];
     }
 }
 
@@ -419,7 +622,11 @@ export class StringField implements Field {
                 args: [],
                 description: "Check if string is not a valid email address",
             },
-            is_valid_url: { name: "is a valid URL", args: [], description: "Check if string is a valid URL" },
+            is_valid_url: {
+                name: "is a valid URL",
+                args: [],
+                description: "Check if string is a valid URL",
+            },
             is_not_valid_url: {
                 name: "is not a valid URL",
                 args: [],
@@ -435,8 +642,16 @@ export class StringField implements Field {
                 args: [],
                 description: "Check if string is not a valid IP address",
             },
-            is_uppercase: { name: "is uppercase", args: [], description: "Check if string is all uppercase" },
-            is_lowercase: { name: "is lowercase", args: [], description: "Check if string is all lowercase" },
+            is_uppercase: {
+                name: "is uppercase",
+                args: [],
+                description: "Check if string is all uppercase",
+            },
+            is_lowercase: {
+                name: "is lowercase",
+                args: [],
+                description: "Check if string is all lowercase",
+            },
             is_numeric: {
                 name: "is numeric",
                 args: [],
@@ -457,316 +672,155 @@ export class StringField implements Field {
                 args: [],
                 description: "Check if string contains only digits and letters",
             },
-            starts_with_case_insensitive: {
-                name: "starts with (case-insensitive)",
-                args: [
-                    {
-                        name: "prefix",
-                        type: "string",
-                        description: "The string that the value should start with (case-insensitive)",
-                    },
-                ],
-            },
-            ends_with_case_insensitive: {
-                name: "ends with (case-insensitive)",
-                args: [
-                    {
-                        name: "suffix",
-                        type: "string",
-                        description: "The string that the value should end with (case-insensitive)",
-                    },
-                ],
-            },
-            contains_case_insensitive: {
-                name: "contains (case-insensitive)",
-                args: [
-                    {
-                        name: "substring",
-                        type: "string",
-                        description: "The string that should be contained within the value (case-insensitive)",
-                    },
-                ],
-            },
-            is_work_email: {
-                name: "is a work email address",
-                args: [],
-                description: "Check if string is a work email address",
-            },
-            is_personal_email: {
-                name: "is a personal email address",
-                args: [],
-                description: "Check if string is a personal email address",
-            },
-            is_valid_ipv6: {
-                name: "is a valid IPV6 address",
-                args: [],
-                description: "Check if string is a valid IPv6 address",
-            },
-            is_not_valid_ipv6: {
-                name: "is not a valid IPV6 address",
-                args: [],
-                description: "Check if string is not a valid IPv6 address",
-            },
-            is_valid_phone: {
-                name: "is a valid phone number",
-                args: [],
-                description: "Check if string is a valid phone number",
-            },
-            is_valid_zip: { name: "is a valid zip code", args: [], description: "Check if string is a valid zip code" },
-            contains_profanity: {
-                name: "contains profanity",
-                args: [],
-                description: "Check if string contains profanity",
-            },
-            does_not_contain_profanity: {
-                name: "does not contain profanity",
-                args: [],
-                description: "Check if string does not contain profanity",
-            },
         };
     }
 
-    contains(value: string | DynamicValue): [string, any[]] {
-        return ["contains", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    contains(value: string | DynamicValue): OperatorResult {
+        const arg = new Argument(value, DynamicValueType.STRING);
+        if (!(value instanceof DynamicValue)) {
+            const op = this.operators["contains"];
+            if (op.args[0].validate && !op.args[0].validate(value)) {
+                throw new Error(`Invalid value for contains: ${value}`);
+            }
+        }
+        return ["contains", [arg.toDict()]];
     }
 
-    not_contains(value: string | DynamicValue): [string, any[]] {
-        return ["does not contain", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    not_contains(value: string | DynamicValue): OperatorResult {
+        const arg = new Argument(value, DynamicValueType.STRING);
+        if (!(value instanceof DynamicValue)) {
+            const op = this.operators["does_not_contain"];
+            if (op.args[0].validate && !op.args[0].validate(value)) {
+                throw new Error(`Invalid value for does not contain: ${value}`);
+            }
+        }
+        return ["does not contain", [arg.toDict()]];
     }
 
-    equals(value: string | DynamicValue): [string, any[]] {
+    equals(value: string | DynamicValue): OperatorResult {
         return ["equals", [new Argument(value, DynamicValueType.STRING).toDict()]];
     }
 
-    not_equals(value: string | DynamicValue): [string, any[]] {
+    not_equals(value: string | DynamicValue): OperatorResult {
         return ["does not equal", [new Argument(value, DynamicValueType.STRING).toDict()]];
     }
 
-    is_empty(): [string, any[]] {
+    is_empty(): OperatorResult {
         return ["is empty", []];
     }
 
-    is_not_empty(): [string, any[]] {
+    is_not_empty(): OperatorResult {
         return ["is not empty", []];
     }
 
-    starts_with(value: string | DynamicValue): [string, any[]] {
-        return ["starts with", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    starts_with(value: string | DynamicValue): OperatorResult {
+        const arg = new Argument(value, DynamicValueType.STRING);
+        if (!(value instanceof DynamicValue)) {
+            const op = this.operators["starts_with"];
+            if (op.args[0].validate && !op.args[0].validate(value)) {
+                throw new Error(`Invalid value for starts with: ${value}`);
+            }
+        }
+        return ["starts with", [arg.toDict()]];
     }
 
-    ends_with(value: string | DynamicValue): [string, any[]] {
-        return ["ends with", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    ends_with(value: string | DynamicValue): OperatorResult {
+        const arg = new Argument(value, DynamicValueType.STRING);
+        if (!(value instanceof DynamicValue)) {
+            const op = this.operators["ends_with"];
+            if (op.args[0].validate && !op.args[0].validate(value)) {
+                throw new Error(`Invalid value for ends with: ${value}`);
+            }
+        }
+        return ["ends with", [arg.toDict()]];
     }
 
-    is_included_in(values: string[] | DynamicValue): [string, any[]] {
+    is_included_in(values: string[] | DynamicValue): OperatorResult {
         if (values instanceof DynamicValue) {
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
             return ["is included in", [new Argument(values, DynamicValueType.LIST).toDict()]];
         }
-        const args = values.map((value) => new Argument(value, DynamicValueType.STRING).toDict());
-        return ["is included in", args];
+
+        const op = this.operators["is_included_in"];
+        if (op.args[0].validate && !op.args[0].validate(values)) {
+            throw new Error("List must not be empty");
+        }
+
+        return ["is included in", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
     }
 
-    matches_regex(pattern: string | DynamicValue): [string, any[]] {
-        return ["matches regex", [new Argument(pattern, DynamicValueType.STRING).toDict()]];
+    matches_regex(pattern: string | DynamicValue): OperatorResult {
+        const arg = new Argument(pattern, DynamicValueType.STRING);
+        if (!(pattern instanceof DynamicValue)) {
+            const op = this.operators["matches_regex"];
+            if (op.args[0].validate && !op.args[0].validate(pattern)) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
+        }
+        return ["matches RegEx", [arg.toDict()]];
     }
 
-    not_matches_regex(pattern: string | DynamicValue): [string, any[]] {
-        return ["does not match regex", [new Argument(pattern, DynamicValueType.STRING).toDict()]];
+    not_matches_regex(pattern: string | DynamicValue): OperatorResult {
+        const arg = new Argument(pattern, DynamicValueType.STRING);
+        if (!(pattern instanceof DynamicValue)) {
+            const op = this.operators["does_not_match_regex"];
+            if (op.args[0].validate && !op.args[0].validate(pattern)) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
+        }
+        return ["does not match RegEx", [arg.toDict()]];
     }
 
-    is_email(): [string, any[]] {
-        return ["is email", []];
+    is_email(): OperatorResult {
+        return ["is a valid email address", []];
     }
 
-    is_not_email(): [string, any[]] {
-        return ["is not email", []];
+    is_not_email(): OperatorResult {
+        return ["is not a valid email address", []];
     }
 
-    is_url(): [string, any[]] {
-        return ["is url", []];
+    is_url(): OperatorResult {
+        return ["is a valid URL", []];
     }
 
-    is_not_url(): [string, any[]] {
-        return ["is not url", []];
+    is_not_url(): OperatorResult {
+        return ["is not a valid URL", []];
     }
 
-    is_ip(): [string, any[]] {
-        return ["is ip", []];
+    is_ip(): OperatorResult {
+        return ["is a valid IP address", []];
     }
 
-    is_not_ip(): [string, any[]] {
-        return ["is not ip", []];
+    is_not_ip(): OperatorResult {
+        return ["is not a valid IP address", []];
     }
 
-    is_uppercase(): [string, any[]] {
+    is_uppercase(): OperatorResult {
         return ["is uppercase", []];
     }
 
-    is_lowercase(): [string, any[]] {
+    is_lowercase(): OperatorResult {
         return ["is lowercase", []];
     }
 
-    is_numeric(): [string, any[]] {
+    is_numeric(): OperatorResult {
         return ["is numeric", []];
     }
 
-    contains_only_digits(): [string, any[]] {
+    contains_only_digits(): OperatorResult {
         return ["contains only digits", []];
     }
 
-    contains_only_letters(): [string, any[]] {
+    contains_only_letters(): OperatorResult {
         return ["contains only letters", []];
     }
 
-    contains_only_digits_and_letters(): [string, any[]] {
+    contains_only_digits_and_letters(): OperatorResult {
         return ["contains only digits and letters", []];
-    }
-
-    starts_with_case_insensitive(prefix: string | DynamicValue): [string, any[]] {
-        return ["starts with case insensitive", [new Argument(prefix, DynamicValueType.STRING).toDict()]];
-    }
-
-    ends_with_case_insensitive(suffix: string | DynamicValue): [string, any[]] {
-        return ["ends with case insensitive", [new Argument(suffix, DynamicValueType.STRING).toDict()]];
-    }
-
-    contains_case_insensitive(substring: string | DynamicValue): [string, any[]] {
-        return ["contains case insensitive", [new Argument(substring, DynamicValueType.STRING).toDict()]];
-    }
-
-    is_work_email(): [string, any[]] {
-        return ["is work email", []];
-    }
-
-    is_personal_email(): [string, any[]] {
-        return ["is personal email", []];
-    }
-
-    is_valid_ipv6(): [string, any[]] {
-        return ["is valid ipv6", []];
-    }
-
-    is_not_valid_ipv6(): [string, any[]] {
-        return ["is not valid ipv6", []];
-    }
-
-    is_valid_phone(): [string, any[]] {
-        return ["is valid phone", []];
-    }
-
-    is_valid_zip(): [string, any[]] {
-        return ["is valid zip", []];
-    }
-
-    contains_profanity(): [string, any[]] {
-        return ["contains profanity", []];
-    }
-
-    does_not_contain_profanity(): [string, any[]] {
-        return ["does not contain profanity", []];
-    }
-}
-
-export class DateField implements Field {
-    public readonly type = RuleType.DATE;
-    public readonly operators: Record<string, OperatorDef>;
-    public readonly name: string;
-    public readonly description: string;
-    public readonly defaultValue: Date;
-
-    constructor(name: string, description: string = "", defaultValue?: Date) {
-        this.name = name;
-        this.description = description;
-        this.defaultValue = defaultValue || new Date();
-        this.operators = {
-            equals: {
-                name: "equals",
-                args: [{ name: "value", type: "date", description: "Value to compare with" }],
-                description: "Check if the field equals the given value",
-            },
-            before: {
-                name: "before",
-                args: [{ name: "value", type: "date", description: "Value to compare with" }],
-                description: "Check if the field is before the given value",
-            },
-            after: {
-                name: "after",
-                args: [{ name: "value", type: "date", description: "Value to compare with" }],
-                description: "Check if the field is after the given value",
-            },
-            is_past: { name: "is in the past", args: [] },
-            is_future: { name: "is in the future", args: [] },
-            is_today: { name: "is today", args: [] },
-            is_this_week: { name: "is this week", args: [] },
-            is_this_month: { name: "is this month", args: [] },
-            is_this_year: { name: "is this year", args: [] },
-            is_next_week: { name: "is next week", args: [] },
-            is_next_month: { name: "is next month", args: [] },
-            is_next_year: { name: "is next year", args: [] },
-            is_last_week: { name: "is last week", args: [] },
-            is_last_month: { name: "is last month", args: [] },
-            is_last_year: { name: "is last year", args: [] },
-        };
-    }
-
-    equals(value: Date | DynamicValue): [string, any[]] {
-        return ["equals", [new Argument(value, DynamicValueType.DATE).toDict()]];
-    }
-
-    before(value: Date | DynamicValue): [string, any[]] {
-        return ["before", [new Argument(value, DynamicValueType.DATE).toDict()]];
-    }
-
-    after(value: Date | DynamicValue): [string, any[]] {
-        return ["after", [new Argument(value, DynamicValueType.DATE).toDict()]];
-    }
-
-    is_past(): [string, any[]] {
-        return ["is in the past", []];
-    }
-
-    is_future(): [string, any[]] {
-        return ["is in the future", []];
-    }
-
-    is_today(): [string, any[]] {
-        return ["is today", []];
-    }
-
-    is_this_week(): [string, any[]] {
-        return ["is this week", []];
-    }
-
-    is_this_month(): [string, any[]] {
-        return ["is this month", []];
-    }
-
-    is_this_year(): [string, any[]] {
-        return ["is this year", []];
-    }
-
-    is_next_week(): [string, any[]] {
-        return ["is next week", []];
-    }
-
-    is_next_month(): [string, any[]] {
-        return ["is next month", []];
-    }
-
-    is_next_year(): [string, any[]] {
-        return ["is next year", []];
-    }
-
-    is_last_week(): [string, any[]] {
-        return ["is last week", []];
-    }
-
-    is_last_month(): [string, any[]] {
-        return ["is last month", []];
-    }
-
-    is_last_year(): [string, any[]] {
-        return ["is last year", []];
     }
 }
 
@@ -782,46 +836,231 @@ export class ListField implements Field {
         this.description = description;
         this.defaultValue = defaultValue;
         this.operators = {
+            any: { name: "any", args: [], description: "Match any list value", skipTypecheck: true },
             contains: {
                 name: "contains",
-                args: [{ name: "value", type: "any", description: "Value to check for" }],
-                description: "Check if the list contains the given value",
+                args: [{ name: "value", type: "generic", description: "Value that must be contained in the list" }],
             },
-            is_empty: {
-                name: "is empty",
+            is_empty: { name: "is empty", args: [], description: "Check if list is empty" },
+            is_not_empty: { name: "is not empty", args: [], description: "Check if list is not empty" },
+            is_of_length: {
+                name: "is of length",
+                args: [{ name: "length", type: "number", description: "Length that the list must be" }],
+            },
+            is_not_of_length: {
+                name: "is not of length",
+                args: [{ name: "length", type: "number", description: "Length that the list must not be" }],
+            },
+            is_longer_than: {
+                name: "is longer than",
+                args: [{ name: "length", type: "number", description: "Length that the list must be longer than" }],
+            },
+            is_shorter_than: {
+                name: "is shorter than",
+                args: [{ name: "length", type: "number", description: "Length that the list must be shorter than" }],
+            },
+            contains_all_of: {
+                name: "contains all of",
+                args: [
+                    { name: "values", type: "list", description: "List of values that must be contained in the list" },
+                ],
+            },
+            contains_any_of: {
+                name: "contains any of",
+                args: [
+                    { name: "values", type: "list", description: "List of values that might be contained in the list" },
+                ],
+            },
+            contains_none_of: {
+                name: "contains none of",
+                args: [
+                    {
+                        name: "values",
+                        type: "list",
+                        description: "List of values that must not be contained in the list",
+                    },
+                ],
+            },
+            does_not_contain: {
+                name: "does not contain",
+                args: [{ name: "value", type: "generic", description: "Value that must not be contained in the list" }],
+            },
+            is_equal_to: {
+                name: "is equal to",
+                args: [{ name: "list", type: "list", description: "Value that the list must be equal to" }],
+            },
+            is_not_equal_to: {
+                name: "is not equal to",
+                args: [{ name: "list", type: "list", description: "Value that the list must not be equal to" }],
+            },
+            contains_duplicates: {
+                name: "contains duplicates",
                 args: [],
-                description: "Check if list is empty",
+                description: "Check if list contains duplicate values",
             },
-            length_equals: {
-                name: "length equals",
-                args: [{ name: "length", type: "number", description: "Length to compare with" }],
-                description: "Check if list length equals the given value",
+            does_not_contain_duplicates: {
+                name: "does not contain duplicates",
+                args: [],
+                description: "Check if list does not contain duplicate values",
             },
-            contains_all: {
-                name: "contains all",
-                args: [{ name: "values", type: "list", description: "List of values that must be contained" }],
-                description: "Check if list contains all specified values",
+            contains_object_with_key_value: {
+                name: "contains object with key & value",
+                args: [
+                    { name: "key", type: "string", description: "Key of any object contained in the list" },
+                    { name: "value", type: "generic", description: "Value that the key must be equal to" },
+                ],
+            },
+            has_unique_elements: {
+                name: "has unique elements",
+                args: [],
+                description: "Check if all elements in the list are unique",
+            },
+            is_sublist_of: {
+                name: "is a sublist of",
+                args: [{ name: "superlist", type: "list", description: "List that should contain this list" }],
+            },
+            is_superlist_of: {
+                name: "is a superlist of",
+                args: [{ name: "sublist", type: "list", description: "List that should be contained in this list" }],
             },
         };
     }
 
-    contains(value: any | DynamicValue): [string, any[]] {
-        return ["contains", [new Argument(value, DynamicValueType.LIST).toDict()]];
+    contains(value: any | DynamicValue): OperatorResult {
+        return ["contains", [new Argument(value, DynamicValueType.OBJECT).toDict()]];
     }
 
-    is_empty(): [string, any[]] {
+    is_empty(): OperatorResult {
         return ["is empty", []];
     }
 
-    length_equals(length: number | DynamicValue): [string, any[]] {
-        return ["length equals", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    is_not_empty(): OperatorResult {
+        return ["is not empty", []];
     }
 
-    contains_all(values: any[] | DynamicValue): [string, any[]] {
+    length_equals(length: number | DynamicValue): OperatorResult {
+        return ["is of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    length_not_equals(length: number | DynamicValue): OperatorResult {
+        return ["is not of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    longer_than(length: number | DynamicValue): OperatorResult {
+        return ["is longer than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    shorter_than(length: number | DynamicValue): OperatorResult {
+        return ["is shorter than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    contains_all(values: any[] | DynamicValue): OperatorResult {
         if (values instanceof DynamicValue) {
-            return ["contains all", [values.toDict()]];
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
+            return ["contains all of", [new Argument(values, DynamicValueType.LIST).toDict()]];
         }
-        const args = values.map((v) => new Argument(v, DynamicValueType.LIST).toDict());
-        return ["contains all", args];
+        return ["contains all of", [values.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    contains_any(values: any[] | DynamicValue): OperatorResult {
+        if (values instanceof DynamicValue) {
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
+            return ["contains any of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+        }
+        return ["contains any of", [values.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    contains_none(values: any[] | DynamicValue): OperatorResult {
+        if (values instanceof DynamicValue) {
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
+            return ["contains none of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+        }
+        return ["contains none of", [values.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    not_contains(value: any | DynamicValue): OperatorResult {
+        return ["does not contain", [new Argument(value, DynamicValueType.OBJECT).toDict()]];
+    }
+
+    equals(other: any[] | DynamicValue): OperatorResult {
+        if (other instanceof DynamicValue) {
+            if (other.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${other.name}' has type ${other.valueType}, but list was expected`
+                );
+            }
+            return ["is equal to", [new Argument(other, DynamicValueType.LIST).toDict()]];
+        }
+        return ["is equal to", [other.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    not_equals(other: any[] | DynamicValue): OperatorResult {
+        if (other instanceof DynamicValue) {
+            if (other.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${other.name}' has type ${other.valueType}, but list was expected`
+                );
+            }
+            return ["is not equal to", [new Argument(other, DynamicValueType.LIST).toDict()]];
+        }
+        return ["is not equal to", [other.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    has_duplicates(): OperatorResult {
+        return ["contains duplicates", []];
+    }
+
+    no_duplicates(): OperatorResult {
+        return ["does not contain duplicates", []];
+    }
+
+    contains_object_with_key_value(key: string | DynamicValue, value: any | DynamicValue): OperatorResult {
+        return [
+            "contains object with key & value",
+            [
+                new Argument(key, DynamicValueType.STRING).toDict(),
+                new Argument(value, DynamicValueType.OBJECT).toDict(),
+            ],
+        ];
+    }
+
+    has_unique_elements(): OperatorResult {
+        return ["has unique elements", []];
+    }
+
+    is_sublist_of(superlist: any[] | DynamicValue): OperatorResult {
+        if (superlist instanceof DynamicValue) {
+            if (superlist.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${superlist.name}' has type ${superlist.valueType}, but list was expected`
+                );
+            }
+            return ["is a sublist of", [new Argument(superlist, DynamicValueType.LIST).toDict()]];
+        }
+        return ["is a sublist of", [superlist.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    is_superlist_of(sublist: any[] | DynamicValue): OperatorResult {
+        if (sublist instanceof DynamicValue) {
+            if (sublist.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${sublist.name}' has type ${sublist.valueType}, but list was expected`
+                );
+            }
+            return ["is a superlist of", [new Argument(sublist, DynamicValueType.LIST).toDict()]];
+        }
+        return ["is a superlist of", [sublist.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
     }
 }

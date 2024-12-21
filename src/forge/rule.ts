@@ -1,52 +1,103 @@
 import { RulebricksApiClient } from "../Client.js";
-import {
-    RuleCondition,
-    RuleType,
-    Field,
-    RuleTest,
-    RuleSettings,
-    Rule as RuleInterface,
-    OperatorResult,
-} from "./types.js";
+import { RuleType, Field, RuleTest, RuleSettings, OperatorResult } from "./types.js";
 import { BooleanField, NumberField, StringField, DateField, ListField } from "./operators.js";
-import { Condition } from "./condition.js";
 
-export class Rule implements RuleInterface {
-    private _id: string;
-    private name: string = "";
-    private description: string = "";
-    private folderId: string = "";
-    public slug: string = "";
-    private settings: RuleSettings = {
-        testing: false,
-        schemaValidation: false,
-        requireAllProperties: false,
-        schemaLocked: false,
+export class Condition {
+    request: Record<string, { op: string; args: any[] }> = {};
+    response: Record<string, { value: any }> = {};
+    settings: {
+        enabled: boolean;
+        groupId?: string | null;
+        priority: number;
+        schedule: any[];
+        or?: boolean;
+    } = {
+        enabled: true,
+        groupId: null,
+        priority: 0,
+        schedule: [],
+        or: false,
     };
-    private accessGroups: string[] = [];
+
+    constructor(private rule: Rule) {}
+
+    setRequest(conditions: Record<string, OperatorResult>): Condition {
+        this.request = Object.entries(conditions).reduce((acc, [key, value]) => {
+            const [op, args] = value;
+            acc[key] = { op, args };
+            return acc;
+        }, {} as Record<string, { op: string; args: any[] }>);
+        return this;
+    }
+
+    then(responses: Record<string, any>): Rule {
+        this.response = Object.entries(responses).reduce((acc, [key, value]) => {
+            acc[key] = { value };
+            return acc;
+        }, {} as Record<string, { value: any }>);
+        return this.rule;
+    }
+
+    setPriority(priority: number): Condition {
+        this.settings.priority = priority;
+        return this;
+    }
+
+    enable(): Condition {
+        this.settings.enabled = true;
+        return this;
+    }
+
+    disable(): Condition {
+        this.settings.enabled = false;
+        return this;
+    }
+
+    toJSON(): Record<string, any> {
+        return {
+            request: this.request,
+            response: this.response,
+            settings: this.settings,
+        };
+    }
+}
+
+export class Rule {
+    public id: string = this.generateUUID();
+    public name: string = "Untitled Rule";
+    public description: string = "";
+    public folderId: string | null = null;
+    public slug: string = this.generateSlug();
+    public createdAt: string = new Date().toISOString();
+    public updatedAt: string = this.createdAt;
+    public updatedBy: string = "Rulebricks Forge SDK";
+    public published: boolean = false;
+
     private workspace?: RulebricksApiClient;
-    private conditions: RuleCondition[] = [];
+    private sampleRequest: Record<string, any> = {};
+    private sampleResponse: Record<string, any> = {};
+    public testRequest: Record<string, any> = {};
+    private testSuite: RuleTest[] = [];
     private fields: Record<string, Field> = {};
     private responseFields: Record<string, Field> = {};
-    private testSuite: RuleTest[] = [];
-    private publishedRequestSchema: any[] = [];
-    private publishedResponseSchema: any[] = [];
-    private publishedGroups: Record<string, any> = {};
-    private createdAt: string;
-    private updatedAt: string;
-    private updatedBy: string = "Rulebricks Forge SDK";
+    public conditions: Condition[] = [];
+    private groups: Record<string, any> = {};
+    private publishedRequestSchema: any[] | null = null;
+    private publishedResponseSchema: any[] | null = null;
+    private publishedConditions: any[] | null = null;
+    private publishedGroups: Record<string, any> | null = {};
 
-    constructor(rulebricksClient?: RulebricksApiClient) {
-        this._id = this.generateUUID();
-        this.workspace = rulebricksClient;
-        this.createdAt = new Date().toISOString();
-        this.updatedAt = this.createdAt;
-        this.slug = this.generateSlug();
-    }
+    private history: any[] = [];
+    private form: any | null = null;
+    public accessGroups: string[] = [];
+    public settings: RuleSettings = {
+        testing: false,
+        schemaValidation: false,
+        allProperties: false,
+        lockSchema: false,
+    };
 
-    get id(): string {
-        return this._id;
-    }
+    constructor() {}
 
     private generateUUID(): string {
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -93,7 +144,7 @@ export class Rule implements RuleInterface {
         return this;
     }
 
-    setFolderId(folderId: string): Rule {
+    setFolderById(folderId: string): Rule {
         this.folderId = folderId;
         return this;
     }
@@ -156,12 +207,12 @@ export class Rule implements RuleInterface {
     }
 
     requireAllProperties(enabled: boolean = true): Rule {
-        this.settings.requireAllProperties = enabled;
+        this.settings.allProperties = enabled;
         return this;
     }
 
     lockSchema(enabled: boolean = true): Rule {
-        this.settings.schemaLocked = enabled;
+        this.settings.lockSchema = enabled;
         return this;
     }
 
@@ -216,20 +267,19 @@ export class Rule implements RuleInterface {
     when(conditions: Record<string, OperatorResult> = {}): Condition {
         const condition = new Condition(this);
         condition.setRequest(conditions);
-        this.conditions.push(condition.getCondition());
+        this.conditions.push(condition);
         return condition;
     }
 
     any(conditions: Record<string, OperatorResult>): Condition {
         const condition = new Condition(this);
         condition.setRequest(conditions);
-        const ruleCondition = condition.getCondition();
-        ruleCondition.any = true;
-        this.conditions.push(ruleCondition);
+        condition.settings.or = true;
+        this.conditions.push(condition);
         return condition;
     }
 
-    getConditions(): RuleCondition[] {
+    getConditions(): Condition[] {
         return this.conditions;
     }
 
@@ -237,14 +287,13 @@ export class Rule implements RuleInterface {
         return this.conditions.length;
     }
 
-    addTest(test: RuleTest): Rule {
+    addTest(test: RuleTest): void {
         const existingTest = this.findTestById(test.id);
         if (existingTest) {
             Object.assign(existingTest, test);
         } else {
             this.testSuite.push(test);
         }
-        return this;
     }
 
     removeTest(testId: string): void {
@@ -266,9 +315,7 @@ export class Rule implements RuleInterface {
         if (!this.workspace) {
             throw new Error("Workspace not set. Call setWorkspace() before updating the rule.");
         }
-
         const ruleData = this.toDict();
-        console.log("Rule data being sent:", JSON.stringify(ruleData, null, 2));
         await this.workspace.assets.importRule({ rule: ruleData });
     }
 
@@ -293,8 +340,38 @@ export class Rule implements RuleInterface {
     }
 
     toDict(): Record<string, any> {
+        let sampleRequest = this.sampleRequest || {};
+        let sampleResponse = this.sampleResponse || {};
+
+        for (const [name, field] of Object.entries(this.fields)) {
+            const parts = name.split(".");
+            let current = sampleRequest;
+            for (const part of parts.slice(0, -1)) {
+                current = current[part] = current[part] || {};
+            }
+            current[parts[parts.length - 1]] = field.defaultValue;
+        }
+        for (const [name, field] of Object.entries(this.responseFields)) {
+            const parts = name.split(".");
+            let current = sampleResponse;
+            for (const part of parts.slice(0, -1)) {
+                current = current[part] = current[part] || {};
+            }
+            current[parts[parts.length - 1]] = field.defaultValue;
+        }
+
+        const caseAndSpace = (str: string) => {
+            let titleCase = str.replace(
+                /\w\S*/g,
+                (text: string) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+            );
+            // Replace underscores and any special characters with spaces
+            return titleCase.replace(/_/g, " ").replace(/[^a-zA-Z0-9 ]/g, "");
+        };
+
         const fields = Object.entries(this.fields).map(([name, field]) => ({
-            name,
+            name: caseAndSpace(name),
+            key: field.key || name,
             type: field.type,
             description: field.description,
             defaultValue: field.defaultValue,
@@ -302,7 +379,8 @@ export class Rule implements RuleInterface {
         }));
 
         const responseFields = Object.entries(this.responseFields).map(([name, field]) => ({
-            name,
+            name: caseAndSpace(name),
+            key: field.key || name,
             type: field.type,
             description: field.description,
             defaultValue: field.defaultValue,
@@ -327,9 +405,18 @@ export class Rule implements RuleInterface {
                 ...test,
                 id: test.id || this.generateUUID(),
             })),
-            publishedRequestSchema: this.publishedRequestSchema,
-            publishedResponseSchema: this.publishedResponseSchema,
-            publishedGroups: this.publishedGroups,
+            published_requestSchema: this.publishedRequestSchema,
+            published_responseSchema: this.publishedResponseSchema,
+            published_conditions: this.publishedConditions,
+            published_groups: this.publishedGroups,
+            form: this.form,
+            history: this.history,
+            published: this.published,
+            sampleRequest: sampleRequest,
+            sampleResponse: sampleResponse,
+            testRequest: this.testRequest,
+            groups: this.groups,
+            no_conditions: this.conditions.length,
         };
     }
 
@@ -350,7 +437,7 @@ export class Rule implements RuleInterface {
         const jsonData = typeof data === "string" ? JSON.parse(data) : data;
         const rule = new Rule();
 
-        rule._id = jsonData.id;
+        rule.id = jsonData.id;
         rule.name = jsonData.name;
         rule.description = jsonData.description;
         rule.folderId = jsonData.tag;
@@ -361,14 +448,31 @@ export class Rule implements RuleInterface {
         rule.settings = jsonData.settings;
         rule.accessGroups = jsonData.accessGroups;
         rule.conditions = jsonData.conditions;
-        rule.publishedRequestSchema = jsonData.publishedRequestSchema;
-        rule.publishedResponseSchema = jsonData.publishedResponseSchema;
-        rule.publishedGroups = jsonData.publishedGroups;
+        rule.publishedRequestSchema = jsonData.publishedRequestSchema || null;
+        rule.publishedResponseSchema = jsonData.publishedResponseSchema || null;
+        rule.publishedConditions = jsonData.publishedConditions || null;
+        rule.publishedGroups = jsonData.publishedGroups || {};
+        rule.form = jsonData.form || null;
+        rule.history = jsonData.history || [];
+        rule.published = jsonData.published;
+        rule.testRequest = jsonData.testRequest || {};
+        rule.groups = jsonData.groups || {};
+
+        const caseAndSpace = (str: string) => {
+            let titleCase = str.replace(
+                /\w\S*/g,
+                (text: string) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+            );
+            // Replace underscores and any special characters with spaces
+            return titleCase.replace(/_/g, " ").replace(/[^a-zA-Z0-9 ]/g, "");
+        };
 
         // Convert request schema to fields
         jsonData.requestSchema.forEach((fieldData: any) => {
             const field = {
-                name: fieldData.name,
+                key: fieldData.key,
+                // start case and replace underscores and any special characters with spaces
+                name: fieldData.name || caseAndSpace(fieldData.key),
                 type: fieldData.type,
                 description: fieldData.description,
                 defaultValue: fieldData.defaultValue,
@@ -380,7 +484,8 @@ export class Rule implements RuleInterface {
         // Convert response schema to fields
         jsonData.responseSchema.forEach((fieldData: any) => {
             const field = {
-                name: fieldData.name,
+                key: fieldData.key,
+                name: fieldData.name || caseAndSpace(fieldData.key),
                 type: fieldData.type,
                 description: fieldData.description,
                 defaultValue: fieldData.defaultValue,
@@ -395,8 +500,8 @@ export class Rule implements RuleInterface {
             name: test.name,
             description: test.description,
             request: test.request,
-            expectedResponse: test.expectedResponse,
-            enabled: test.enabled !== false,
+            response: test.response,
+            critical: test.critical,
         }));
 
         return rule;
