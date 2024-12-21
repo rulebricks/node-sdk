@@ -9,10 +9,6 @@
 
 ## Documentation
 
-The Rulebricks Node.js library provides convenient access to the Rulebricks API from JavaScript/TypeScript.
-
-## Documentation
-
 Find detailed examples of using this SDK in our [examples repository](https://github.com/rulebricks/examples).
 General API reference documentation is available on our User Guide [here](https://rulebricks.com/docs).
 
