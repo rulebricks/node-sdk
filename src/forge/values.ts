@@ -1,6 +1,6 @@
 import { RulebricksApiClient } from "../Client.js";
 import { ListDynamicValuesResponseItem } from "../api/resources/values/types/ListDynamicValuesResponseItem.js";
-import { UpdateRequestValue } from "../api/resources/values/types/UpdateRequestValue.js";
+import type { UpdateRequestValue } from "../api/resources/values/types/UpdateRequestValue.js";
 import { DynamicValueType, DynamicValueNotFoundError } from "./types.js";
 
 export class DynamicValue {
