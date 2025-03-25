@@ -5,8 +5,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RulebricksApiTimeoutError = void 0;
 class RulebricksApiTimeoutError extends Error {
-    constructor() {
-        super("Timeout");
+    constructor(message) {
+        super(message);
         Object.setPrototypeOf(this, RulebricksApiTimeoutError.prototype);
     }
 }

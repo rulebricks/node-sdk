@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateGroupRequest = exports.InviteRequest = void 0;
-var InviteRequest_1 = require("./InviteRequest");
-Object.defineProperty(exports, "InviteRequest", { enumerable: true, get: function () { return InviteRequest_1.InviteRequest; } });
-var CreateGroupRequest_1 = require("./CreateGroupRequest");
-Object.defineProperty(exports, "CreateGroupRequest", { enumerable: true, get: function () { return CreateGroupRequest_1.CreateGroupRequest; } });
+exports.CreateUserGroupRequest = exports.UserInviteRequest = void 0;
+var UserInviteRequest_1 = require("./UserInviteRequest");
+Object.defineProperty(exports, "UserInviteRequest", { enumerable: true, get: function () { return UserInviteRequest_1.UserInviteRequest; } });
+var CreateUserGroupRequest_1 = require("./CreateUserGroupRequest");
+Object.defineProperty(exports, "CreateUserGroupRequest", { enumerable: true, get: function () { return CreateUserGroupRequest_1.CreateUserGroupRequest; } });

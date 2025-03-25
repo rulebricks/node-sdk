@@ -18,13 +18,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,10 +50,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Flows = void 0;
 const core = __importStar(require("../../../../core"));
-const RulebricksApi = __importStar(require("../../.."));
-const serializers = __importStar(require("../../../../serialization"));
+const RulebricksApi = __importStar(require("../../../index"));
+const serializers = __importStar(require("../../../../serialization/index"));
 const url_join_1 = __importDefault(require("url-join"));
-const errors = __importStar(require("../../../../errors"));
+const errors = __importStar(require("../../../../errors/index"));
 /**
  * Operations for executing flows, which are sequences of rules and external actions
  */
@@ -53,32 +63,37 @@ class Flows {
     }
     /**
      * Execute a flow by its slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {RulebricksApi.DynamicRequestPayload} request
+     * @param {Flows.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.flows.execute("slug", {
+     *     await client.flows.executeFlow("slug", {
      *         "name": "John Doe",
      *         "age": 30,
      *         "email": "jdoe@acme.co"
      *     })
      */
-    execute(slug, request, requestOptions) {
+    executeFlow(slug, request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/flows/${slug}`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/flows/${encodeURIComponent(slug)}`),
                 method: "POST",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
-                body: yield serializers.flows.execute.Request.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                requestType: "json",
+                body: serializers.DynamicRequestPayload.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.flows.execute.Response.parseOrThrow(_response.body, {
+                return serializers.DynamicResponsePayload.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -105,12 +120,18 @@ class Flows {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling POST /api/v1/flows/{slug}.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
                     });
             }
+        });
+    }
+    _getCustomAuthorizationHeaders() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const apiKeyValue = yield core.Supplier.get(this._options.apiKey);
+            return { "x-api-key": apiKeyValue };
         });
     }
 }

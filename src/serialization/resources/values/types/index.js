@@ -14,12 +14,4 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./ListDynamicValuesResponseItemType"), exports);
-__exportStar(require("./ListDynamicValuesResponseItemValue"), exports);
-__exportStar(require("./ListDynamicValuesResponseItemUsagesItem"), exports);
-__exportStar(require("./ListDynamicValuesResponseItem"), exports);
-__exportStar(require("./UpdateRequestValue"), exports);
-__exportStar(require("./UpdateResponseItemType"), exports);
-__exportStar(require("./UpdateResponseItemValue"), exports);
-__exportStar(require("./UpdateResponseItem"), exports);
-__exportStar(require("./DeleteDynamicValueResponse"), exports);
+__exportStar(require("./UpdateValuesRequestValuesValue"), exports);

@@ -3,9 +3,11 @@
  */
 /**
  * @example
- *     {}
+ *     {
+ *         id: "id"
+ *     }
  */
 export interface DeleteRuleRequest {
     /** The ID of the rule to delete. */
-    id?: string;
+    id: string;
 }

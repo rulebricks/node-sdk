@@ -1,1 +1,1 @@
-export { QueryRequest } from "./QueryRequest";
+export { type QueryDecisionsRequest } from "./QueryDecisionsRequest";

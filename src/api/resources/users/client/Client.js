@@ -18,13 +18,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,10 +50,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Users = void 0;
 const core = __importStar(require("../../../../core"));
-const RulebricksApi = __importStar(require("../../.."));
-const serializers = __importStar(require("../../../../serialization"));
+const RulebricksApi = __importStar(require("../../../index"));
+const serializers = __importStar(require("../../../../serialization/index"));
 const url_join_1 = __importDefault(require("url-join"));
-const errors = __importStar(require("../../../../errors"));
+const errors = __importStar(require("../../../../errors/index"));
 /**
  * Operations for managing users on your team and their permissions
  */
@@ -52,54 +62,44 @@ class Users {
         this._options = _options;
     }
     /**
-     * Invite a new user to the organization or update groupspermissions for an existing user.
+     * Invite a new user to the organization or update role or access group data for an existing user.
+     *
+     * @param {RulebricksApi.UserInviteRequest} request
+     * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.users.invite({
+     *     await client.users.inviteUser({
      *         email: "newuser@example.com",
-     *         role: RulebricksApi.InviteRequestRole.Developer,
+     *         role: "developer",
      *         accessGroups: ["group1", "group2"]
      *     })
      *
      * @example
-     *     await rulebricksApi.users.invite({
+     *     await client.users.inviteUser({
      *         email: "existinguser@example.com",
-     *         role: RulebricksApi.InviteRequestRole.Editor,
+     *         role: "custom-role",
      *         accessGroups: ["group1"]
      *     })
-     *
-     * @example
-     *     await rulebricksApi.users.invite({
-     *         email: "newuser@example.com",
-     *         role: RulebricksApi.InviteRequestRole.Developer,
-     *         accessGroups: ["group1", "group2"]
-     *     })
-     *
-     * @example
-     *     await rulebricksApi.users.invite({
-     *         email: "newuser@example.com",
-     *         role: RulebricksApi.InviteRequestRole.Developer,
-     *         accessGroups: ["group1", "group2"]
-     *     })
      */
-    invite(request, requestOptions) {
+    inviteUser(request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/users/invite"),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), "api/v1/admin/users/invite"),
                 method: "POST",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
-                body: yield serializers.InviteRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                requestType: "json",
+                body: serializers.UserInviteRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.InviteResponse.parseOrThrow(_response.body, {
+                return serializers.UserInviteResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -126,7 +126,7 @@ class Users {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling POST /api/v1/admin/users/invite.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -136,26 +136,29 @@ class Users {
     }
     /**
      * List all user groups available in your Rulebricks organization.
+     *
+     * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.users.listGroups()
+     *     await client.users.listGroups()
      */
     listGroups(requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/users/groups"),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), "api/v1/admin/users/groups"),
                 method: "GET",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.users.listGroups.Response.parseOrThrow(_response.body, {
+                return serializers.UserGroupListResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -180,7 +183,7 @@ class Users {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling GET /api/v1/admin/users/groups.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -190,31 +193,35 @@ class Users {
     }
     /**
      * Create a new user group in your Rulebricks organization.
+     *
+     * @param {RulebricksApi.CreateUserGroupRequest} request
+     * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.users.createGroup({
+     *     await client.users.createGroup({
      *         name: "NewGroup",
      *         description: "Description of the new group."
      *     })
      */
     createGroup(request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/admin/users/groups"),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), "api/v1/admin/users/groups"),
                 method: "POST",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
-                body: yield serializers.CreateGroupRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                requestType: "json",
+                body: serializers.CreateUserGroupRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.CreateGroupResponse.parseOrThrow(_response.body, {
+                return serializers.UserGroup.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -241,12 +248,18 @@ class Users {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling POST /api/v1/admin/users/groups.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
                     });
             }
+        });
+    }
+    _getCustomAuthorizationHeaders() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const apiKeyValue = yield core.Supplier.get(this._options.apiKey);
+            return { "x-api-key": apiKeyValue };
         });
     }
 }

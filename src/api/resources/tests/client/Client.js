@@ -18,13 +18,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,10 +50,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Tests = void 0;
 const core = __importStar(require("../../../../core"));
-const RulebricksApi = __importStar(require("../../.."));
+const RulebricksApi = __importStar(require("../../../index"));
 const url_join_1 = __importDefault(require("url-join"));
-const serializers = __importStar(require("../../../../serialization"));
-const errors = __importStar(require("../../../../errors"));
+const serializers = __importStar(require("../../../../serialization/index"));
+const errors = __importStar(require("../../../../errors/index"));
 /**
  * Administrative operations for programmatically managing test suites for rules and flows
  */
@@ -53,27 +63,31 @@ class Tests {
     }
     /**
      * Retrieves a list of tests associated with the rule identified by the slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {Tests.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.listRuleTests("slug")
+     *     await client.tests.listRuleTests("slug")
      */
     listRuleTests(slug, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/rules/${slug}/tests`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/admin/rules/${encodeURIComponent(slug)}/tests`),
                 method: "GET",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.tests.listRuleTests.Response.parseOrThrow(_response.body, {
+                return serializers.TestListResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -100,7 +114,7 @@ class Tests {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling GET /api/v1/admin/rules/{slug}/tests.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -110,12 +124,17 @@ class Tests {
     }
     /**
      * Adds a new test to the test suite of a rule identified by the slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {RulebricksApi.CreateTestRequest} request
+     * @param {Tests.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.createRuleTest("slug", {
+     *     await client.tests.createRuleTest("slug", {
      *         name: "Test 3",
      *         request: {
      *             "param1": "value1"
@@ -128,20 +147,20 @@ class Tests {
      */
     createRuleTest(slug, request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/rules/${slug}/tests`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/admin/rules/${encodeURIComponent(slug)}/tests`),
                 method: "POST",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
-                body: yield serializers.CreateRuleTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                requestType: "json",
+                body: serializers.CreateTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.CreateRuleTestResponse.parseOrThrow(_response.body, {
+                return serializers.Test.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -170,7 +189,7 @@ class Tests {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling POST /api/v1/admin/rules/{slug}/tests.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -180,27 +199,32 @@ class Tests {
     }
     /**
      * Deletes a test from the test suite of a rule identified by the slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {string} testId - The ID of the test.
+     * @param {Tests.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.deleteRuleTest("slug", "testId")
+     *     await client.tests.deleteRuleTest("slug", "testId")
      */
     deleteRuleTest(slug, testId, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/rules/${slug}/tests/${testId}`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/admin/rules/${encodeURIComponent(slug)}/tests/${encodeURIComponent(testId)}`),
                 method: "DELETE",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.DeleteRuleTestResponse.parseOrThrow(_response.body, {
+                return serializers.Test.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -227,7 +251,7 @@ class Tests {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling DELETE /api/v1/admin/rules/{slug}/tests/{testId}.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -237,27 +261,31 @@ class Tests {
     }
     /**
      * Retrieves a list of tests associated with the flow identified by the slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {Tests.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.listFlowTests("slug")
+     *     await client.tests.listFlowTests("slug")
      */
     listFlowTests(slug, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/flows/${slug}/tests`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/admin/flows/${encodeURIComponent(slug)}/tests`),
                 method: "GET",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.tests.listFlowTests.Response.parseOrThrow(_response.body, {
+                return serializers.TestListResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -284,7 +312,7 @@ class Tests {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling GET /api/v1/admin/flows/{slug}/tests.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -294,12 +322,17 @@ class Tests {
     }
     /**
      * Adds a new test to the test suite of a flow identified by the slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {RulebricksApi.CreateTestRequest} request
+     * @param {Tests.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.createFlowTest("slug", {
+     *     await client.tests.createFlowTest("slug", {
      *         name: "Test 3",
      *         request: {
      *             "param1": "value1"
@@ -312,20 +345,20 @@ class Tests {
      */
     createFlowTest(slug, request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/flows/${slug}/tests`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/admin/flows/${encodeURIComponent(slug)}/tests`),
                 method: "POST",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
-                body: yield serializers.CreateFlowTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                requestType: "json",
+                body: serializers.CreateTestRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.CreateFlowTestResponse.parseOrThrow(_response.body, {
+                return serializers.Test.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -354,7 +387,7 @@ class Tests {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling POST /api/v1/admin/flows/{slug}/tests.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -364,27 +397,32 @@ class Tests {
     }
     /**
      * Deletes a test from the test suite of a flow identified by the slug.
+     *
+     * @param {string} slug - The unique identifier for the resource.
+     * @param {string} testId - The ID of the test.
+     * @param {Tests.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.tests.deleteFlowTest("slug", "testId")
+     *     await client.tests.deleteFlowTest("slug", "testId")
      */
     deleteFlowTest(slug, testId, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), `api/v1/admin/flows/${slug}/tests/${testId}`),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), `api/v1/admin/flows/${encodeURIComponent(slug)}/tests/${encodeURIComponent(testId)}`),
                 method: "DELETE",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.DeleteFlowTestResponse.parseOrThrow(_response.body, {
+                return serializers.Test.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -411,12 +449,18 @@ class Tests {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling DELETE /api/v1/admin/flows/{slug}/tests/{testId}.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
                     });
             }
+        });
+    }
+    _getCustomAuthorizationHeaders() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const apiKeyValue = yield core.Supplier.get(this._options.apiKey);
+            return { "x-api-key": apiKeyValue };
         });
     }
 }

@@ -12,28 +12,36 @@ import { Values } from "./api/resources/values/client/Client";
 export declare namespace RulebricksApiClient {
     interface Options {
         environment: core.Supplier<string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         apiKey: core.Supplier<string>;
     }
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 export declare class RulebricksApiClient {
     protected readonly _options: RulebricksApiClient.Options;
-    constructor(_options: RulebricksApiClient.Options);
     protected _rules: Rules | undefined;
-    get rules(): Rules;
     protected _flows: Flows | undefined;
-    get flows(): Flows;
     protected _decisions: Decisions | undefined;
-    get decisions(): Decisions;
     protected _assets: Assets | undefined;
-    get assets(): Assets;
     protected _users: Users | undefined;
-    get users(): Users;
     protected _tests: Tests | undefined;
-    get tests(): Tests;
     protected _values: Values | undefined;
+    constructor(_options: RulebricksApiClient.Options);
+    get rules(): Rules;
+    get flows(): Flows;
+    get decisions(): Decisions;
+    get assets(): Assets;
+    get users(): Users;
+    get tests(): Tests;
     get values(): Values;
 }

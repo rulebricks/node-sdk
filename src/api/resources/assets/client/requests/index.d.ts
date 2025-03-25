@@ -1,6 +1,6 @@
-export { DeleteRuleRequest } from "./DeleteRuleRequest";
-export { ExportRuleRequest } from "./ExportRuleRequest";
-export { ImportRuleRequest } from "./ImportRuleRequest";
-export { ListRulesRequest } from "./ListRulesRequest";
-export { UpsertFolderRequest } from "./UpsertFolderRequest";
-export { DeleteFolderRequest } from "./DeleteFolderRequest";
+export { type DeleteRuleRequest } from "./DeleteRuleRequest";
+export { type ExportRuleRequest } from "./ExportRuleRequest";
+export { type ImportRuleRequest } from "./ImportRuleRequest";
+export { type ListRulesRequest } from "./ListRulesRequest";
+export { type UpsertFolderRequest } from "./UpsertFolderRequest";
+export { type DeleteFolderRequest } from "./DeleteFolderRequest";

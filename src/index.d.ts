@@ -12,3 +12,4 @@ export {
 } from "./forge";
 export { RulebricksApiClient } from "./Client";
 export { RulebricksApiError, RulebricksApiTimeoutError } from "./errors";
+export * as serialization from "./serialization";

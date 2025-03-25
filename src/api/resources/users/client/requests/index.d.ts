@@ -1,2 +1,2 @@
-export { InviteRequest } from "./InviteRequest";
-export { CreateGroupRequest } from "./CreateGroupRequest";
+export { type UserInviteRequest } from "./UserInviteRequest";
+export { type CreateUserGroupRequest } from "./CreateUserGroupRequest";

@@ -18,13 +18,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,10 +50,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Values = void 0;
 const core = __importStar(require("../../../../core"));
-const RulebricksApi = __importStar(require("../../.."));
+const RulebricksApi = __importStar(require("../../../index"));
 const url_join_1 = __importDefault(require("url-join"));
-const serializers = __importStar(require("../../../../serialization"));
-const errors = __importStar(require("../../../../errors"));
+const serializers = __importStar(require("../../../../serialization/index"));
+const errors = __importStar(require("../../../../errors/index"));
 /**
  * Operations for managing dynamic values referenced in rules
  */
@@ -53,32 +63,36 @@ class Values {
     }
     /**
      * Retrieve all dynamic values for the authenticated user.
+     *
+     * @param {RulebricksApi.ListDynamicValuesRequest} request
+     * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.values.listDynamicValues({})
+     *     await client.values.listDynamicValues()
      */
-    listDynamicValues(request = {}, requestOptions) {
-        return __awaiter(this, void 0, void 0, function* () {
+    listDynamicValues() {
+        return __awaiter(this, arguments, void 0, function* (request = {}, requestOptions) {
+            var _a;
             const { name } = request;
             const _queryParams = {};
             if (name != null) {
                 _queryParams["name"] = name;
             }
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/values"),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), "api/v1/values"),
                 method: "GET",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
                 queryParameters: _queryParams,
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.values.listDynamicValues.Response.parseOrThrow(_response.body, {
+                return serializers.DynamicValueListResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -103,7 +117,7 @@ class Values {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling GET /api/v1/values.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -113,28 +127,40 @@ class Values {
     }
     /**
      * Update existing dynamic values or add new ones for the authenticated user.
+     *
+     * @param {RulebricksApi.UpdateValuesRequest} request
+     * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.values.update({})
+     *     await client.values.updateValues({
+     *         values: {
+     *             "Favorite Color": "blue",
+     *             "Age": 30,
+     *             "Is Student": false,
+     *             "Hobbies": ["reading", "cycling"]
+     *         },
+     *         accessGroups: ["marketing", "developers"]
+     *     })
      */
-    update(request, requestOptions) {
+    updateValues(request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/values"),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), "api/v1/values"),
                 method: "POST",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
-                body: yield serializers.values.update.Request.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
+                requestType: "json",
+                body: serializers.UpdateValuesRequest.jsonOrThrow(request, { unrecognizedObjectKeys: "strip" }),
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.values.update.Response.parseOrThrow(_response.body, {
+                return serializers.DynamicValueListResponse.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -161,7 +187,7 @@ class Values {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling POST /api/v1/values.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
@@ -171,34 +197,38 @@ class Values {
     }
     /**
      * Delete a specific dynamic value for the authenticated user by its ID.
+     *
+     * @param {RulebricksApi.DeleteDynamicValueRequest} request
+     * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.NotFoundError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await rulebricksApi.values.deleteDynamicValue({
+     *     await client.values.deleteDynamicValue({
      *         id: "id"
      *     })
      */
     deleteDynamicValue(request, requestOptions) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { id } = request;
             const _queryParams = {};
             _queryParams["id"] = id;
             const _response = yield core.fetcher({
-                url: (0, url_join_1.default)(yield core.Supplier.get(this._options.environment), "api/v1/values"),
+                url: (0, url_join_1.default)((_a = (yield core.Supplier.get(this._options.baseUrl))) !== null && _a !== void 0 ? _a : (yield core.Supplier.get(this._options.environment)), "api/v1/values"),
                 method: "DELETE",
-                headers: {
-                    "x-api-key": yield core.Supplier.get(this._options.apiKey),
-                    "X-Fern-Language": "JavaScript",
-                },
+                headers: Object.assign(Object.assign({ "X-Fern-Language": "JavaScript", "X-Fern-Runtime": core.RUNTIME.type, "X-Fern-Runtime-Version": core.RUNTIME.version }, (yield this._getCustomAuthorizationHeaders())), requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.headers),
                 contentType: "application/json",
                 queryParameters: _queryParams,
+                requestType: "json",
                 timeoutMs: (requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.timeoutInSeconds) != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
                 maxRetries: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.maxRetries,
+                abortSignal: requestOptions === null || requestOptions === void 0 ? void 0 : requestOptions.abortSignal,
             });
             if (_response.ok) {
-                return yield serializers.DeleteDynamicValueResponse.parseOrThrow(_response.body, {
+                return serializers.SuccessMessage.parseOrThrow(_response.body, {
                     unrecognizedObjectKeys: "passthrough",
                     allowUnrecognizedUnionMembers: true,
                     allowUnrecognizedEnumValues: true,
@@ -227,12 +257,18 @@ class Values {
                         body: _response.error.rawBody,
                     });
                 case "timeout":
-                    throw new errors.RulebricksApiTimeoutError();
+                    throw new errors.RulebricksApiTimeoutError("Timeout exceeded when calling DELETE /api/v1/values.");
                 case "unknown":
                     throw new errors.RulebricksApiError({
                         message: _response.error.errorMessage,
                     });
             }
+        });
+    }
+    _getCustomAuthorizationHeaders() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const apiKeyValue = yield core.Supplier.get(this._options.apiKey);
+            return { "x-api-key": apiKeyValue };
         });
     }
 }
