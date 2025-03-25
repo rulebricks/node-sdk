@@ -45,13 +45,13 @@ export class Flows {
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await client.flows.executeFlow("slug", {
+     *     await client.flows.execute("slug", {
      *         "name": "John Doe",
      *         "age": 30,
      *         "email": "jdoe@acme.co"
      *     })
      */
-    public async executeFlow(
+    public async execute(
         slug: string,
         request: RulebricksApi.DynamicRequestPayload,
         requestOptions?: Flows.RequestOptions,

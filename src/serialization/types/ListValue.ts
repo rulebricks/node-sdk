@@ -5,17 +5,18 @@
 import * as serializers from "../index";
 import * as RulebricksApi from "../../api/index";
 import * as core from "../../core";
+import { ListValueValueItem } from "./ListValueValueItem";
 import { DynamicValueBase } from "./DynamicValueBase";
 
 export const ListValue: core.serialization.ObjectSchema<serializers.ListValue.Raw, RulebricksApi.ListValue> =
     core.serialization
         .object({
-            value: core.serialization.list(core.serialization.string()).optional(),
+            value: core.serialization.list(ListValueValueItem).optional(),
         })
         .extend(DynamicValueBase);
 
 export declare namespace ListValue {
     export interface Raw extends DynamicValueBase.Raw {
-        value?: string[] | null;
+        value?: ListValueValueItem.Raw[] | null;
     }
 }

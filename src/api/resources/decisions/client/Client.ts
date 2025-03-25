@@ -37,19 +37,19 @@ export class Decisions {
     /**
      * Retrieve logs for a specific user and rule, with optional date range and pagination.
      *
-     * @param {RulebricksApi.QueryDecisionsRequest} request
+     * @param {RulebricksApi.QueryRequest} request
      * @param {Decisions.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link RulebricksApi.BadRequestError}
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await client.decisions.queryDecisions({
+     *     await client.decisions.query({
      *         slug: "slug"
      *     })
      */
-    public async queryDecisions(
-        request: RulebricksApi.QueryDecisionsRequest,
+    public async query(
+        request: RulebricksApi.QueryRequest,
         requestOptions?: Decisions.RequestOptions,
     ): Promise<RulebricksApi.DecisionLogResponse> {
         const { slug, from: from_, to, cursor, limit } = request;

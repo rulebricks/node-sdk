@@ -55,7 +55,7 @@ export class DynamicValues {
             return cachedValue;
         }
 
-        const values = await this.workspace.values.listDynamicValues();
+        const values = await this.workspace.values.list();
         const value = values.find((v: DynamicValueModel) => v.name === name);
 
         if (!value) {
@@ -77,7 +77,7 @@ export class DynamicValues {
             throw new Error("Workspace not configured. Call configure() first.");
         }
 
-        await this.workspace.values.updateValues({ values: dynamicValues, accessGroups });
+        await this.workspace.values.update({ values: dynamicValues, accessGroups });
         this.cache.clear();
     }
 

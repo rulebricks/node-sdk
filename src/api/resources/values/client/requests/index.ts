@@ -1,3 +1,3 @@
-export { type ListDynamicValuesRequest } from "./ListDynamicValuesRequest";
+export { type ListRequest } from "./ListRequest";
 export { type UpdateValuesRequest } from "./UpdateValuesRequest";
-export { type DeleteDynamicValueRequest } from "./DeleteDynamicValueRequest";
+export { type DeleteRequest } from "./DeleteRequest";

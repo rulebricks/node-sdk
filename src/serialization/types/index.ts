@@ -33,6 +33,7 @@ export * from "./DynamicValueBase";
 export * from "./StringValue";
 export * from "./NumberValue";
 export * from "./BooleanValue";
+export * from "./ListValueValueItem";
 export * from "./ListValue";
 export * from "./DynamicValue";
 export * from "./DynamicValueListResponse";

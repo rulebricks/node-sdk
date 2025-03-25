@@ -37,16 +37,16 @@ export class Values {
     /**
      * Retrieve all dynamic values for the authenticated user.
      *
-     * @param {RulebricksApi.ListDynamicValuesRequest} request
+     * @param {RulebricksApi.ListRequest} request
      * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await client.values.listDynamicValues()
+     *     await client.values.list()
      */
-    public async listDynamicValues(
-        request: RulebricksApi.ListDynamicValuesRequest = {},
+    public async list(
+        request: RulebricksApi.ListRequest = {},
         requestOptions?: Values.RequestOptions,
     ): Promise<RulebricksApi.DynamicValueListResponse> {
         const { name } = request;
@@ -122,7 +122,7 @@ export class Values {
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await client.values.updateValues({
+     *     await client.values.update({
      *         values: {
      *             "Favorite Color": "blue",
      *             "Age": 30,
@@ -132,7 +132,7 @@ export class Values {
      *         accessGroups: ["marketing", "developers"]
      *     })
      */
-    public async updateValues(
+    public async update(
         request: RulebricksApi.UpdateValuesRequest,
         requestOptions?: Values.RequestOptions,
     ): Promise<RulebricksApi.DynamicValueListResponse> {
@@ -198,7 +198,7 @@ export class Values {
     /**
      * Delete a specific dynamic value for the authenticated user by its ID.
      *
-     * @param {RulebricksApi.DeleteDynamicValueRequest} request
+     * @param {RulebricksApi.DeleteRequest} request
      * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link RulebricksApi.BadRequestError}
@@ -206,12 +206,12 @@ export class Values {
      * @throws {@link RulebricksApi.InternalServerError}
      *
      * @example
-     *     await client.values.deleteDynamicValue({
+     *     await client.values.delete({
      *         id: "id"
      *     })
      */
-    public async deleteDynamicValue(
-        request: RulebricksApi.DeleteDynamicValueRequest,
+    public async delete(
+        request: RulebricksApi.DeleteRequest,
         requestOptions?: Values.RequestOptions,
     ): Promise<RulebricksApi.SuccessMessage> {
         const { id } = request;

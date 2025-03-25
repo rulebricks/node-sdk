@@ -6,5 +6,5 @@ import * as RulebricksApi from "../index";
 
 export interface ListValue extends RulebricksApi.DynamicValueBase {
     /** The list value */
-    value?: string[];
+    value?: RulebricksApi.ListValueValueItem[];
 }
