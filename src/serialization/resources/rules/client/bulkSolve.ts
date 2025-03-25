@@ -3,14 +3,14 @@
  */
 
 import * as serializers from "../../../index";
-import * as RulebricksApi from "../../../../api/index";
+import * as Rulebricks from "../../../../api/index";
 import * as core from "../../../../core";
 import { DynamicRequestPayload } from "../../../types/DynamicRequestPayload";
 import { BulkRuleResponseItem } from "../../../types/BulkRuleResponseItem";
 
 export const Request: core.serialization.Schema<
     serializers.rules.bulkSolve.Request.Raw,
-    RulebricksApi.DynamicRequestPayload[]
+    Rulebricks.DynamicRequestPayload[]
 > = core.serialization.list(DynamicRequestPayload);
 
 export declare namespace Request {
@@ -19,7 +19,7 @@ export declare namespace Request {
 
 export const Response: core.serialization.Schema<
     serializers.rules.bulkSolve.Response.Raw,
-    RulebricksApi.BulkRuleResponseItem[]
+    Rulebricks.BulkRuleResponseItem[]
 > = core.serialization.list(BulkRuleResponseItem);
 
 export declare namespace Response {

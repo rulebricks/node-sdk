@@ -4,7 +4,7 @@
 
 import * as errors from "../../errors/index";
 
-export class NotFoundError extends errors.RulebricksApiError {
+export class NotFoundError extends errors.RulebricksError {
     constructor(body?: unknown) {
         super({
             message: "NotFoundError",

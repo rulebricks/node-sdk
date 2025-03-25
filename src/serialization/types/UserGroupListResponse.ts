@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { UserGroup } from "./UserGroup";
 
 export const UserGroupListResponse: core.serialization.Schema<
     serializers.UserGroupListResponse.Raw,
-    RulebricksApi.UserGroupListResponse
+    Rulebricks.UserGroupListResponse
 > = core.serialization.list(UserGroup);
 
 export declare namespace UserGroupListResponse {

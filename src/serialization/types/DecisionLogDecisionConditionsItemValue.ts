@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const DecisionLogDecisionConditionsItemValue: core.serialization.ObjectSchema<
     serializers.DecisionLogDecisionConditionsItemValue.Raw,
-    RulebricksApi.DecisionLogDecisionConditionsItemValue
+    Rulebricks.DecisionLogDecisionConditionsItemValue
 > = core.serialization.object({
     result: core.serialization.boolean().optional(),
     err: core.serialization.string().optional(),

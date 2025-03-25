@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { DecisionLogRequest } from "./DecisionLogRequest";
 import { DecisionLogDecision } from "./DecisionLogDecision";
 
-export const DecisionLog: core.serialization.ObjectSchema<serializers.DecisionLog.Raw, RulebricksApi.DecisionLog> =
+export const DecisionLog: core.serialization.ObjectSchema<serializers.DecisionLog.Raw, Rulebricks.DecisionLog> =
     core.serialization.object({
         request: DecisionLogRequest.optional(),
         response: core.serialization.lazyObject(() => serializers.DecisionLogResponse).optional(),

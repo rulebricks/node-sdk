@@ -1,2 +1,2 @@
-export { RulebricksApiError } from "./RulebricksApiError";
-export { RulebricksApiTimeoutError } from "./RulebricksApiTimeoutError";
+export { RulebricksError } from "./RulebricksError";
+export { RulebricksTimeoutError } from "./RulebricksTimeoutError";

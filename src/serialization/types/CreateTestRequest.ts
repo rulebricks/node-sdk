@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const CreateTestRequest: core.serialization.ObjectSchema<
     serializers.CreateTestRequest.Raw,
-    RulebricksApi.CreateTestRequest
+    Rulebricks.CreateTestRequest
 > = core.serialization.object({
     name: core.serialization.string(),
     request: core.serialization.record(core.serialization.string(), core.serialization.unknown()),

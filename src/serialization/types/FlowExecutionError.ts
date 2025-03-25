@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const FlowExecutionError: core.serialization.ObjectSchema<
     serializers.FlowExecutionError.Raw,
-    RulebricksApi.FlowExecutionError
+    Rulebricks.FlowExecutionError
 > = core.serialization.object({
     error: core.serialization.string().optional(),
     node: core.serialization.string().optional(),

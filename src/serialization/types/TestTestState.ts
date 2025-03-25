@@ -3,24 +3,22 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { TestTestStateConditionsItemValue } from "./TestTestStateConditionsItemValue";
 import { TestTestStateEvaluationError } from "./TestTestStateEvaluationError";
 
-export const TestTestState: core.serialization.ObjectSchema<
-    serializers.TestTestState.Raw,
-    RulebricksApi.TestTestState
-> = core.serialization.object({
-    duration: core.serialization.number().optional(),
-    response: core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional(),
-    conditions: core.serialization
-        .list(core.serialization.record(core.serialization.string(), TestTestStateConditionsItemValue))
-        .optional(),
-    httpStatus: core.serialization.number().optional(),
-    successIdxs: core.serialization.list(core.serialization.number()).optional(),
-    evaluationError: TestTestStateEvaluationError.optional(),
-});
+export const TestTestState: core.serialization.ObjectSchema<serializers.TestTestState.Raw, Rulebricks.TestTestState> =
+    core.serialization.object({
+        duration: core.serialization.number().optional(),
+        response: core.serialization.record(core.serialization.string(), core.serialization.unknown()).optional(),
+        conditions: core.serialization
+            .list(core.serialization.record(core.serialization.string(), TestTestStateConditionsItemValue))
+            .optional(),
+        httpStatus: core.serialization.number().optional(),
+        successIdxs: core.serialization.list(core.serialization.number()).optional(),
+        evaluationError: TestTestStateEvaluationError.optional(),
+    });
 
 export declare namespace TestTestState {
     export interface Raw {

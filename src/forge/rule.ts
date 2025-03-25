@@ -1,4 +1,4 @@
-import { RulebricksApiClient } from "../Client.js";
+import { RulebricksClient } from "../Client.js";
 import { RuleType, Field, RuleSettings, OperatorResult } from "./types.js";
 import { BooleanField, NumberField, StringField, DateField, ListField } from "./operators.js";
 
@@ -256,7 +256,7 @@ export class Rule {
     public updatedBy: string = "Rulebricks Forge SDK";
     public published: boolean = false;
 
-    private workspace?: RulebricksApiClient;
+    private workspace?: RulebricksClient;
     private sampleRequest: Record<string, any> = {};
     private sampleResponse: Record<string, any> = {};
     public testRequest: Record<string, any> = {};
@@ -304,7 +304,7 @@ export class Rule {
         return RuleType.STRING; // Default fallback
     }
 
-    setWorkspace(client: RulebricksApiClient): Rule {
+    setWorkspace(client: RulebricksClient): Rule {
         this.workspace = client;
         return this;
     }
@@ -324,14 +324,14 @@ export class Rule {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to set a folder by name");
         }
-        const folders = await this.workspace.assets.listFolders();
+        const folders = await this.workspace.assets.folders.list();
         let folder = folders.find((f) => f.name === folderName);
 
         if (!folder && createIfMissing) {
             if (folders.some((f) => f.name === folderName)) {
                 throw new Error("Folder name conflicts with an existing folder");
             }
-            folder = await this.workspace.assets.upsertFolder({ name: folderName });
+            folder = await this.workspace.assets.folders.upsert({ name: folderName });
         }
 
         if (!folder) {
@@ -365,7 +365,7 @@ export class Rule {
             throw new Error("Alias cannot contain special characters");
         }
 
-        const rules = await this.workspace.assets.listRules();
+        const rules = await this.workspace.assets.rules.list();
         if (rules.some((r) => r.slug === alias)) {
             throw new Error("Alias conflicts with an existing rule");
         }
@@ -429,7 +429,7 @@ export class Rule {
             throw new Error("A Rulebricks client is required to manage access groups");
         }
 
-        const existingGroups = await this.workspace.users.listGroups();
+        const existingGroups = await this.workspace.users.groups.list();
         let group = existingGroups.find((g) => g.name === groupName);
 
         if (!group && !createIfMissing) {
@@ -437,7 +437,7 @@ export class Rule {
         }
 
         if (!group && createIfMissing) {
-            group = await this.workspace.users.createGroup({ name: groupName });
+            group = await this.workspace.users.groups.create({ name: groupName });
         }
 
         if (!this.accessGroups.includes(groupName)) {
@@ -605,7 +605,7 @@ export class Rule {
             throw new Error("Workspace not set. Call setWorkspace() before updating the rule.");
         }
         const ruleData = this.toDict();
-        await this.workspace.assets.importRule({ rule: ruleData });
+        await this.workspace.assets.rules.import({ rule: ruleData });
         return this;
     }
 
@@ -615,7 +615,7 @@ export class Rule {
         }
         const ruleData = this.toDict();
         ruleData._publish = true;
-        await this.workspace.assets.importRule({ rule: ruleData });
+        await this.workspace.assets.rules.import({ rule: ruleData });
         return this;
     }
 
@@ -623,7 +623,7 @@ export class Rule {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to load a rule from the workspace");
         }
-        const ruleData = await this.workspace.assets.exportRule({ id: ruleId });
+        const ruleData = await this.workspace.assets.rules.export({ id: ruleId });
         const rule = Rule.fromJSON(ruleData);
         Object.assign(this, rule);
         return this;

@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { Test } from "./Test";
 
 export const TestListResponse: core.serialization.Schema<
     serializers.TestListResponse.Raw,
-    RulebricksApi.TestListResponse
+    Rulebricks.TestListResponse
 > = core.serialization.list(Test);
 
 export declare namespace TestListResponse {

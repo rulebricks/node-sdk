@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { Folder } from "./Folder";
 import { SchemaField } from "./SchemaField";
 import { RuleBase } from "./RuleBase";
 
-export const RuleDetail: core.serialization.ObjectSchema<serializers.RuleDetail.Raw, RulebricksApi.RuleDetail> =
+export const RuleDetail: core.serialization.ObjectSchema<serializers.RuleDetail.Raw, Rulebricks.RuleDetail> =
     core.serialization
         .object({
             createdAt: core.serialization.property("created_at", core.serialization.date().optional()),

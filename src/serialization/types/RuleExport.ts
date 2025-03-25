@@ -3,10 +3,10 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
-export const RuleExport: core.serialization.Schema<serializers.RuleExport.Raw, RulebricksApi.RuleExport> =
+export const RuleExport: core.serialization.Schema<serializers.RuleExport.Raw, Rulebricks.RuleExport> =
     core.serialization.record(core.serialization.string(), core.serialization.unknown());
 
 export declare namespace RuleExport {

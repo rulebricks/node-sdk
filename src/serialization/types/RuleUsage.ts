@@ -3,10 +3,10 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
-export const RuleUsage: core.serialization.ObjectSchema<serializers.RuleUsage.Raw, RulebricksApi.RuleUsage> =
+export const RuleUsage: core.serialization.ObjectSchema<serializers.RuleUsage.Raw, Rulebricks.RuleUsage> =
     core.serialization.object({
         id: core.serialization.string().optional(),
         name: core.serialization.string().optional(),

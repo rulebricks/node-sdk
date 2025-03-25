@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const SchemaFieldDefaultValue: core.serialization.Schema<
     serializers.SchemaFieldDefaultValue.Raw,
-    RulebricksApi.SchemaFieldDefaultValue
+    Rulebricks.SchemaFieldDefaultValue
 > = core.serialization.undiscriminatedUnion([
     core.serialization.string(),
     core.serialization.number(),

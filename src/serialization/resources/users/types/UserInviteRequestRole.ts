@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../../../index";
-import * as RulebricksApi from "../../../../api/index";
+import * as Rulebricks from "../../../../api/index";
 import * as core from "../../../../core";
 
 export const UserInviteRequestRole: core.serialization.Schema<
     serializers.UserInviteRequestRole.Raw,
-    RulebricksApi.UserInviteRequestRole
+    Rulebricks.UserInviteRequestRole
 > = core.serialization.enum_(["admin", "editor", "developer", "custom-role"]);
 
 export declare namespace UserInviteRequestRole {

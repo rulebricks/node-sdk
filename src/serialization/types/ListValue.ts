@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { ListValueValueItem } from "./ListValueValueItem";
 import { DynamicValueBase } from "./DynamicValueBase";
 
-export const ListValue: core.serialization.ObjectSchema<serializers.ListValue.Raw, RulebricksApi.ListValue> =
+export const ListValue: core.serialization.ObjectSchema<serializers.ListValue.Raw, Rulebricks.ListValue> =
     core.serialization
         .object({
             value: core.serialization.list(ListValueValueItem).optional(),

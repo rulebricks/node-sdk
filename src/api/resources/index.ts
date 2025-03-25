@@ -8,6 +8,5 @@ export * as decisions from "./decisions";
 export * as assets from "./assets";
 export * as tests from "./tests";
 export * from "./decisions/client/requests";
-export * from "./assets/client/requests";
 export * from "./users/client/requests";
 export * from "./values/client/requests";

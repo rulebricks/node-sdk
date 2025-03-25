@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const ParallelSolveRequestValue: core.serialization.ObjectSchema<
     serializers.ParallelSolveRequestValue.Raw,
-    RulebricksApi.ParallelSolveRequestValue
+    Rulebricks.ParallelSolveRequestValue
 > = core.serialization
     .object({
         rule: core.serialization.property("$rule", core.serialization.string().optional()),

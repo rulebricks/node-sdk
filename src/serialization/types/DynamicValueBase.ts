@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { RuleUsage } from "./RuleUsage";
 
 export const DynamicValueBase: core.serialization.ObjectSchema<
     serializers.DynamicValueBase.Raw,
-    RulebricksApi.DynamicValueBase
+    Rulebricks.DynamicValueBase
 > = core.serialization.object({
     id: core.serialization.string().optional(),
     name: core.serialization.string().optional(),

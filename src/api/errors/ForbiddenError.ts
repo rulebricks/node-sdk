@@ -3,10 +3,10 @@
  */
 
 import * as errors from "../../errors/index";
-import * as RulebricksApi from "../index";
+import * as Rulebricks from "../index";
 
-export class ForbiddenError extends errors.RulebricksApiError {
-    constructor(body: RulebricksApi.Error_) {
+export class ForbiddenError extends errors.RulebricksError {
+    constructor(body: Rulebricks.Error_) {
         super({
             message: "ForbiddenError",
             statusCode: 403,

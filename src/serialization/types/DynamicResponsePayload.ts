@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const DynamicResponsePayload: core.serialization.Schema<
     serializers.DynamicResponsePayload.Raw,
-    RulebricksApi.DynamicResponsePayload
+    Rulebricks.DynamicResponsePayload
 > = core.serialization.record(core.serialization.string(), core.serialization.unknown());
 
 export declare namespace DynamicResponsePayload {

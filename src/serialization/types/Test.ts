@@ -3,22 +3,21 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { TestTestState } from "./TestTestState";
 
-export const Test: core.serialization.ObjectSchema<serializers.Test.Raw, RulebricksApi.Test> =
-    core.serialization.object({
-        id: core.serialization.string(),
-        name: core.serialization.string(),
-        request: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
-        response: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
-        critical: core.serialization.boolean(),
-        error: core.serialization.boolean(),
-        success: core.serialization.boolean(),
-        testState: TestTestState.optional(),
-        lastExecuted: core.serialization.date().optional(),
-    });
+export const Test: core.serialization.ObjectSchema<serializers.Test.Raw, Rulebricks.Test> = core.serialization.object({
+    id: core.serialization.string(),
+    name: core.serialization.string(),
+    request: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
+    response: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
+    critical: core.serialization.boolean(),
+    error: core.serialization.boolean(),
+    success: core.serialization.boolean(),
+    testState: TestTestState.optional(),
+    lastExecuted: core.serialization.date().optional(),
+});
 
 export declare namespace Test {
     export interface Raw {

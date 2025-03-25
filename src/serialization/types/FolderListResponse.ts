@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { Folder } from "./Folder";
 
 export const FolderListResponse: core.serialization.Schema<
     serializers.FolderListResponse.Raw,
-    RulebricksApi.FolderListResponse
+    Rulebricks.FolderListResponse
 > = core.serialization.list(Folder);
 
 export declare namespace FolderListResponse {

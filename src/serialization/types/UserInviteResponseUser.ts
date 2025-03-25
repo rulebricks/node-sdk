@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const UserInviteResponseUser: core.serialization.ObjectSchema<
     serializers.UserInviteResponseUser.Raw,
-    RulebricksApi.UserInviteResponseUser
+    Rulebricks.UserInviteResponseUser
 > = core.serialization.object({
     email: core.serialization.string().optional(),
     role: core.serialization.string().optional(),

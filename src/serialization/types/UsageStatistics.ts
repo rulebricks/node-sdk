@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const UsageStatistics: core.serialization.ObjectSchema<
     serializers.UsageStatistics.Raw,
-    RulebricksApi.UsageStatistics
+    Rulebricks.UsageStatistics
 > = core.serialization.object({
     plan: core.serialization.string().optional(),
     monthlyPeriodStart: core.serialization.property("monthly_period_start", core.serialization.string().optional()),

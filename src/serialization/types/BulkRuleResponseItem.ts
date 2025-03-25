@@ -3,14 +3,14 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { DynamicResponsePayload } from "./DynamicResponsePayload";
 import { BulkRuleResponseItemError } from "./BulkRuleResponseItemError";
 
 export const BulkRuleResponseItem: core.serialization.Schema<
     serializers.BulkRuleResponseItem.Raw,
-    RulebricksApi.BulkRuleResponseItem
+    Rulebricks.BulkRuleResponseItem
 > = core.serialization.undiscriminatedUnion([DynamicResponsePayload, BulkRuleResponseItemError]);
 
 export declare namespace BulkRuleResponseItem {

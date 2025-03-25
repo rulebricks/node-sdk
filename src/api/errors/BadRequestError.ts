@@ -4,7 +4,7 @@
 
 import * as errors from "../../errors/index";
 
-export class BadRequestError extends errors.RulebricksApiError {
+export class BadRequestError extends errors.RulebricksError {
     constructor(body?: unknown) {
         super({
             message: "BadRequestError",

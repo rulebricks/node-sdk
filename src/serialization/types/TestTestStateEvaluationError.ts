@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const TestTestStateEvaluationError: core.serialization.Schema<
     serializers.TestTestStateEvaluationError.Raw,
-    RulebricksApi.TestTestStateEvaluationError
+    Rulebricks.TestTestStateEvaluationError
 > = core.serialization.undiscriminatedUnion([core.serialization.boolean(), core.serialization.string()]);
 
 export declare namespace TestTestStateEvaluationError {

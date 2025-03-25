@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { SchemaFieldType } from "./SchemaFieldType";
 import { SchemaFieldDefaultValue } from "./SchemaFieldDefaultValue";
 
-export const SchemaField: core.serialization.ObjectSchema<serializers.SchemaField.Raw, RulebricksApi.SchemaField> =
+export const SchemaField: core.serialization.ObjectSchema<serializers.SchemaField.Raw, Rulebricks.SchemaField> =
     core.serialization.object({
         key: core.serialization.string().optional(),
         show: core.serialization.boolean().optional(),

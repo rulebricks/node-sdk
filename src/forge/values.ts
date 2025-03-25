@@ -1,4 +1,4 @@
-import { RulebricksApiClient } from "../Client.js";
+import { RulebricksClient } from "../Client.js";
 import { DynamicValue as DynamicValueModel } from "../api/types";
 import { DynamicValueType, DynamicValueNotFoundError } from "./types.js";
 
@@ -37,10 +37,10 @@ export class DynamicValue {
 }
 
 export class DynamicValues {
-    private static workspace?: RulebricksApiClient;
+    private static workspace?: RulebricksClient;
     private static cache: Map<string, DynamicValue> = new Map();
 
-    static configure(client: RulebricksApiClient): void {
+    static configure(client: RulebricksClient): void {
         this.workspace = client;
         this.cache.clear();
     }

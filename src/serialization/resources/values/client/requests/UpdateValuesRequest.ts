@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../../../../index";
-import * as RulebricksApi from "../../../../../api/index";
+import * as Rulebricks from "../../../../../api/index";
 import * as core from "../../../../../core";
 import { UpdateValuesRequestValuesValue } from "../../types/UpdateValuesRequestValuesValue";
 
 export const UpdateValuesRequest: core.serialization.Schema<
     serializers.UpdateValuesRequest.Raw,
-    RulebricksApi.UpdateValuesRequest
+    Rulebricks.UpdateValuesRequest
 > = core.serialization.object({
     values: core.serialization.record(core.serialization.string(), UpdateValuesRequestValuesValue),
     accessGroups: core.serialization.list(core.serialization.string()).optional(),

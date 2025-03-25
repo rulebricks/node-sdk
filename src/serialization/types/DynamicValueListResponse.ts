@@ -3,13 +3,13 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { DynamicValue } from "./DynamicValue";
 
 export const DynamicValueListResponse: core.serialization.Schema<
     serializers.DynamicValueListResponse.Raw,
-    RulebricksApi.DynamicValueListResponse
+    Rulebricks.DynamicValueListResponse
 > = core.serialization.list(DynamicValue);
 
 export declare namespace DynamicValueListResponse {

@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const ListValueValueItem: core.serialization.Schema<
     serializers.ListValueValueItem.Raw,
-    RulebricksApi.ListValueValueItem
+    Rulebricks.ListValueValueItem
 > = core.serialization.undiscriminatedUnion([
     core.serialization.string(),
     core.serialization.number(),

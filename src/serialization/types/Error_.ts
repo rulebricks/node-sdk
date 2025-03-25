@@ -3,10 +3,10 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
-export const Error_: core.serialization.ObjectSchema<serializers.Error_.Raw, RulebricksApi.Error_> =
+export const Error_: core.serialization.ObjectSchema<serializers.Error_.Raw, Rulebricks.Error_> =
     core.serialization.object({
         error: core.serialization.string().optional(),
     });

@@ -3,14 +3,14 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { StringValue } from "./StringValue";
 import { NumberValue } from "./NumberValue";
 import { BooleanValue } from "./BooleanValue";
 import { ListValue } from "./ListValue";
 
-export const DynamicValue: core.serialization.Schema<serializers.DynamicValue.Raw, RulebricksApi.DynamicValue> =
+export const DynamicValue: core.serialization.Schema<serializers.DynamicValue.Raw, Rulebricks.DynamicValue> =
     core.serialization
         .union("type", {
             string: StringValue,
@@ -18,7 +18,7 @@ export const DynamicValue: core.serialization.Schema<serializers.DynamicValue.Ra
             boolean: BooleanValue,
             list: ListValue,
         })
-        .transform<RulebricksApi.DynamicValue>({
+        .transform<Rulebricks.DynamicValue>({
             transform: (value) => value,
             untransform: (value) => value,
         });

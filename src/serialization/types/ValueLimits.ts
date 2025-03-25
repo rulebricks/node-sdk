@@ -3,10 +3,10 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
-export const ValueLimits: core.serialization.ObjectSchema<serializers.ValueLimits.Raw, RulebricksApi.ValueLimits> =
+export const ValueLimits: core.serialization.ObjectSchema<serializers.ValueLimits.Raw, Rulebricks.ValueLimits> =
     core.serialization.object({
         maxKeys: core.serialization.property("MAX_KEYS", core.serialization.number().optional()),
         maxValueLength: core.serialization.property("MAX_VALUE_LENGTH", core.serialization.number().optional()),

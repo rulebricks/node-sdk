@@ -3,11 +3,11 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 import { FlowBase } from "./FlowBase";
 
-export const FlowDetail: core.serialization.ObjectSchema<serializers.FlowDetail.Raw, RulebricksApi.FlowDetail> =
+export const FlowDetail: core.serialization.ObjectSchema<serializers.FlowDetail.Raw, Rulebricks.FlowDetail> =
     core.serialization
         .object({
             published: core.serialization.boolean().optional(),

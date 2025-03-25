@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const SuccessMessage: core.serialization.ObjectSchema<
     serializers.SuccessMessage.Raw,
-    RulebricksApi.SuccessMessage
+    Rulebricks.SuccessMessage
 > = core.serialization.object({
     message: core.serialization.string().optional(),
 });

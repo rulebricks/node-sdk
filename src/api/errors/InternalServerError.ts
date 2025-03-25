@@ -4,7 +4,7 @@
 
 import * as errors from "../../errors/index";
 
-export class InternalServerError extends errors.RulebricksApiError {
+export class InternalServerError extends errors.RulebricksError {
     constructor(body?: unknown) {
         super({
             message: "InternalServerError",

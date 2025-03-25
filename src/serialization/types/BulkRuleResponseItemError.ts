@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as RulebricksApi from "../../api/index";
+import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
 
 export const BulkRuleResponseItemError: core.serialization.ObjectSchema<
     serializers.BulkRuleResponseItemError.Raw,
-    RulebricksApi.BulkRuleResponseItemError
+    Rulebricks.BulkRuleResponseItemError
 > = core.serialization.object({
     error: core.serialization.string().optional(),
 });
