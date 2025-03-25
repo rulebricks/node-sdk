@@ -1,10 +1,10 @@
 {
     "name": "@rulebricks/sdk",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "private": false,
     "repository": "https://github.com/rulebricks/node-sdk",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
+    "main": "./index.js",
+    "types": "./index.d.ts",
     "license": "MIT",
     "author": "Rulebricks",
     "description": "Rulebricks API – Node SDK",
@@ -15,7 +15,7 @@
         "sdk"
     ],
     "scripts": {
-        "format": "prettier --write 'src/**/*.ts'",
+        "format": "prettier . --write --ignore-unknown",
         "build": "tsc",
         "prepack": "cp -rv dist/. .",
         "test": "jest"
@@ -27,6 +27,7 @@
         "node-fetch": "2.7.0",
         "pako": "2.0.1",
         "qs": "6.11.2",
+        "readable-stream": "^4.7.0",
         "url-join": "4.0.1"
     },
     "devDependencies": {
@@ -34,6 +35,7 @@
         "@types/node": "17.0.33",
         "@types/node-fetch": "2.6.9",
         "@types/qs": "6.9.8",
+        "@types/readable-stream": "^4.0.18",
         "@types/url-join": "4.0.1",
         "jest": "^29.7.0",
         "prettier": "2.7.1",
