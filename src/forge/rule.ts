@@ -605,7 +605,7 @@ export class Rule {
             throw new Error("Workspace not set. Call setWorkspace() before updating the rule.");
         }
         const ruleData = this.toDict();
-        await this.workspace.assets.rules.import({ rule: ruleData });
+        await this.workspace.assets.rules.push({ rule: ruleData });
         return this;
     }
 
@@ -615,7 +615,7 @@ export class Rule {
         }
         const ruleData = this.toDict();
         ruleData._publish = true;
-        await this.workspace.assets.rules.import({ rule: ruleData });
+        await this.workspace.assets.rules.push({ rule: ruleData });
         return this;
     }
 
@@ -623,7 +623,7 @@ export class Rule {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to load a rule from the workspace");
         }
-        const ruleData = await this.workspace.assets.rules.export({ id: ruleId });
+        const ruleData = await this.workspace.assets.rules.pull({ id: ruleId });
         const rule = Rule.fromJSON(ruleData);
         Object.assign(this, rule);
         return this;

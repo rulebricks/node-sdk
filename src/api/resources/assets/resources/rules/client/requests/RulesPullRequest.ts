@@ -8,7 +8,7 @@
  *         id: "id"
  *     }
  */
-export interface RulesExportRequest {
+export interface RulesPullRequest {
     /**
      * The ID of the rule to export.
      */

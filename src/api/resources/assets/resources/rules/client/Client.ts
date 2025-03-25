@@ -116,7 +116,7 @@ export class Rules {
     /**
      * Export a specific rule by its ID.
      *
-     * @param {Rulebricks.assets.RulesExportRequest} request
+     * @param {Rulebricks.assets.RulesPullRequest} request
      * @param {Rules.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
@@ -124,12 +124,12 @@ export class Rules {
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.assets.rules.export({
+     *     await client.assets.rules.pull({
      *         id: "id"
      *     })
      */
-    public async export(
-        request: Rulebricks.assets.RulesExportRequest,
+    public async pull(
+        request: Rulebricks.assets.RulesPullRequest,
         requestOptions?: Rules.RequestOptions,
     ): Promise<Rulebricks.RuleExport> {
         const { id } = request;
@@ -208,13 +208,13 @@ export class Rules {
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.assets.rules.import({
+     *     await client.assets.rules.push({
      *         rule: {
      *             "key": "value"
      *         }
      *     })
      */
-    public async import(
+    public async push(
         request: Rulebricks.assets.ImportRuleRequest,
         requestOptions?: Rules.RequestOptions,
     ): Promise<Rulebricks.RuleExport> {
