@@ -5,19 +5,18 @@
 import * as serializers from "../../../../index";
 import * as Rulebricks from "../../../../../api/index";
 import * as core from "../../../../../core";
-import { UpdateValuesRequestValuesValue } from "../../types/UpdateValuesRequestValuesValue";
 
 export const UpdateValuesRequest: core.serialization.Schema<
     serializers.UpdateValuesRequest.Raw,
     Rulebricks.UpdateValuesRequest
 > = core.serialization.object({
-    values: core.serialization.record(core.serialization.string(), UpdateValuesRequestValuesValue),
+    values: core.serialization.record(core.serialization.string(), core.serialization.unknown()),
     accessGroups: core.serialization.list(core.serialization.string()).optional(),
 });
 
 export declare namespace UpdateValuesRequest {
     export interface Raw {
-        values: Record<string, UpdateValuesRequestValuesValue.Raw>;
+        values: Record<string, unknown>;
         accessGroups?: string[] | null;
     }
 }

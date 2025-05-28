@@ -5,40 +5,25 @@
 import * as serializers from "../index";
 import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
-import { StringValue } from "./StringValue";
-import { NumberValue } from "./NumberValue";
-import { BooleanValue } from "./BooleanValue";
-import { ListValue } from "./ListValue";
+import { RuleUsage } from "./RuleUsage";
 
-export const DynamicValue: core.serialization.Schema<serializers.DynamicValue.Raw, Rulebricks.DynamicValue> =
-    core.serialization
-        .union("type", {
-            string: StringValue,
-            number: NumberValue,
-            boolean: BooleanValue,
-            list: ListValue,
-        })
-        .transform<Rulebricks.DynamicValue>({
-            transform: (value) => value,
-            untransform: (value) => value,
-        });
+export const DynamicValue: core.serialization.ObjectSchema<serializers.DynamicValue.Raw, Rulebricks.DynamicValue> =
+    core.serialization.object({
+        id: core.serialization.string(),
+        name: core.serialization.string(),
+        type: core.serialization.string(),
+        value: core.serialization.unknown().optional(),
+        usages: core.serialization.list(RuleUsage).optional(),
+        accessGroups: core.serialization.list(core.serialization.string()).optional(),
+    });
 
 export declare namespace DynamicValue {
-    export type Raw = DynamicValue.String | DynamicValue.Number | DynamicValue.Boolean | DynamicValue.List;
-
-    export interface String extends StringValue.Raw {
-        type: "string";
-    }
-
-    export interface Number extends NumberValue.Raw {
-        type: "number";
-    }
-
-    export interface Boolean extends BooleanValue.Raw {
-        type: "boolean";
-    }
-
-    export interface List extends ListValue.Raw {
-        type: "list";
+    export interface Raw {
+        id: string;
+        name: string;
+        type: string;
+        value?: unknown | null;
+        usages?: RuleUsage.Raw[] | null;
+        accessGroups?: string[] | null;
     }
 }

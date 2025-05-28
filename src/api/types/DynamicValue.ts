@@ -4,26 +4,16 @@
 
 import * as Rulebricks from "../index";
 
-export type DynamicValue =
-    | Rulebricks.DynamicValue.String
-    | Rulebricks.DynamicValue.Number
-    | Rulebricks.DynamicValue.Boolean
-    | Rulebricks.DynamicValue.List;
-
-export namespace DynamicValue {
-    export interface String extends Rulebricks.StringValue {
-        type: "string";
-    }
-
-    export interface Number extends Rulebricks.NumberValue {
-        type: "number";
-    }
-
-    export interface Boolean extends Rulebricks.BooleanValue {
-        type: "boolean";
-    }
-
-    export interface List extends Rulebricks.ListValue {
-        type: "list";
-    }
+export interface DynamicValue {
+    /** Unique identifier for the dynamic value. */
+    id: string;
+    /** Name of the dynamic value (may include dot notation for nested properties). */
+    name: string;
+    /** Type identifier for the value (e.g., 'string', 'number', 'boolean', 'list', 'function', etc.) */
+    type: string;
+    value?: unknown;
+    /** Rules that use this dynamic value (only included when 'include=usage' parameter is used). */
+    usages?: Rulebricks.RuleUsage[];
+    /** Access groups assigned to this value. */
+    accessGroups?: string[];
 }

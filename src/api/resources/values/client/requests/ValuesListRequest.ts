@@ -4,11 +4,22 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         include: "usage"
+ *     }
+ *
+ * @example
+ *     {
+ *         include: "usage"
+ *     }
  */
 export interface ValuesListRequest {
     /**
      * Query all dynamic values containing a specific name
      */
     name?: string;
+    /**
+     * Comma-separated list of additional data to include. Use 'usage' to include which rules reference each value.
+     */
+    include?: string;
 }

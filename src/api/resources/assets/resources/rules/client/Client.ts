@@ -254,14 +254,7 @@ export class Rules {
                 case 400:
                     throw new Rulebricks.BadRequestError(_response.error.body);
                 case 403:
-                    throw new Rulebricks.ForbiddenError(
-                        serializers.Error_.parseOrThrow(_response.error.body, {
-                            unrecognizedObjectKeys: "passthrough",
-                            allowUnrecognizedUnionMembers: true,
-                            allowUnrecognizedEnumValues: true,
-                            breadcrumbsPrefix: ["response"],
-                        }),
-                    );
+                    throw new Rulebricks.ForbiddenError(_response.error.body);
                 case 500:
                     throw new Rulebricks.InternalServerError(_response.error.body);
                 default:

@@ -36,24 +36,31 @@ export class Values {
     constructor(protected readonly _options: Values.Options) {}
 
     /**
-     * Retrieve all dynamic values for the authenticated user.
+     * Retrieve all dynamic values for the authenticated user. Use the 'include' parameter to control whether usage information is returned.
      *
      * @param {Rulebricks.ValuesListRequest} request
      * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.values.list()
+     *     await client.values.list({
+     *         include: "usage"
+     *     })
      */
     public async list(
         request: Rulebricks.ValuesListRequest = {},
         requestOptions?: Values.RequestOptions,
     ): Promise<Rulebricks.DynamicValueListResponse> {
-        const { name } = request;
+        const { name, include } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (name != null) {
             _queryParams["name"] = name;
+        }
+
+        if (include != null) {
+            _queryParams["include"] = include;
         }
 
         const _response = await core.fetcher({
@@ -89,6 +96,8 @@ export class Values {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 404:
+                    throw new Rulebricks.NotFoundError(_response.error.body);
                 case 500:
                     throw new Rulebricks.InternalServerError(_response.error.body);
                 default:
@@ -115,12 +124,13 @@ export class Values {
     }
 
     /**
-     * Update existing dynamic values or add new ones for the authenticated user.
+     * Update existing dynamic values or add new ones for the authenticated user. Supports both flat and nested object structures. Nested objects are automatically flattened using dot notation and keys are converted to readable format (e.g., 'user_name' becomes 'User Name', nested 'user.contact_info.email' becomes 'User.Contact Info.Email').
      *
      * @param {Rulebricks.UpdateValuesRequest} request
      * @param {Values.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
@@ -129,9 +139,59 @@ export class Values {
      *             "Favorite Color": "blue",
      *             "Age": 30,
      *             "Is Student": false,
-     *             "Hobbies": ["reading", "cycling"]
+     *             "Hobbies": [
+     *                 "reading",
+     *                 "cycling"
+     *             ]
      *         },
      *         accessGroups: ["marketing", "developers"]
+     *     })
+     *
+     * @example
+     *     await client.values.update({
+     *         values: {
+     *             "user_profile": {
+     *                 "first_name": "Alice",
+     *                 "last_name": "Johnson",
+     *                 "contact_info": {
+     *                     "email_address": "alice@example.com",
+     *                     "phone_number": "555-0123"
+     *                 }
+     *             },
+     *             "account_settings": {
+     *                 "is_premium_user": true,
+     *                 "subscription_tier": "gold",
+     *                 "preferences": [
+     *                     "email_notifications",
+     *                     "sms_alerts"
+     *                 ]
+     *             },
+     *             "account_balance": 1250.75
+     *         },
+     *         accessGroups: ["marketing", "developers"]
+     *     })
+     *
+     * @example
+     *     await client.values.update({
+     *         values: {
+     *             "Company Name": "Acme Corp",
+     *             "company_details": {
+     *                 "founded_year": 2020,
+     *                 "employee_count": 150,
+     *                 "headquarters": {
+     *                     "city": "San Francisco",
+     *                     "state": "CA",
+     *                     "country": "USA"
+     *                 }
+     *             },
+     *             "Is Public": false,
+     *             "tags": [
+     *                 "tech",
+     *                 "startup",
+     *                 "saas"
+     *             ]
+     *         },
+     *         accessGroups: ["marketing"]
      *     })
      */
     public async update(
@@ -173,6 +233,8 @@ export class Values {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new Rulebricks.BadRequestError(_response.error.body);
+                case 403:
+                    throw new Rulebricks.ForbiddenError(_response.error.body);
                 case 500:
                     throw new Rulebricks.InternalServerError(_response.error.body);
                 default:

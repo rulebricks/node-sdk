@@ -1,11 +1,10 @@
 export * as users from "./users";
 export * from "./users/types";
-export * as values from "./values";
-export * from "./values/types";
 export * as rules from "./rules";
 export * as flows from "./flows";
 export * as decisions from "./decisions";
 export * as assets from "./assets";
+export * as values from "./values";
 export * as tests from "./tests";
 export * from "./decisions/client/requests";
 export * from "./users/client/requests";
