@@ -6,6 +6,7 @@ export enum DynamicValueType {
     BOOLEAN = "boolean",
     DATE = "date",
     LIST = "list",
+    FUNCTION = "function",
     OBJECT = "object",
 }
 
@@ -15,6 +16,7 @@ export enum RuleType {
     STRING = "string",
     DATE = "date",
     LIST = "list",
+    FUNCTION = "function",
 }
 
 export interface Field {

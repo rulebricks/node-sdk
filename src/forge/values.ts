@@ -27,6 +27,7 @@ export class DynamicValue {
             [DynamicValueType.DATE]: Date,
             [DynamicValueType.LIST]: Array,
             [DynamicValueType.OBJECT]: Object,
+            [DynamicValueType.FUNCTION]: Function,
         };
         return typeMapping[valueType];
     }

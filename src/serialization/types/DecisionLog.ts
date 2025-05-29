@@ -5,20 +5,10 @@
 import * as serializers from "../index";
 import * as Rulebricks from "../../api/index";
 import * as core from "../../core";
-import { DecisionLogRequest } from "./DecisionLogRequest";
-import { DecisionLogDecision } from "./DecisionLogDecision";
 
-export const DecisionLog: core.serialization.ObjectSchema<serializers.DecisionLog.Raw, Rulebricks.DecisionLog> =
-    core.serialization.object({
-        request: DecisionLogRequest.optional(),
-        response: core.serialization.lazyObject(() => serializers.DecisionLogResponse).optional(),
-        decision: DecisionLogDecision.optional(),
-    });
+export const DecisionLog: core.serialization.Schema<serializers.DecisionLog.Raw, Rulebricks.DecisionLog> =
+    core.serialization.record(core.serialization.string(), core.serialization.unknown());
 
 export declare namespace DecisionLog {
-    export interface Raw {
-        request?: DecisionLogRequest.Raw | null;
-        response?: serializers.DecisionLogResponse.Raw | null;
-        decision?: DecisionLogDecision.Raw | null;
-    }
+    export type Raw = Record<string, unknown>;
 }
