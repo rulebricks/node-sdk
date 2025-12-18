@@ -30,7 +30,7 @@ export namespace Test {
         duration?: number;
         /** Actual response returned */
         response?: Record<string, unknown> | null;
-        conditions?: Record<string, TestState.Conditions.Value>[];
+        conditions?: Record<string, unknown>[];
         /** HTTP status code returned */
         httpStatus?: number;
         successIdxs?: number[];
@@ -39,15 +39,6 @@ export namespace Test {
     }
 
     export namespace TestState {
-        export type Conditions = Conditions.Item[];
-
-        export namespace Conditions {
-            export interface Item {
-                result?: boolean;
-                err?: string;
-            }
-        }
-
         /**
          * Error message or flag indicating if evaluation error occurred
          */
