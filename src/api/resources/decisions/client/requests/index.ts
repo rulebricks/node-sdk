@@ -1,1 +1,1 @@
-export { type DecisionsQueryRequest } from "./DecisionsQueryRequest";
+export type { QueryDecisionsRequest } from "./QueryDecisionsRequest.js";

@@ -1,3 +1,3 @@
-export { type ValuesListRequest } from "./ValuesListRequest";
-export { type UpdateValuesRequest } from "./UpdateValuesRequest";
-export { type ValuesDeleteRequest } from "./ValuesDeleteRequest";
+export type { DeleteValuesRequest } from "./DeleteValuesRequest.js";
+export type { ListValuesRequest } from "./ListValuesRequest.js";
+export type { UpdateValuesRequest } from "./UpdateValuesRequest.js";

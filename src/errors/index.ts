@@ -1,2 +1,2 @@
-export { RulebricksError } from "./RulebricksError";
-export { RulebricksTimeoutError } from "./RulebricksTimeoutError";
+export { RulebricksError } from "./RulebricksError.js";
+export { RulebricksTimeoutError } from "./RulebricksTimeoutError.js";

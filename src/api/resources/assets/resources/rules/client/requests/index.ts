@@ -1,4 +1,4 @@
-export { type DeleteRuleRequest } from "./DeleteRuleRequest";
-export { type RulesPullRequest } from "./RulesPullRequest";
-export { type ImportRuleRequest } from "./ImportRuleRequest";
-export { type RulesListRequest } from "./RulesListRequest";
+export type { DeleteRuleRequest } from "./DeleteRuleRequest.js";
+export type { ImportRuleRequest } from "./ImportRuleRequest.js";
+export type { ListRulesRequest } from "./ListRulesRequest.js";
+export type { PullRulesRequest } from "./PullRulesRequest.js";

@@ -1,1 +1,0 @@
-export { CreateUserGroupRequest } from "./CreateUserGroupRequest";

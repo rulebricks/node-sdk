@@ -1,2 +1,2 @@
-export { type UpsertFolderRequest } from "./UpsertFolderRequest";
-export { type DeleteFolderRequest } from "./DeleteFolderRequest";
+export type { DeleteFolderRequest } from "./DeleteFolderRequest.js";
+export type { UpsertFolderRequest } from "./UpsertFolderRequest.js";

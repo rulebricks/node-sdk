@@ -1,1 +1,2 @@
-export { type UserInviteRequest } from "./UserInviteRequest";
+export type { CreateUserRequest } from "./CreateUserRequest.js";
+export type { UserInviteRequest } from "./UserInviteRequest.js";
