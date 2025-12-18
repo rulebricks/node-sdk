@@ -3,45 +3,50 @@ name: ci
 on: [push]
 
 jobs:
-  compile:
-    runs-on: ubuntu-latest
+    compile:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
 
-      - name: Set up node
-        uses: actions/setup-node@v3
+            - name: Set up node
+              uses: actions/setup-node@v3
 
-      - name: Compile
-        run: yarn && yarn build
+            - name: Compile
+              run: yarn && yarn build
 
-  publish:
-    needs: [compile]
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
+    publish:
+        needs: [compile]
+        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+            - name: Set up Node environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  registry-url: https://registry.npmjs.org
 
-      - name: Set up node
-        uses: actions/setup-node@v3
+            - run: npm install -g npm@latest
 
-      - name: Install dependencies
-        run: yarn install
+            - name: Install dependencies
+              run: yarn install
 
-      - name: Build
-        run: yarn build
+            - name: Build
+              run: yarn build
 
-      - name: Publish to npm
-        run: |
-          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-          VERSION=$(cat package.json | jq -r '.version')
-          if [[ $VERSION == *"rc"* ]]; then
-            npm publish --access public --tag rc
-          else
-            npm publish --access public
-          fi
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish to npm
+              run: |
+                  npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+                  VERSION=$(cat package.json | jq -r '.version')
+                  if [[ $VERSION == *"rc"* ]]; then
+                    npm publish --access public --tag rc
+                  else
+                    npm publish --access public
+                  fi
