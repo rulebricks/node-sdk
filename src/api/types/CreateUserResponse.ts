@@ -21,9 +21,9 @@ export namespace CreateUserResponse {
         name?: string | null;
         /** Role assigned to the user. */
         role?: string;
-        /** Access groups assigned to the user. */
-        accessGroups?: string[];
+        /** User groups assigned to the user. */
+        user_groups?: string[];
         /** API key generated for the user. */
-        apiKey?: string | null;
+        api_key?: string | null;
     }
 }

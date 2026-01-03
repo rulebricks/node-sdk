@@ -11,11 +11,11 @@ export interface UserDetail {
     /** Display name of the user (if set). */
     name?: string | null;
     /** API key assigned to the user. */
-    apiKey?: string | null;
+    api_key?: string | null;
     /** Role assigned to the user (e.g., 'administrator', 'developer', 'editor', or custom role ID). */
     role?: string;
-    /** List of access group names the user belongs to. */
-    accessGroups?: string[];
+    /** List of user group names the user belongs to. */
+    user_groups?: string[];
     /** Date and time when the user joined the organization. */
-    joinedAt?: string | null;
+    joined_at?: string | null;
 }

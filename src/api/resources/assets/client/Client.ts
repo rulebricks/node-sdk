@@ -7,7 +7,7 @@ import * as core from "../../../../core/index.js";
 import * as environments from "../../../../environments.js";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError.js";
 import * as errors from "../../../../errors/index.js";
-import type * as Rulebricks from "../../../index.js";
+import * as Rulebricks from "../../../index.js";
 import { FlowsClient } from "../resources/flows/client/Client.js";
 import { FoldersClient } from "../resources/folders/client/Client.js";
 import { RulesClient } from "../resources/rules/client/Client.js";
@@ -95,5 +95,171 @@ export class AssetsClient {
         }
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/admin/usage");
+    }
+
+    /**
+     * Import rules, flows, contexts, and values from an RBM manifest file.
+     *
+     * @param {Rulebricks.ImportManifestRequest} request
+     * @param {AssetsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.InternalServerError}
+     *
+     * @example
+     *     await client.assets.import({
+     *         manifest: {
+     *             version: "1.0",
+     *             rules: [{
+     *                     "name": "Pricing Rule",
+     *                     "slug": "pricing-rule"
+     *                 }],
+     *             flows: [{
+     *                     "name": "Onboarding Flow",
+     *                     "slug": "onboarding-flow"
+     *                 }],
+     *             contexts: [{
+     *                     "name": "Customer",
+     *                     "slug": "customer"
+     *                 }],
+     *             values: [{
+     *                     "key": "tax_rate",
+     *                     "value": 0.08
+     *                 }]
+     *         },
+     *         overwrite: false
+     *     })
+     */
+    public import(
+        request: Rulebricks.ImportManifestRequest,
+        requestOptions?: AssetsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.ImportManifestResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__import(request, requestOptions));
+    }
+
+    private async __import(
+        request: Rulebricks.ImportManifestRequest,
+        requestOptions?: AssetsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.ImportManifestResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                "admin/import",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.ImportManifestResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 500:
+                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/admin/import");
+    }
+
+    /**
+     * Export selected rules, flows, contexts, and values to an RBM manifest file.
+     *
+     * @param {Rulebricks.ExportManifestRequest} request
+     * @param {AssetsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.InternalServerError}
+     *
+     * @example
+     *     await client.assets.export({
+     *         rules: ["pricing-rule", "eligibility-check"],
+     *         flows: ["onboarding-flow"],
+     *         contexts: ["customer"],
+     *         values: ["tax_rate", "discount_threshold"]
+     *     })
+     */
+    public export(
+        request: Rulebricks.ExportManifestRequest = {},
+        requestOptions?: AssetsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.ExportAssetsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__export(request, requestOptions));
+    }
+
+    private async __export(
+        request: Rulebricks.ExportManifestRequest = {},
+        requestOptions?: AssetsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.ExportAssetsResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                "admin/export",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.ExportAssetsResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                case 500:
+                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/admin/export");
     }
 }

@@ -125,7 +125,7 @@ export class ValuesClient {
      *                 "cycling"
      *             ]
      *         },
-     *         accessGroups: ["marketing", "developers"]
+     *         user_groups: ["marketing", "developers"]
      *     })
      *
      * @example
@@ -149,7 +149,7 @@ export class ValuesClient {
      *             },
      *             "account_balance": 1250.75
      *         },
-     *         accessGroups: ["marketing", "developers"]
+     *         user_groups: ["marketing", "developers"]
      *     })
      *
      * @example
@@ -172,7 +172,7 @@ export class ValuesClient {
      *                 "saas"
      *             ]
      *         },
-     *         accessGroups: ["marketing"]
+     *         user_groups: ["marketing"]
      *     })
      */
     public update(

@@ -12,7 +12,7 @@
  *                 "cycling"
  *             ]
  *         },
- *         accessGroups: ["marketing", "developers"]
+ *         user_groups: ["marketing", "developers"]
  *     }
  *
  * @example
@@ -36,7 +36,7 @@
  *             },
  *             "account_balance": 1250.75
  *         },
- *         accessGroups: ["marketing", "developers"]
+ *         user_groups: ["marketing", "developers"]
  *     }
  *
  * @example
@@ -59,7 +59,7 @@
  *                 "saas"
  *             ]
  *         },
- *         accessGroups: ["marketing"]
+ *         user_groups: ["marketing"]
  *     }
  *
  * @example
@@ -73,7 +73,7 @@
  *                 "cycling"
  *             ]
  *         },
- *         accessGroups: ["marketing", "developers"]
+ *         user_groups: ["marketing", "developers"]
  *     }
  *
  * @example
@@ -87,12 +87,12 @@
  *                 "cycling"
  *             ]
  *         },
- *         accessGroups: ["marketing", "developers"]
+ *         user_groups: ["marketing", "developers"]
  *     }
  */
 export interface UpdateValuesRequest {
     /** A dictionary of keys and values to update or add. Supports both flat key-value pairs and nested objects. Nested objects will be automatically flattened using dot notation with readable key names (e.g., 'user.contact_info.email' becomes 'User.Contact Info.Email'). */
     values: Record<string, unknown>;
     /** Optional array of access group names or IDs. If omitted and user belongs to access groups, values will be assigned to all user's access groups. Required if values should be restricted to specific access groups. */
-    accessGroups?: string[];
+    user_groups?: string[];
 }

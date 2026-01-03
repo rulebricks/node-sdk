@@ -5,28 +5,28 @@
  *     {
  *         email: "newuser@example.com",
  *         role: "developer",
- *         accessGroups: ["group1", "group2"]
+ *         user_groups: ["group1", "group2"]
  *     }
  *
  * @example
  *     {
  *         email: "existinguser@example.com",
  *         role: "custom-role",
- *         accessGroups: ["group1"]
+ *         user_groups: ["group1"]
  *     }
  *
  * @example
  *     {
  *         email: "newuser@example.com",
  *         role: "developer",
- *         accessGroups: ["group1", "group2"]
+ *         user_groups: ["group1", "group2"]
  *     }
  *
  * @example
  *     {
  *         email: "newuser@example.com",
  *         role: "developer",
- *         accessGroups: ["group1", "group2"]
+ *         user_groups: ["group1", "group2"]
  *     }
  */
 export interface UserInviteRequest {
@@ -34,8 +34,8 @@ export interface UserInviteRequest {
     email: string;
     /** System or custom role ID to assign to the user. Available system roles include 'admin', 'editor', and 'developer'. */
     role?: UserInviteRequest.Role;
-    /** List of access group names or IDs to assign to the user. All specified groups must exist in your organization. */
-    accessGroups?: string[];
+    /** List of user group names or IDs to assign to the user. All specified groups must exist in your organization. */
+    user_groups?: string[];
 }
 
 export namespace UserInviteRequest {

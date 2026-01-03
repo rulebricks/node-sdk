@@ -7,4 +7,34 @@ export interface FlowDetail extends Rulebricks.FlowBase {
     published?: boolean;
     /** The date this flow was last updated. */
     updated_at?: string;
+    /** The origin rule that this flow starts from. Flows execute starting from this rule's outputs. */
+    origin_rule?: FlowDetail.OriginRule | null;
+    /** The context this flow is bound to (via its origin rule). Flows inherit context binding from their origin rule. */
+    context?: FlowDetail.Context | null;
+}
+
+export namespace FlowDetail {
+    /**
+     * The origin rule that this flow starts from. Flows execute starting from this rule's outputs.
+     */
+    export interface OriginRule {
+        /** The origin rule ID. */
+        id?: string;
+        /** The origin rule name. */
+        name?: string;
+        /** The origin rule slug. */
+        slug?: string;
+    }
+
+    /**
+     * The context this flow is bound to (via its origin rule). Flows inherit context binding from their origin rule.
+     */
+    export interface Context {
+        /** The context ID. */
+        id?: string;
+        /** The context name. */
+        name?: string;
+        /** The context slug. */
+        slug?: string;
+    }
 }

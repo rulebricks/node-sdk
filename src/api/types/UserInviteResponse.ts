@@ -12,7 +12,7 @@ export namespace UserInviteResponse {
         email?: string;
         /** Role assigned to the user. */
         role?: string;
-        /** Access groups assigned to the user. */
-        accessGroups?: string[];
+        /** User groups assigned to the user. */
+        user_groups?: string[];
     }
 }

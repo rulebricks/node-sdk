@@ -13,7 +13,7 @@
  *         password: "securePassword123",
  *         name: "New User",
  *         role: "developer",
- *         accessGroups: ["engineering", "qa"]
+ *         user_groups: ["engineering", "qa"]
  *     }
  */
 export interface CreateUserRequest {
@@ -25,6 +25,6 @@ export interface CreateUserRequest {
     name?: string;
     /** Role to assign to the user. Defaults to 'developer' if not specified. */
     role?: string;
-    /** List of access group names or IDs to assign to the user. */
-    accessGroups?: string[];
+    /** List of user group names or IDs to assign to the user. */
+    user_groups?: string[];
 }

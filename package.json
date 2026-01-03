@@ -1,6 +1,6 @@
 {
     "name": "@rulebricks/sdk",
-    "version": "1.5.2",
+    "version": "2.0.0",
     "private": false,
     "repository": "https://github.com/rulebricks/node-sdk",
     "main": "./index.js",
@@ -21,7 +21,6 @@
         "test": "jest"
     },
     "dependencies": {
-        "@rulebricks/sdk": "^1.2.0",
         "@types/pako": "2.0.1",
         "form-data": "4.0.0",
         "js-base64": "3.7.2",

@@ -512,21 +512,6 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@rulebricks/sdk@^1.2.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@rulebricks/sdk/-/sdk-1.5.0.tgz#8f3169d6624129701f36298508d481bf215de8be"
-  integrity sha512-NShSARcBrstHhNqTyFiz8+RA4BGT+NVJafd74RFFMmHpmIMiTmoWE6p3hyjLAnWhiUMyntZL/db+dBFpF2q+qQ==
-  dependencies:
-    "@rulebricks/sdk" "^1.2.0"
-    "@types/pako" "2.0.1"
-    form-data "4.0.0"
-    js-base64 "3.7.2"
-    node-fetch "2.7.0"
-    pako "2.0.1"
-    qs "6.11.2"
-    readable-stream "^4.7.0"
-    url-join "4.0.1"
-
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.27.8.tgz#6667fac16c436b5434a387a34dedb013198f6e6e"

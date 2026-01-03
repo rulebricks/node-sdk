@@ -8,5 +8,5 @@ export interface Folder {
     /** Description of the folder. */
     description?: string;
     /** Timestamp of when the folder was last updated. */
-    updatedAt?: string;
+    updated_at?: string;
 }

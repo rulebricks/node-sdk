@@ -44,14 +44,14 @@ export class UsersClient {
      *     await client.users.invite({
      *         email: "newuser@example.com",
      *         role: "developer",
-     *         accessGroups: ["group1", "group2"]
+     *         user_groups: ["group1", "group2"]
      *     })
      *
      * @example
      *     await client.users.invite({
      *         email: "existinguser@example.com",
      *         role: "custom-role",
-     *         accessGroups: ["group1"]
+     *         user_groups: ["group1"]
      *     })
      */
     public invite(
@@ -193,7 +193,7 @@ export class UsersClient {
      *         password: "securePassword123",
      *         name: "New User",
      *         role: "developer",
-     *         accessGroups: ["engineering", "qa"]
+     *         user_groups: ["engineering", "qa"]
      *     })
      */
     public create(

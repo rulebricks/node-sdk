@@ -5,9 +5,27 @@ import type * as Rulebricks from "../index.js";
 export interface RuleDetail extends Rulebricks.RuleBase {
     /** The date this rule was created. */
     created_at?: string;
+    /** The date this rule was last updated. */
+    updated_at?: string;
     folder?: Rulebricks.Folder;
+    /** The context this rule is bound to (if any). Rules bound to a context have their inputs/outputs mapped to context fields. */
+    context?: RuleDetail.Context | null;
     /** The published request schema for the rule. */
     request_schema?: Rulebricks.SchemaField[];
     /** The published response schema for the rule. */
     response_schema?: Rulebricks.SchemaField[];
+}
+
+export namespace RuleDetail {
+    /**
+     * The context this rule is bound to (if any). Rules bound to a context have their inputs/outputs mapped to context fields.
+     */
+    export interface Context {
+        /** The context ID. */
+        id?: string;
+        /** The context name. */
+        name?: string;
+        /** The context slug. */
+        slug?: string;
+    }
 }

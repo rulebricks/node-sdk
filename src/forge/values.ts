@@ -73,12 +73,12 @@ export class DynamicValues {
         }
     }
 
-    static async set(dynamicValues: Record<string, any>, accessGroups: string[] = []): Promise<void> {
+    static async set(dynamicValues: Record<string, any>, user_groups: string[] = []): Promise<void> {
         if (!this.workspace) {
             throw new Error("Workspace not configured. Call configure() first.");
         }
 
-        await this.workspace.values.update({ values: dynamicValues, accessGroups });
+        await this.workspace.values.update({ values: dynamicValues, user_groups });
         this.cache.clear();
     }
 
