@@ -3,23 +3,33 @@
 /**
  * @example
  *     {
- *         rules: ["pricing-rule", "eligibility-check"],
- *         flows: ["onboarding-flow"],
- *         contexts: ["customer"],
- *         values: ["tax_rate", "discount_threshold"]
+ *         root_type: "rule",
+ *         root_ids: ["pricing-rule", "eligibility-check"],
+ *         include_downstream: false
  *     }
  */
 export interface ExportManifestRequest {
-    /** Rule IDs or slugs to export. */
-    rules?: string[];
-    /** Flow IDs or slugs to export. */
-    flows?: string[];
-    /** Context IDs or slugs to export. */
-    contexts?: string[];
-    /** Value IDs or names to export. */
-    values?: string[];
-    /** Export all assets of specified types. */
-    includeAll?: boolean;
-    /** Return a preview of what would be exported without the full data. */
-    preview?: boolean;
+    /** The type of root asset to export. All dependencies will be included. */
+    root_type: ExportManifestRequest.RootType;
+    /** Array of IDs for the root assets to export. Dependencies are automatically resolved. */
+    root_ids: string[];
+    /** For context exports, whether to include rules and flows bound to the context. */
+    include_downstream?: boolean;
+    /** Optional name for the exported manifest. */
+    manifest_name?: string;
+    /** Optional description for the exported manifest. */
+    manifest_description?: string;
+    /** If true, returns a preview of what would be exported without the full data. */
+    preview_only?: boolean;
+}
+
+export namespace ExportManifestRequest {
+    /** The type of root asset to export. All dependencies will be included. */
+    export const RootType = {
+        Rule: "rule",
+        Flow: "flow",
+        Context: "context",
+        Value: "value",
+    } as const;
+    export type RootType = (typeof RootType)[keyof typeof RootType];
 }

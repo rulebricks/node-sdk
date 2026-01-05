@@ -9,4 +9,6 @@ export interface UserGroup {
     description?: string;
     /** List of member emails in the user group. */
     members?: string[];
+    /** When the user group was created. */
+    created_at?: string;
 }

@@ -14,8 +14,8 @@ export interface ContextInstancePendingEvaluation {
     flow?: string | null;
     /** The flow ID (if type is 'flow'). */
     flow_id?: string | null;
-    /** List of field keys this evaluation is waiting for. */
-    waiting_on?: string[];
+    /** List of field keys or dependency objects this evaluation is waiting for. Can contain simple strings for direct fields or objects for relationship dependencies. */
+    waiting_on?: ContextInstancePendingEvaluation.WaitingOn.Item[];
     /** When this pending evaluation was registered. */
     created_at?: string;
     /** When this pending evaluation will expire. */
@@ -29,4 +29,15 @@ export namespace ContextInstancePendingEvaluation {
         Flow: "flow",
     } as const;
     export type Type = (typeof Type)[keyof typeof Type];
+    export type WaitingOn = WaitingOn.Item[];
+
+    export namespace WaitingOn {
+        export type Item =
+            | string
+            | {
+                  field?: string | undefined;
+                  relation?: string | undefined;
+                  instance?: string | undefined;
+              };
+    }
 }

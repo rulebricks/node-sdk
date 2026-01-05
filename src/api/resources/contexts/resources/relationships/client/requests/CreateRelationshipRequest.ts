@@ -4,9 +4,9 @@
  * @example
  *     {
  *         id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
- *         targetContextId: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
- *         type: "one-to-many",
- *         foreignKey: "customer_id",
+ *         to_context_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+ *         relation_type: "has_many",
+ *         foreign_key_fact: "customer_id",
  *         name: "Customer Orders"
  *     }
  */
@@ -14,11 +14,11 @@ export interface CreateRelationshipRequest {
     /** The unique identifier for the context. */
     id: string;
     /** The ID of the target context. */
-    targetContextId: string;
+    to_context_id: string;
     /** The type of relationship. */
-    type: CreateRelationshipRequest.Type;
+    relation_type: CreateRelationshipRequest.RelationType;
     /** The field key to use as the foreign key. */
-    foreignKey: string;
+    foreign_key_fact: string;
     /** Display name for the relationship. */
     name?: string;
     /** Description of the relationship. */
@@ -27,10 +27,10 @@ export interface CreateRelationshipRequest {
 
 export namespace CreateRelationshipRequest {
     /** The type of relationship. */
-    export const Type = {
-        OneToOne: "one-to-one",
-        OneToMany: "one-to-many",
-        ManyToOne: "many-to-one",
+    export const RelationType = {
+        HasMany: "has_many",
+        HasOne: "has_one",
+        BelongsTo: "belongs_to",
     } as const;
-    export type Type = (typeof Type)[keyof typeof Type];
+    export type RelationType = (typeof RelationType)[keyof typeof RelationType];
 }

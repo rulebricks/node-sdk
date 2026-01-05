@@ -113,9 +113,9 @@ export class RelationshipsClient {
      * @example
      *     await client.contexts.relationships.create({
      *         id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-     *         targetContextId: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-     *         type: "one-to-many",
-     *         foreignKey: "customer_id",
+     *         to_context_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+     *         relation_type: "has_many",
+     *         foreign_key_fact: "customer_id",
      *         name: "Customer Orders"
      *     })
      */

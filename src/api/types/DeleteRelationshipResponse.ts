@@ -3,4 +3,6 @@
 export interface DeleteRelationshipResponse {
     /** Success message. */
     message?: string;
+    /** The ID of the deleted relationship. */
+    id?: string;
 }

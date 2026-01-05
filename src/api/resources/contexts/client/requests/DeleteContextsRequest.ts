@@ -7,7 +7,7 @@
  *         instance: "cust-12345"
  *     }
  */
-export interface DeleteInstanceContextsRequest {
+export interface DeleteContextsRequest {
     /** The unique slug for the context. */
     slug: string;
     /** The unique identifier for the context instance. */

@@ -1,8 +1,8 @@
-export type { CascadeContextRequest } from "./CascadeContextRequest.js";
-export type { DeleteInstanceContextsRequest } from "./DeleteInstanceContextsRequest.js";
+export type { CascadeContextsRequest } from "./CascadeContextsRequest.js";
+export type { DeleteContextsRequest } from "./DeleteContextsRequest.js";
+export type { ExecuteContextsRequest } from "./ExecuteContextsRequest.js";
+export type { GetContextsRequest } from "./GetContextsRequest.js";
 export type { GetHistoryContextsRequest } from "./GetHistoryContextsRequest.js";
-export type { GetInstanceContextsRequest } from "./GetInstanceContextsRequest.js";
 export type { GetPendingContextsRequest } from "./GetPendingContextsRequest.js";
-export type { SolveContextFlowRequest } from "./SolveContextFlowRequest.js";
-export type { SolveContextRuleRequest } from "./SolveContextRuleRequest.js";
+export type { SolveContextsRequest } from "./SolveContextsRequest.js";
 export type { SubmitContextsRequest } from "./SubmitContextsRequest.js";

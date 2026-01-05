@@ -6,19 +6,21 @@ export interface ContextRelationshipBase {
     /** The type of relationship. */
     type?: ContextRelationshipBase.Type;
     /** The field key used as the foreign key. */
-    foreignKey?: string;
+    foreign_key?: string;
     /** Display name for the relationship. */
     name?: string;
     /** Description of the relationship. */
     description?: string;
+    /** When the relationship was created. */
+    created_at?: string;
 }
 
 export namespace ContextRelationshipBase {
     /** The type of relationship. */
     export const Type = {
-        OneToOne: "one-to-one",
-        OneToMany: "one-to-many",
-        ManyToOne: "many-to-one",
+        HasMany: "has_many",
+        HasOne: "has_one",
+        BelongsTo: "belongs_to",
     } as const;
     export type Type = (typeof Type)[keyof typeof Type];
 }

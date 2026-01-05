@@ -12,9 +12,9 @@ export interface SchemaField {
     /** Data type of this field. */
     type?: SchemaField.Type;
     /** Default value for this field. */
-    defaultValue?: SchemaField.DefaultValue | null;
+    default_value?: SchemaField.DefaultValue | null;
     /** Computed default value for this field. */
-    defaultComputedValue?: string | null;
+    default_computed_value?: string | null;
     /** Transformation expression to apply to this field. */
     transform?: string;
 }

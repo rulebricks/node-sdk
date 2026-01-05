@@ -2,4 +2,4 @@
 
 import type * as Rulebricks from "../index.js";
 
-export type ContextListResponse = Rulebricks.ContextDetail[];
+export type ContextListResponse = Rulebricks.ContextListItem[];

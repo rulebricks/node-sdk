@@ -32,7 +32,7 @@ export class UsersClient {
     }
 
     /**
-     * Invite a new user to the organization or update role or access group data for an existing user.
+     * Invite a new user to the organization or update role or user group data for an existing user.
      *
      * @param {Rulebricks.UserInviteRequest} request
      * @param {UsersClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -113,7 +113,7 @@ export class UsersClient {
     }
 
     /**
-     * List all users (including the admin and all team members) in the organization with their details including email, name, API key, role, access groups, and join date.
+     * List all users (including the admin and all team members) in the organization with their details including email, name, API key, role, user groups, and join date.
      *
      * @param {UsersClient.RequestOptions} requestOptions - Request-specific configuration.
      *

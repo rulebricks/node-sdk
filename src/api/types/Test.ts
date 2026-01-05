@@ -11,14 +11,14 @@ export interface Test {
     response: Record<string, unknown>;
     /** Indicates whether the test is critical. */
     critical: boolean;
-    /** Indicates if the test resulted in an error. */
-    error: boolean;
-    /** Indicates if the test was successful. */
-    success: boolean;
+    /** Indicates if the test resulted in an error. Null if test has not been executed. */
+    error?: boolean | null;
+    /** Indicates if the test was successful. Null if test has not been executed. */
+    success?: boolean | null;
     /** The state of the test after execution. */
-    testState?: Test.TestState | null;
+    test_state?: Test.TestState | null;
     /** The timestamp when the test was last executed. */
-    lastExecuted?: string | null;
+    last_executed?: string | null;
 }
 
 export namespace Test {
@@ -32,10 +32,10 @@ export namespace Test {
         response?: Record<string, unknown> | null;
         conditions?: Record<string, unknown>[];
         /** HTTP status code returned */
-        httpStatus?: number;
-        successIdxs?: number[];
+        http_status?: number;
+        success_idxs?: number[];
         /** Error message or flag indicating if evaluation error occurred */
-        evaluationError?: TestState.EvaluationError;
+        evaluation_error?: TestState.EvaluationError;
     }
 
     export namespace TestState {

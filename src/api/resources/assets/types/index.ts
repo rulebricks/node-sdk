@@ -1,1 +1,1 @@
-export * from "./ExportAssetsResponse.js";
+export * from "./ExportRbmAssetsResponse.js";

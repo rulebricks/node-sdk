@@ -9,35 +9,37 @@ import { handleNonStatusCodeError } from "../../../../../../errors/handleNonStat
 import * as errors from "../../../../../../errors/index.js";
 import * as Rulebricks from "../../../../../index.js";
 
-export declare namespace AdminClient {
+export declare namespace ObjectsClient {
     export type Options = BaseClientOptions;
 
     export interface RequestOptions extends BaseRequestOptions {}
 }
 
-export class AdminClient {
-    protected readonly _options: NormalizedClientOptionsWithAuth<AdminClient.Options>;
+export class ObjectsClient {
+    protected readonly _options: NormalizedClientOptionsWithAuth<ObjectsClient.Options>;
 
-    constructor(options: AdminClient.Options) {
+    constructor(options: ObjectsClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
     }
 
     /**
-     * Retrieve all contexts (entities) for the authenticated user.
+     * Retrieve all contexts for the authenticated user.
      *
-     * @param {AdminClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.admin.list()
+     *     await client.contexts.objects.list()
      */
-    public list(requestOptions?: AdminClient.RequestOptions): core.HttpResponsePromise<Rulebricks.ContextListResponse> {
+    public list(
+        requestOptions?: ObjectsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.ContextListResponse> {
         return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
     }
 
     private async __list(
-        requestOptions?: AdminClient.RequestOptions,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ContextListResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -82,16 +84,16 @@ export class AdminClient {
     }
 
     /**
-     * Create a new context (entity) for the authenticated user.
+     * Create a new context for the authenticated user.
      *
      * @param {Rulebricks.contexts.CreateContextRequest} request
-     * @param {AdminClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.admin.create({
+     *     await client.contexts.objects.create({
      *         name: "Customer",
      *         description: "Represents a customer in the system",
      *         schema: [{
@@ -102,19 +104,20 @@ export class AdminClient {
      *                 key: "age",
      *                 name: "Age",
      *                 type: "number"
-     *             }]
+     *             }],
+     *         identity_fact: "email"
      *     })
      */
     public create(
         request: Rulebricks.contexts.CreateContextRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.CreateContextResponse> {
         return core.HttpResponsePromise.fromPromise(this.__create(request, requestOptions));
     }
 
     private async __create(
         request: Rulebricks.contexts.CreateContextRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.CreateContextResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -166,27 +169,27 @@ export class AdminClient {
     /**
      * Retrieve a specific context by its ID.
      *
-     * @param {Rulebricks.contexts.GetAdminRequest} request
-     * @param {AdminClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Rulebricks.contexts.GetObjectsRequest} request
+     * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.admin.get({
+     *     await client.contexts.objects.get({
      *         id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
      *     })
      */
     public get(
-        request: Rulebricks.contexts.GetAdminRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        request: Rulebricks.contexts.GetObjectsRequest,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.ContextDetail> {
         return core.HttpResponsePromise.fromPromise(this.__get(request, requestOptions));
     }
 
     private async __get(
-        request: Rulebricks.contexts.GetAdminRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        request: Rulebricks.contexts.GetObjectsRequest,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ContextDetail>> {
         const { id } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
@@ -237,14 +240,14 @@ export class AdminClient {
      * Update an existing context's properties and schema.
      *
      * @param {Rulebricks.contexts.UpdateContextRequest} request
-     * @param {AdminClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.admin.update({
+     *     await client.contexts.objects.update({
      *         id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
      *         name: "Updated Customer",
      *         description: "Updated description for premium customers"
@@ -252,14 +255,14 @@ export class AdminClient {
      */
     public update(
         request: Rulebricks.contexts.UpdateContextRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.UpdateContextResponse> {
         return core.HttpResponsePromise.fromPromise(this.__update(request, requestOptions));
     }
 
     private async __update(
         request: Rulebricks.contexts.UpdateContextRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.UpdateContextResponse>> {
         const { id, ..._body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
@@ -314,27 +317,27 @@ export class AdminClient {
     /**
      * Delete a specific context and all its instances.
      *
-     * @param {Rulebricks.contexts.DeleteAdminRequest} request
-     * @param {AdminClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Rulebricks.contexts.DeleteObjectsRequest} request
+     * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.admin.delete({
+     *     await client.contexts.objects.delete({
      *         id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
      *     })
      */
     public delete(
-        request: Rulebricks.contexts.DeleteAdminRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        request: Rulebricks.contexts.DeleteObjectsRequest,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.DeleteContextResponse> {
         return core.HttpResponsePromise.fromPromise(this.__delete(request, requestOptions));
     }
 
     private async __delete(
-        request: Rulebricks.contexts.DeleteAdminRequest,
-        requestOptions?: AdminClient.RequestOptions,
+        request: Rulebricks.contexts.DeleteObjectsRequest,
+        requestOptions?: ObjectsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DeleteContextResponse>> {
         const { id } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();

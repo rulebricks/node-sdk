@@ -3,13 +3,13 @@
 import type * as Rulebricks from "../index.js";
 
 /**
- * Response containing decision logs or a count.
+ * Response containing decision logs or a count. Returns either {data, cursor} for log queries OR {count} for count queries - these are mutually exclusive based on the count parameter.
  */
 export interface DecisionLogResponse {
-    /** Array of decision log entries (omitted when count=true). */
+    /** Array of decision log entries. Only present when count parameter is not 'true'. */
     data?: Rulebricks.DecisionLog[];
-    /** Pagination cursor for fetching the next page. Null if no more results. */
+    /** Pagination cursor for fetching the next page. Null if no more results. Only present when count parameter is not 'true'. */
     cursor?: string | null;
-    /** Total count of matching logs (only present when count=true parameter is used). */
+    /** Total count of matching logs. Only present when count parameter is 'true'. When this is returned, data and cursor are not included. */
     count?: number;
 }

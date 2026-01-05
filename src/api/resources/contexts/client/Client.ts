@@ -8,7 +8,7 @@ import * as environments from "../../../../environments.js";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError.js";
 import * as errors from "../../../../errors/index.js";
 import * as Rulebricks from "../../../index.js";
-import { AdminClient } from "../resources/admin/client/Client.js";
+import { ObjectsClient } from "../resources/objects/client/Client.js";
 import { RelationshipsClient } from "../resources/relationships/client/Client.js";
 
 export declare namespace ContextsClient {
@@ -18,19 +18,19 @@ export declare namespace ContextsClient {
 }
 
 /**
- * Operations for managing and interacting with Contexts (Entities) and their instances
+ * Operations for managing and interacting with live Context instances
  */
 export class ContextsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<ContextsClient.Options>;
-    protected _admin: AdminClient | undefined;
+    protected _objects: ObjectsClient | undefined;
     protected _relationships: RelationshipsClient | undefined;
 
     constructor(options: ContextsClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
     }
 
-    public get admin(): AdminClient {
-        return (this._admin ??= new AdminClient(this._options));
+    public get objects(): ObjectsClient {
+        return (this._objects ??= new ObjectsClient(this._options));
     }
 
     public get relationships(): RelationshipsClient {
@@ -40,27 +40,27 @@ export class ContextsClient {
     /**
      * Retrieve the current state of a context instance.
      *
-     * @param {Rulebricks.GetInstanceContextsRequest} request
+     * @param {Rulebricks.GetContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.getInstance({
+     *     await client.contexts.get({
      *         slug: "customer",
      *         instance: "cust-12345"
      *     })
      */
-    public getInstance(
-        request: Rulebricks.GetInstanceContextsRequest,
+    public get(
+        request: Rulebricks.GetContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.ContextInstanceState> {
-        return core.HttpResponsePromise.fromPromise(this.__getInstance(request, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__get(request, requestOptions));
     }
 
-    private async __getInstance(
-        request: Rulebricks.GetInstanceContextsRequest,
+    private async __get(
+        request: Rulebricks.GetContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ContextInstanceState>> {
         const { slug, instance } = request;
@@ -192,27 +192,27 @@ export class ContextsClient {
     /**
      * Delete a specific context instance and its history.
      *
-     * @param {Rulebricks.DeleteInstanceContextsRequest} request
+     * @param {Rulebricks.DeleteContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.deleteInstance({
+     *     await client.contexts.delete({
      *         slug: "customer",
      *         instance: "cust-12345"
      *     })
      */
-    public deleteInstance(
-        request: Rulebricks.DeleteInstanceContextsRequest,
+    public delete(
+        request: Rulebricks.DeleteContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.DeleteContextInstanceResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__deleteInstance(request, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(request, requestOptions));
     }
 
-    private async __deleteInstance(
-        request: Rulebricks.DeleteInstanceContextsRequest,
+    private async __delete(
+        request: Rulebricks.DeleteContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DeleteContextInstanceResponse>> {
         const { slug, instance } = request;
@@ -435,7 +435,7 @@ export class ContextsClient {
     /**
      * Execute a specific rule using the context instance's state as input.
      *
-     * @param {Rulebricks.SolveContextRuleRequest} request
+     * @param {Rulebricks.SolveContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
@@ -446,21 +446,22 @@ export class ContextsClient {
      *     await client.contexts.solve({
      *         slug: "customer",
      *         instance: "cust-12345",
-     *         ruleSlug: "eligibility-check"
+     *         ruleSlug: "eligibility-check",
+     *         body: {}
      *     })
      */
     public solve(
-        request: Rulebricks.SolveContextRuleRequest,
+        request: Rulebricks.SolveContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.SolveContextRuleResponse> {
         return core.HttpResponsePromise.fromPromise(this.__solve(request, requestOptions));
     }
 
     private async __solve(
-        request: Rulebricks.SolveContextRuleRequest,
+        request: Rulebricks.SolveContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.SolveContextRuleResponse>> {
-        const { slug, instance, ruleSlug, ..._body } = request;
+        const { slug, instance, ruleSlug, body: _body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -518,7 +519,7 @@ export class ContextsClient {
     /**
      * Trigger re-evaluation of all bound rules and flows for the instance.
      *
-     * @param {Rulebricks.CascadeContextRequest} request
+     * @param {Rulebricks.CascadeContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.NotFoundError}
@@ -527,21 +528,22 @@ export class ContextsClient {
      * @example
      *     await client.contexts.cascade({
      *         slug: "customer",
-     *         instance: "cust-12345"
+     *         instance: "cust-12345",
+     *         body: {}
      *     })
      */
     public cascade(
-        request: Rulebricks.CascadeContextRequest,
+        request: Rulebricks.CascadeContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.CascadeContextResponse> {
         return core.HttpResponsePromise.fromPromise(this.__cascade(request, requestOptions));
     }
 
     private async __cascade(
-        request: Rulebricks.CascadeContextRequest,
+        request: Rulebricks.CascadeContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.CascadeContextResponse>> {
-        const { slug, instance, ..._body } = request;
+        const { slug, instance, body: _body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -597,7 +599,7 @@ export class ContextsClient {
     /**
      * Execute a specific flow using the context instance's state as input.
      *
-     * @param {Rulebricks.SolveContextFlowRequest} request
+     * @param {Rulebricks.ExecuteContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
@@ -608,21 +610,22 @@ export class ContextsClient {
      *     await client.contexts.execute({
      *         slug: "customer",
      *         instance: "cust-12345",
-     *         flowSlug: "onboarding-flow"
+     *         flowSlug: "onboarding-flow",
+     *         body: {}
      *     })
      */
     public execute(
-        request: Rulebricks.SolveContextFlowRequest,
+        request: Rulebricks.ExecuteContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.SolveContextFlowResponse> {
         return core.HttpResponsePromise.fromPromise(this.__execute(request, requestOptions));
     }
 
     private async __execute(
-        request: Rulebricks.SolveContextFlowRequest,
+        request: Rulebricks.ExecuteContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.SolveContextFlowResponse>> {
-        const { slug, instance, flowSlug, ..._body } = request;
+        const { slug, instance, flowSlug, body: _body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,

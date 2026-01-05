@@ -7,6 +7,10 @@ export interface Folder {
     name?: string;
     /** Description of the folder. */
     description?: string;
+    /** Timestamp of when the folder was created. */
+    created_at?: string;
     /** Timestamp of when the folder was last updated. */
     updated_at?: string;
+    /** User groups that can view this folder. */
+    user_groups?: string[];
 }

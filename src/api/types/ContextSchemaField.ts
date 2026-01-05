@@ -13,15 +13,15 @@ export interface ContextSchemaField {
     /** Data type of this field. 'function' type fields compute values dynamically. */
     type?: ContextSchemaField.Type;
     /** Default value for this field. */
-    defaultValue?: unknown | null;
+    default_value?: unknown | null;
     /** Whether this field is derived from rule/flow outputs. */
     derived?: boolean;
     /** The rule ID that derives this field (if derived). */
-    sourceRule?: string | null;
+    source_rule?: string | null;
     /** The flow ID that derives this field (if derived). */
-    sourceFlow?: string | null;
+    source_flow?: string | null;
     /** The source field key in the rule/flow output. */
-    sourceField?: string | null;
+    source_field?: string | null;
 }
 
 export namespace ContextSchemaField {

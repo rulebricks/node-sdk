@@ -3,6 +3,19 @@
 import type * as Rulebricks from "../index.js";
 
 export interface ContextRelationshipsResponse {
+    /** The context these relationships belong to. */
+    context?: ContextRelationshipsResponse.Context;
     outgoing?: Rulebricks.ContextRelationshipOutgoing[];
     incoming?: Rulebricks.ContextRelationshipIncoming[];
+}
+
+export namespace ContextRelationshipsResponse {
+    /**
+     * The context these relationships belong to.
+     */
+    export interface Context {
+        id?: string;
+        name?: string;
+        slug?: string;
+    }
 }

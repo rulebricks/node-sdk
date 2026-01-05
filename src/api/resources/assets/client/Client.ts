@@ -98,7 +98,7 @@ export class AssetsClient {
     }
 
     /**
-     * Import rules, flows, contexts, and values from an RBM manifest file.
+     * Import rules, flows, contexts, and values from an Rulebricks manifest file (*.rbm).
      *
      * @param {Rulebricks.ImportManifestRequest} request
      * @param {AssetsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -107,7 +107,7 @@ export class AssetsClient {
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.assets.import({
+     *     await client.assets.importRbm({
      *         manifest: {
      *             version: "1.0",
      *             rules: [{
@@ -118,26 +118,26 @@ export class AssetsClient {
      *                     "name": "Onboarding Flow",
      *                     "slug": "onboarding-flow"
      *                 }],
-     *             contexts: [{
+     *             entities: [{
      *                     "name": "Customer",
      *                     "slug": "customer"
      *                 }],
      *             values: [{
-     *                     "key": "tax_rate",
+     *                     "name": "tax_rate",
      *                     "value": 0.08
      *                 }]
      *         },
-     *         overwrite: false
+     *         conflict_strategy: "update"
      *     })
      */
-    public import(
+    public importRbm(
         request: Rulebricks.ImportManifestRequest,
         requestOptions?: AssetsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.ImportManifestResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__import(request, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__importRbm(request, requestOptions));
     }
 
-    private async __import(
+    private async __importRbm(
         request: Rulebricks.ImportManifestRequest,
         requestOptions?: AssetsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ImportManifestResponse>> {
@@ -189,7 +189,7 @@ export class AssetsClient {
     }
 
     /**
-     * Export selected rules, flows, contexts, and values to an RBM manifest file.
+     * Export selected rules, flows, contexts, and values to an Rulebricks manifest file (*.rbm).
      *
      * @param {Rulebricks.ExportManifestRequest} request
      * @param {AssetsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -198,24 +198,23 @@ export class AssetsClient {
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.assets.export({
-     *         rules: ["pricing-rule", "eligibility-check"],
-     *         flows: ["onboarding-flow"],
-     *         contexts: ["customer"],
-     *         values: ["tax_rate", "discount_threshold"]
+     *     await client.assets.exportRbm({
+     *         root_type: "rule",
+     *         root_ids: ["pricing-rule", "eligibility-check"],
+     *         include_downstream: false
      *     })
      */
-    public export(
-        request: Rulebricks.ExportManifestRequest = {},
+    public exportRbm(
+        request: Rulebricks.ExportManifestRequest,
         requestOptions?: AssetsClient.RequestOptions,
-    ): core.HttpResponsePromise<Rulebricks.ExportAssetsResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__export(request, requestOptions));
+    ): core.HttpResponsePromise<Rulebricks.ExportRbmAssetsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__exportRbm(request, requestOptions));
     }
 
-    private async __export(
-        request: Rulebricks.ExportManifestRequest = {},
+    private async __exportRbm(
+        request: Rulebricks.ExportManifestRequest,
         requestOptions?: AssetsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Rulebricks.ExportAssetsResponse>> {
+    ): Promise<core.WithRawResponse<Rulebricks.ExportRbmAssetsResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -242,7 +241,7 @@ export class AssetsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Rulebricks.ExportAssetsResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Rulebricks.ExportRbmAssetsResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {

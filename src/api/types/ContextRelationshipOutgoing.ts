@@ -3,7 +3,7 @@
 import type * as Rulebricks from "../index.js";
 
 export interface ContextRelationshipOutgoing extends Rulebricks.ContextRelationshipBase {
-    targetContext?: ContextRelationshipOutgoing.TargetContext;
+    target_context?: ContextRelationshipOutgoing.TargetContext;
 }
 
 export namespace ContextRelationshipOutgoing {

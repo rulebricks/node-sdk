@@ -3,37 +3,46 @@
 /**
  * @example
  *     {
- *         id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
- *         name: "Updated Customer",
- *         description: "Updated description for premium customers"
+ *         name: "Customer",
+ *         description: "Represents a customer in the system",
+ *         schema: [{
+ *                 key: "email",
+ *                 name: "Email",
+ *                 type: "string"
+ *             }, {
+ *                 key: "age",
+ *                 name: "Age",
+ *                 type: "number"
+ *             }],
+ *         identity_fact: "email"
  *     }
  */
-export interface UpdateContextRequest {
-    /** The unique identifier for the context. */
-    id: string;
+export interface CreateContextRequest {
     /** The name of the context. */
-    name?: string;
-    /** The slug of the context. */
+    name: string;
+    /** Optional custom slug. Auto-generated if not provided. */
     slug?: string;
     /** The description of the context. */
     description?: string;
-    /** Updated schema fields for the context. */
-    schema?: UpdateContextRequest.Schema.Item[];
-    /** When true, bound rules and flows automatically execute when their inputs are satisfied. */
+    /** Initial schema fields for the context. At least one field must be defined. */
+    schema: CreateContextRequest.Schema.Item[];
+    /** The field key to use as the unique identifier for instances. Must be a key from the schema. */
+    identity_fact: string;
+    /** When true (default), bound rules and flows automatically execute when their inputs are satisfied. */
     auto_execute_decisions?: boolean;
     /** Time-to-live in seconds for live context instances. Instances expire after this duration. */
     ttl_seconds?: number | null;
     /** Maximum number of history entries to retain per field. */
     history_limit?: number;
     /** How to handle fields that don't match the schema. */
-    on_schema_mismatch?: UpdateContextRequest.OnSchemaMismatch;
+    on_schema_mismatch?: CreateContextRequest.OnSchemaMismatch;
     /** Webhook URL called when a rule or flow successfully solves. */
-    webhook_on_solve?: string | null;
+    webhook_on_solve?: string;
     /** Webhook URL called when a live context expires due to TTL. */
-    webhook_on_expire?: string | null;
+    webhook_on_expire?: string;
 }
 
-export namespace UpdateContextRequest {
+export namespace CreateContextRequest {
     export type Schema = Schema.Item[];
 
     export namespace Schema {
@@ -41,7 +50,7 @@ export namespace UpdateContextRequest {
             key?: string;
             name?: string;
             type?: string;
-            defaultValue?: unknown;
+            default_value?: unknown;
         }
     }
 

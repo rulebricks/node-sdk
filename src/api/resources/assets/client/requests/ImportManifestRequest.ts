@@ -13,23 +13,27 @@
  *                     "name": "Onboarding Flow",
  *                     "slug": "onboarding-flow"
  *                 }],
- *             contexts: [{
+ *             entities: [{
  *                     "name": "Customer",
  *                     "slug": "customer"
  *                 }],
  *             values: [{
- *                     "key": "tax_rate",
+ *                     "name": "tax_rate",
  *                     "value": 0.08
  *                 }]
  *         },
- *         overwrite: false
+ *         conflict_strategy: "update"
  *     }
  */
 export interface ImportManifestRequest {
     /** The RBM manifest object containing assets to import. */
     manifest: ImportManifestRequest.Manifest;
-    /** Whether to overwrite existing assets with the same ID/slug. */
-    overwrite?: boolean;
+    /** How to handle conflicts with existing assets. 'update' overwrites, 'skip' ignores, 'error' fails. */
+    conflict_strategy?: ImportManifestRequest.ConflictStrategy;
+    /** Optional folder name to place imported assets into. Created if it doesn't exist. */
+    target_folder_name?: string;
+    /** Optional mapping for legacy flow imports to reuse existing rules. */
+    legacy_rule_mapping?: Record<string, ImportManifestRequest.LegacyRuleMapping.Value>;
 }
 
 export namespace ImportManifestRequest {
@@ -43,9 +47,32 @@ export namespace ImportManifestRequest {
         rules?: Record<string, unknown>[];
         /** Flows to import. */
         flows?: Record<string, unknown>[];
-        /** Contexts (entities) to import. */
-        contexts?: Record<string, unknown>[];
+        /** Contexts to import. */
+        entities?: Record<string, unknown>[];
         /** Dynamic values to import. */
         values?: Record<string, unknown>[];
+    }
+
+    /** How to handle conflicts with existing assets. 'update' overwrites, 'skip' ignores, 'error' fails. */
+    export const ConflictStrategy = {
+        Update: "update",
+        Skip: "skip",
+        Error: "error",
+    } as const;
+    export type ConflictStrategy = (typeof ConflictStrategy)[keyof typeof ConflictStrategy];
+
+    export namespace LegacyRuleMapping {
+        export interface Value {
+            action?: Value.Action;
+            rule_id?: string;
+        }
+
+        export namespace Value {
+            export const Action = {
+                Reuse: "reuse",
+                Create: "create",
+            } as const;
+            export type Action = (typeof Action)[keyof typeof Action];
+        }
     }
 }

@@ -2,4 +2,4 @@
 
 import type * as Rulebricks from "../../../index.js";
 
-export type ExportAssetsResponse = Rulebricks.ExportManifestResponse | Rulebricks.ExportManifestPreviewResponse;
+export type ExportRbmAssetsResponse = Rulebricks.ExportManifestResponse | Rulebricks.ExportManifestPreviewResponse;
