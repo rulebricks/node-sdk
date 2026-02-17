@@ -7,12 +7,16 @@ export interface RuleDetail extends Rulebricks.RuleBase {
     created_at?: string;
     /** The date this rule was last updated. */
     updated_at?: string;
+    /** Whether the rule is currently published. */
+    published?: boolean;
+    /** Optional user-defined metadata for API-first integrations. */
+    metadata?: Record<string, unknown>;
     folder?: Rulebricks.Folder;
     /** The context this rule is bound to (if any). Rules bound to a context have their inputs/outputs mapped to context fields. */
     context?: RuleDetail.Context | null;
-    /** The published request schema for the rule. */
+    /** The request schema for the rule. Uses published schema when published, otherwise draft schema. */
     request_schema?: Rulebricks.SchemaField[];
-    /** The published response schema for the rule. */
+    /** The response schema for the rule. Uses published schema when published, otherwise draft schema. */
     response_schema?: Rulebricks.SchemaField[];
 }
 
