@@ -3,11 +3,11 @@
 import type * as Rulebricks from "../index.js";
 
 /**
- * Rule object accepted by /admin/rules/import. Existing rule IDs allow partial updates; creating a new rule ID requires the full legacy import shape.
+ * Rule object accepted by /admin/rules/import. Existing rule IDs allow partial updates; creating a new rule ID requires the full import shape.
  */
 export interface RuleImportPayload {
     /** Rule ID to create or update. */
-    id: string;
+    id?: string;
     /** Optional stable ID for cross-workspace import/export identity. */
     stable_id?: string;
     /** Rule slug. */

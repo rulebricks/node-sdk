@@ -1,6 +1,6 @@
 {
     "name": "@rulebricks/sdk",
-    "version": "2.5.2",
+    "version": "2.5.3",
     "private": false,
     "repository": "https://github.com/rulebricks/node-sdk",
     "main": "./index.js",
