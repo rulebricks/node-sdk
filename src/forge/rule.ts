@@ -1,4 +1,5 @@
 import { RulebricksClient } from "../Client.js";
+import type { RuleImportPayload } from "../api/types/RuleImportPayload.js";
 import { RuleType, Field, RuleSettings, OperatorResult } from "./types.js";
 import { BooleanField, NumberField, StringField, DateField, ListField } from "./operators.js";
 
@@ -91,9 +92,9 @@ export class Condition {
     public response: Record<string, { value: any }> = {};
     public settings: {
         enabled: boolean;
-        groupId?: string | null;
+        groupId: string | null;
         priority: number;
-        schedule: any[];
+        schedule: Record<string, unknown>[];
         or?: boolean;
     };
 
@@ -629,7 +630,7 @@ export class Rule {
         return this;
     }
 
-    toDict(): Record<string, any> {
+    toDict(): RuleImportPayload {
         let sampleRequest = this.sampleRequest || {};
         let sampleResponse = this.sampleResponse || {};
 
@@ -686,7 +687,7 @@ export class Rule {
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             updatedBy: this.updatedBy,
-            settings: this.settings,
+            settings: { ...this.settings },
             accessGroups: this.accessGroups,
             requestSchema: fields,
             responseSchema: responseFields,
