@@ -367,7 +367,7 @@ export class Rule {
         }
 
         const rules = await this.workspace.assets.rules.list();
-        if (rules.some((r) => r.slug === alias)) {
+        if (rules.some((r) => r.slug === alias && r.id !== this.id)) {
             throw new Error("Alias conflicts with an existing rule");
         }
 
