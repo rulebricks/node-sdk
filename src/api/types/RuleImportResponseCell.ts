@@ -4,7 +4,7 @@
  * A response cell in a condition row.
  */
 export interface RuleImportResponseCell {
-    value?: unknown;
+    value?: unknown | undefined;
     /** Accepts any additional properties */
     [key: string]: any;
 }

@@ -5,7 +5,7 @@
  */
 export interface DeleteContextInstanceResponse {
     /** Success message. */
-    message?: string;
+    message?: string | undefined;
     /** Number of pending evaluations that were cancelled when the instance was deleted. */
-    pending_evaluations_cancelled?: number;
+    pending_evaluations_cancelled?: number | undefined;
 }

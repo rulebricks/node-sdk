@@ -2,19 +2,19 @@
 
 export interface ImportManifestResponse {
     /** Whether the import completed successfully. */
-    success?: boolean;
+    success?: boolean | undefined;
     /** Assets that were created during import. */
-    created?: ImportManifestResponse.Created.Item[];
+    created?: ImportManifestResponse.Created.Item[] | undefined;
     /** Assets that were updated during import. */
-    updated?: ImportManifestResponse.Updated.Item[];
+    updated?: ImportManifestResponse.Updated.Item[] | undefined;
     /** Assets that were skipped during import. */
-    skipped?: ImportManifestResponse.Skipped.Item[];
+    skipped?: ImportManifestResponse.Skipped.Item[] | undefined;
     /** Any errors encountered during import. */
-    errors?: ImportManifestResponse.Errors.Item[];
+    errors?: ImportManifestResponse.Errors.Item[] | undefined;
     /** Non-fatal warnings from import validation. */
-    warnings?: string[];
+    warnings?: string[] | undefined;
     /** IDs of any organizational folders created during import. */
-    organization_created?: ImportManifestResponse.OrganizationCreated | null;
+    organization_created?: (ImportManifestResponse.OrganizationCreated | null) | undefined;
 }
 
 export namespace ImportManifestResponse {
@@ -23,13 +23,13 @@ export namespace ImportManifestResponse {
     export namespace Created {
         export interface Item {
             /** Asset type (context, value, rule, flow, relationship). */
-            type?: string;
+            type?: string | undefined;
             /** Stable ID of asset. */
-            stable_id?: string;
+            stable_id?: string | undefined;
             /** Database ID of asset. */
-            db_id?: string;
+            db_id?: string | undefined;
             /** Import status. */
-            status?: string;
+            status?: string | undefined;
         }
     }
 
@@ -37,10 +37,10 @@ export namespace ImportManifestResponse {
 
     export namespace Updated {
         export interface Item {
-            type?: string;
-            stable_id?: string;
-            db_id?: string;
-            status?: string;
+            type?: string | undefined;
+            stable_id?: string | undefined;
+            db_id?: string | undefined;
+            status?: string | undefined;
         }
     }
 
@@ -48,10 +48,10 @@ export namespace ImportManifestResponse {
 
     export namespace Skipped {
         export interface Item {
-            type?: string;
-            stable_id?: string;
-            status?: string;
-            reason?: string;
+            type?: string | undefined;
+            stable_id?: string | undefined;
+            status?: string | undefined;
+            reason?: string | undefined;
         }
     }
 
@@ -59,10 +59,10 @@ export namespace ImportManifestResponse {
 
     export namespace Errors {
         export interface Item {
-            type?: string;
-            stable_id?: string;
-            status?: string;
-            reason?: string;
+            type?: string | undefined;
+            stable_id?: string | undefined;
+            status?: string | undefined;
+            reason?: string | undefined;
         }
     }
 
@@ -70,8 +70,8 @@ export namespace ImportManifestResponse {
      * IDs of any organizational folders created during import.
      */
     export interface OrganizationCreated {
-        entity_set_id?: string | null;
-        rule_tag_id?: string | null;
-        flow_tag_id?: string | null;
+        entity_set_id?: (string | null) | undefined;
+        rule_tag_id?: (string | null) | undefined;
+        flow_tag_id?: (string | null) | undefined;
     }
 }

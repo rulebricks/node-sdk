@@ -61,38 +61,12 @@
  *         },
  *         user_groups: ["marketing"]
  *     }
- *
- * @example
- *     {
- *         values: {
- *             "Favorite Color": "blue",
- *             "Age": 30,
- *             "Is Student": false,
- *             "Hobbies": [
- *                 "reading",
- *                 "cycling"
- *             ]
- *         },
- *         user_groups: ["marketing", "developers"]
- *     }
- *
- * @example
- *     {
- *         values: {
- *             "Favorite Color": "blue",
- *             "Age": 30,
- *             "Is Student": false,
- *             "Hobbies": [
- *                 "reading",
- *                 "cycling"
- *             ]
- *         },
- *         user_groups: ["marketing", "developers"]
- *     }
  */
 export interface UpdateValuesRequest {
     /** A dictionary of keys and values to update or add. Supports both flat key-value pairs and nested objects. Nested objects will be automatically flattened using dot notation with readable key names (e.g., 'user.contact_info.email' becomes 'User.Contact Info.Email'). */
     values: Record<string, unknown>;
     /** Optional array of user group names or IDs. If omitted and user belongs to user groups, values will be assigned to all user's user groups. Required if values should be restricted to specific user groups. */
     user_groups?: string[];
+    /** Optional metadata keyed by dynamic value name. This is the canonical snake_case field; legacy clients may still send `metadataByName`. */
+    metadata_by_name?: Record<string, Record<string, unknown>>;
 }

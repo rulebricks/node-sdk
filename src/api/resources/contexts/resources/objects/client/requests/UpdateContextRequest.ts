@@ -38,10 +38,10 @@ export namespace UpdateContextRequest {
 
     export namespace Schema {
         export interface Item {
-            key?: string;
-            name?: string;
-            type?: string;
-            default_value?: unknown;
+            key?: string | undefined;
+            name?: string | undefined;
+            type?: string | undefined;
+            default_value?: unknown | undefined;
         }
     }
 

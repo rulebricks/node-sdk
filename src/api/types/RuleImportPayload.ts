@@ -3,61 +3,61 @@
 import type * as Rulebricks from "../index.js";
 
 /**
- * Rule object accepted by /admin/rules/import. Existing rule IDs allow partial updates; creating a new rule ID requires the full import shape.
+ * Rule object accepted by /admin/rules/import. If `id` is provided, the matching rule is partially updated (all other fields optional). If `id` is omitted, a new rule is created with all other fields required. This object intentionally preserves raw rule document casing (for example, `requestSchema`, `sampleRequest`, and `createdAt`) to support `.rbm` round-tripping.
  */
 export interface RuleImportPayload {
-    /** Rule ID to create or update. */
-    id?: string;
+    /** Optional. If omitted, a new rule is created with an auto-generated UUID. If provided, the endpoint performs a partial update on the matching rule. */
+    id?: string | undefined;
     /** Optional stable ID for cross-workspace import/export identity. */
-    stable_id?: string;
-    /** Rule slug. */
-    slug?: string;
+    stable_id?: string | undefined;
+    /** Optional. Auto-generated if omitted during creation. Accepted if provided. */
+    slug?: string | undefined;
     /** Rule name. */
-    name?: string;
+    name?: string | undefined;
     /** Rule description. */
-    description?: string;
+    description?: string | undefined;
     /** Creation timestamp. */
-    createdAt?: string;
+    createdAt?: string | undefined;
     /** Last update timestamp. */
-    updatedAt?: string;
+    updatedAt?: string | undefined;
     /** Current publish state. Set with `_publish`/`_unpublish` to control publish transitions on import. */
-    published?: boolean;
+    published?: boolean | undefined;
     /** Optional user-defined metadata for external IDs or implementation mappings. */
-    metadata?: Record<string, unknown>;
+    metadata?: Record<string, unknown> | undefined;
     /** If true, backend publishes this rule and snapshots published_* fields from draft fields. */
-    _publish?: boolean;
+    _publish?: boolean | undefined;
     /** If true, backend unpublishes this rule. */
-    _unpublish?: boolean;
+    _unpublish?: boolean | undefined;
     /** Draft request schema. */
-    requestSchema?: Rulebricks.RuleImportSchemaField[];
+    requestSchema?: Rulebricks.RuleImportSchemaField[] | undefined;
     /** Draft response schema. */
-    responseSchema?: Rulebricks.RuleImportSchemaField[];
+    responseSchema?: Rulebricks.RuleImportSchemaField[] | undefined;
     /** Sample request JSON. */
-    sampleRequest?: Record<string, unknown>;
+    sampleRequest?: Record<string, unknown> | undefined;
     /** Request payload used by editor test tab. */
-    testRequest?: Record<string, unknown>;
+    testRequest?: Record<string, unknown> | undefined;
     /** Sample response JSON. */
-    sampleResponse?: Record<string, unknown>;
+    sampleResponse?: Record<string, unknown> | undefined;
     /** Draft condition rows. */
-    conditions?: Rulebricks.RuleImportConditionRow[];
+    conditions?: Rulebricks.RuleImportConditionRow[] | undefined;
     /** Optional row grouping definitions. */
-    groups?: Record<string, Record<string, unknown>>;
+    groups?: Record<string, Record<string, unknown>> | undefined;
     /** Optional rule-level settings. */
-    settings?: Record<string, unknown>;
+    settings?: Record<string, unknown> | undefined;
     /** Optional rule test suite. */
-    testSuite?: Record<string, unknown>[];
+    testSuite?: Record<string, unknown>[] | undefined;
     /** Rule history entries. */
-    history?: Record<string, unknown>[];
+    history?: Record<string, unknown>[] | undefined;
     /** Publish timestamp. */
-    publishedAt?: string | null;
+    publishedAt?: (string | null) | undefined;
     /** Optional published request schema override. */
-    published_requestSchema?: Rulebricks.RuleImportSchemaField[] | null;
+    published_requestSchema?: (Rulebricks.RuleImportSchemaField[] | null) | undefined;
     /** Optional published response schema override. */
-    published_responseSchema?: Rulebricks.RuleImportSchemaField[] | null;
+    published_responseSchema?: (Rulebricks.RuleImportSchemaField[] | null) | undefined;
     /** Optional published conditions override. */
-    published_conditions?: Rulebricks.RuleImportConditionRow[] | null;
+    published_conditions?: (Rulebricks.RuleImportConditionRow[] | null) | undefined;
     /** Optional published groups override. */
-    published_groups?: Record<string, Record<string, unknown> | null> | null;
+    published_groups?: (Record<string, Record<string, unknown> | null> | null) | undefined;
     /** Accepts any additional properties */
     [key: string]: any;
 }

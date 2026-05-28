@@ -2,13 +2,11 @@
 
 export interface UserGroup {
     /** Unique identifier of the user group. */
-    id?: string;
+    id?: string | undefined;
     /** Name of the user group. */
-    name?: string;
+    name?: string | undefined;
     /** Description of the user group. */
-    description?: string;
-    /** List of member emails in the user group. */
-    members?: string[];
+    description?: string | undefined;
     /** When the user group was created. */
-    created_at?: string;
+    created_at?: string | undefined;
 }

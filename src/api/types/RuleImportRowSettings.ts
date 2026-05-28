@@ -13,7 +13,7 @@ export interface RuleImportRowSettings {
     /** Optional schedule constraints for this row. */
     schedule: Record<string, unknown>[];
     /** When true, request cells in this row are evaluated with OR semantics. */
-    or?: boolean;
+    or?: boolean | undefined;
     /** Accepts any additional properties */
     [key: string]: any;
 }

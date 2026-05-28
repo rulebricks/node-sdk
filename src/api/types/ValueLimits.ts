@@ -5,11 +5,11 @@
  */
 export interface ValueLimits {
     /** Maximum number of value keys per user */
-    MAX_KEYS?: number;
+    MAX_KEYS?: number | undefined;
     /** Maximum length of a single value in characters */
-    MAX_VALUE_LENGTH?: number;
+    MAX_VALUE_LENGTH?: number | undefined;
     /** Maximum total size of all values in bytes */
-    MAX_TOTAL_SIZE?: number;
+    MAX_TOTAL_SIZE?: number | undefined;
     /** Maximum length of a key name */
-    MAX_KEY_LENGTH?: number;
+    MAX_KEY_LENGTH?: number | undefined;
 }

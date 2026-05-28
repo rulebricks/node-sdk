@@ -5,23 +5,23 @@
  */
 export interface ContextInstanceState {
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** The current base field values for this instance. */
-    state?: Record<string, unknown>;
+    state?: Record<string, unknown> | undefined;
     /** Computed/derived field values from bound rules. */
-    derived?: Record<string, unknown>;
+    derived?: Record<string, unknown> | undefined;
     /** Whether all required fields are present ('complete') or some are missing ('pending'). */
-    status?: ContextInstanceState.Status;
+    status?: ContextInstanceState.Status | undefined;
     /** List of field keys that are currently populated. */
-    have?: string[];
+    have?: string[] | undefined;
     /** List of required field keys that are missing (empty when status is 'complete'). */
-    need?: string[];
+    need?: string[] | undefined;
     /** When the instance was first created. */
-    created_at?: string;
+    created_at?: string | undefined;
     /** When the instance was last updated. */
-    updated_at?: string;
+    updated_at?: string | undefined;
     /** When the instance will expire based on context TTL. */
-    expires_at?: string | null;
+    expires_at?: (string | null) | undefined;
 }
 
 export namespace ContextInstanceState {

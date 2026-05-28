@@ -2,7 +2,7 @@
 
 export interface DeleteRelationshipResponse {
     /** Success message. */
-    message?: string;
+    message?: string | undefined;
     /** The ID of the deleted relationship. */
-    id?: string;
+    id?: string | undefined;
 }

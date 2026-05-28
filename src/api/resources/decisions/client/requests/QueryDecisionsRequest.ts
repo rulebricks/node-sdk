@@ -9,13 +9,6 @@ import type * as Rulebricks from "../../../../index.js";
  *         rules: "Lead Qualification,Pricing Calculator",
  *         statuses: "200,400,500"
  *     }
- *
- * @example
- *     {
- *         search: "status=200",
- *         rules: "Lead Qualification,Pricing Calculator",
- *         statuses: "200,400,500"
- *     }
  */
 export interface QueryDecisionsRequest {
     /** Decision data query language expression to filter logs by request/response data. Supports field comparisons (`field=value`, `field>10`), contains (`field:text`), not-contains (`field!:text`), boolean operators (`AND`, `OR`), and parentheses. */

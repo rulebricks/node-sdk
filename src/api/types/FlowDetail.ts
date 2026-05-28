@@ -4,13 +4,13 @@ import type * as Rulebricks from "../index.js";
 
 export interface FlowDetail extends Rulebricks.FlowBase {
     /** Whether the flow is published. */
-    published?: boolean;
+    published?: boolean | undefined;
     /** The date this flow was last updated. */
-    updated_at?: string;
+    updated_at?: string | undefined;
     /** The origin rule that this flow starts from. Flows execute starting from this rule's outputs. */
-    origin_rule?: FlowDetail.OriginRule | null;
+    origin_rule?: (FlowDetail.OriginRule | null) | undefined;
     /** The context this flow is bound to (via its origin rule). Flows inherit context binding from their origin rule. */
-    context?: FlowDetail.Context | null;
+    context?: (FlowDetail.Context | null) | undefined;
 }
 
 export namespace FlowDetail {
@@ -19,11 +19,11 @@ export namespace FlowDetail {
      */
     export interface OriginRule {
         /** The origin rule ID. */
-        id?: string;
+        id?: string | undefined;
         /** The origin rule name. */
-        name?: string;
+        name?: string | undefined;
         /** The origin rule slug. */
-        slug?: string;
+        slug?: string | undefined;
     }
 
     /**
@@ -31,10 +31,10 @@ export namespace FlowDetail {
      */
     export interface Context {
         /** The context ID. */
-        id?: string;
+        id?: string | undefined;
         /** The context name. */
-        name?: string;
+        name?: string | undefined;
         /** The context slug. */
-        slug?: string;
+        slug?: string | undefined;
     }
 }

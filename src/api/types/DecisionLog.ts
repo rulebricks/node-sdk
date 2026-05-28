@@ -7,23 +7,23 @@ import type * as Rulebricks from "../index.js";
  */
 export interface DecisionLog {
     /** When the rule/flow was executed. */
-    timestamp?: string | null;
+    timestamp?: (string | null) | undefined;
     /** Name of the rule or flow that was executed. */
-    name?: string | null;
+    name?: (string | null) | undefined;
     /** API endpoint that was called. */
-    endpoint?: string | null;
+    endpoint?: (string | null) | undefined;
     /** HTTP status code of the response. */
-    status?: number | null;
+    status?: (number | null) | undefined;
     /** The request payload sent to the rule/flow. Can be an object for single requests or an array for bulk operations. */
-    request?: DecisionLog.Request | null;
+    request?: (DecisionLog.Request | null) | undefined;
     /** The response payload returned by the rule/flow. Can be an object for single responses or an array for bulk operations. */
-    response?: Rulebricks.DecisionLogResponse | null;
-    /** Decision details including matched conditions, rows, and evaluation metadata. */
-    decision?: Record<string, unknown> | null;
+    response?: (Rulebricks.DecisionLogResponse | null) | undefined;
+    /** Decision details including matched conditions, rows, and evaluation metadata. API-owned metadata keys are normalized to snake_case where known, such as `rule_id`, `rule_slug`, `rule_version`, `success_idxs`, `total_usage`, and `entity_count`; user-defined request/response schema keys are preserved. */
+    decision?: (Record<string, unknown> | null) | undefined;
     /** Error message if the execution failed. */
-    error?: string | null;
+    error?: (string | null) | undefined;
     /** Whether the request/response data was truncated due to size limits. */
-    abbreviated?: boolean;
+    abbreviated?: boolean | undefined;
     /** Accepts any additional properties */
     [key: string]: any;
 }

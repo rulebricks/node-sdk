@@ -5,11 +5,11 @@
  */
 export interface DeleteContextResponse {
     /** Success message. */
-    message?: string;
+    message?: string | undefined;
     /** Slugs of rules that were unbound from the deleted context. */
-    unbound_rules?: string[];
+    unbound_rules?: string[] | undefined;
     /** Slugs of flows that were unbound from the deleted context. */
-    unbound_flows?: string[];
+    unbound_flows?: string[] | undefined;
     /** Number of pending evaluations that were cancelled when the context was deleted. */
-    pending_evaluations_cancelled?: number;
+    pending_evaluations_cancelled?: number | undefined;
 }

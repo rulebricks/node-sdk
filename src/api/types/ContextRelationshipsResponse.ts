@@ -4,9 +4,9 @@ import type * as Rulebricks from "../index.js";
 
 export interface ContextRelationshipsResponse {
     /** The context these relationships belong to. */
-    context?: ContextRelationshipsResponse.Context;
-    outgoing?: Rulebricks.ContextRelationshipOutgoing[];
-    incoming?: Rulebricks.ContextRelationshipIncoming[];
+    context?: ContextRelationshipsResponse.Context | undefined;
+    outgoing?: Rulebricks.ContextRelationshipOutgoing[] | undefined;
+    incoming?: Rulebricks.ContextRelationshipIncoming[] | undefined;
 }
 
 export namespace ContextRelationshipsResponse {
@@ -14,8 +14,8 @@ export namespace ContextRelationshipsResponse {
      * The context these relationships belong to.
      */
     export interface Context {
-        id?: string;
-        name?: string;
-        slug?: string;
+        id?: string | undefined;
+        name?: string | undefined;
+        slug?: string | undefined;
     }
 }

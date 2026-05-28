@@ -5,17 +5,17 @@
  */
 export interface UserDetail {
     /** Unique identifier for the user. */
-    id?: string;
+    id?: string | undefined;
     /** Email address of the user. */
-    email?: string;
+    email?: string | undefined;
     /** Display name of the user (if set). */
-    name?: string | null;
+    name?: (string | null) | undefined;
     /** API key assigned to the user. */
-    api_key?: string | null;
+    api_key?: (string | null) | undefined;
     /** Role assigned to the user (e.g., 'administrator', 'developer', 'editor', or custom role ID). */
-    role?: string;
+    role?: string | undefined;
     /** List of user group names the user belongs to. */
-    user_groups?: string[];
+    user_groups?: string[] | undefined;
     /** Date and time when the user joined the organization. */
-    joined_at?: string | null;
+    joined_at?: (string | null) | undefined;
 }

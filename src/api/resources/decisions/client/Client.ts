@@ -53,43 +53,17 @@ export class DecisionsClient {
         requestOptions?: DecisionsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DecisionLogResponse>> {
         const { search, rules, statuses, start, end, cursor, limit, count, slug } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (search != null) {
-            _queryParams.search = search;
-        }
-
-        if (rules != null) {
-            _queryParams.rules = rules;
-        }
-
-        if (statuses != null) {
-            _queryParams.statuses = statuses;
-        }
-
-        if (start != null) {
-            _queryParams.start = start;
-        }
-
-        if (end != null) {
-            _queryParams.end = end;
-        }
-
-        if (cursor != null) {
-            _queryParams.cursor = cursor;
-        }
-
-        if (limit != null) {
-            _queryParams.limit = limit.toString();
-        }
-
-        if (count != null) {
-            _queryParams.count = count;
-        }
-
-        if (slug != null) {
-            _queryParams.slug = slug;
-        }
-
+        const _queryParams: Record<string, unknown> = {
+            search,
+            rules,
+            statuses,
+            start: start != null ? start : undefined,
+            end: end != null ? end : undefined,
+            cursor,
+            limit,
+            count: count != null ? count : undefined,
+            slug,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -105,7 +79,11 @@ export class DecisionsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -119,9 +97,15 @@ export class DecisionsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,

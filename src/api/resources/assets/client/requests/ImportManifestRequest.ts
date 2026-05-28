@@ -26,7 +26,7 @@
  *     }
  */
 export interface ImportManifestRequest {
-    /** The RBM manifest object containing assets to import. */
+    /** The RBM manifest object containing assets to import. Asset objects inside the manifest intentionally preserve `.rbm`/database casing so exported manifests can be imported without rewriting asset payloads. */
     manifest: ImportManifestRequest.Manifest;
     /** How to handle conflicts with existing assets. 'update' overwrites, 'skip' ignores, 'error' fails. */
     conflict_strategy?: ImportManifestRequest.ConflictStrategy;
@@ -38,19 +38,19 @@ export interface ImportManifestRequest {
 
 export namespace ImportManifestRequest {
     /**
-     * The RBM manifest object containing assets to import.
+     * The RBM manifest object containing assets to import. Asset objects inside the manifest intentionally preserve `.rbm`/database casing so exported manifests can be imported without rewriting asset payloads.
      */
     export interface Manifest {
         /** Manifest format version. */
-        version?: string;
+        version?: string | undefined;
         /** Rules to import. */
-        rules?: Record<string, unknown>[];
+        rules?: Record<string, unknown>[] | undefined;
         /** Flows to import. */
-        flows?: Record<string, unknown>[];
+        flows?: Record<string, unknown>[] | undefined;
         /** Contexts to import. */
-        entities?: Record<string, unknown>[];
+        entities?: Record<string, unknown>[] | undefined;
         /** Dynamic values to import. */
-        values?: Record<string, unknown>[];
+        values?: Record<string, unknown>[] | undefined;
     }
 
     /** How to handle conflicts with existing assets. 'update' overwrites, 'skip' ignores, 'error' fails. */
@@ -63,8 +63,8 @@ export namespace ImportManifestRequest {
 
     export namespace LegacyRuleMapping {
         export interface Value {
-            action?: Value.Action;
-            rule_id?: string;
+            action?: Value.Action | undefined;
+            rule_id?: string | undefined;
         }
 
         export namespace Value {

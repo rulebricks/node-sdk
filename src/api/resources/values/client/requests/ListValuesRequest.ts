@@ -5,11 +5,6 @@
  *     {
  *         include: "usage"
  *     }
- *
- * @example
- *     {
- *         include: "usage"
- *     }
  */
 export interface ListValuesRequest {
     /** Query all dynamic values containing a specific name */

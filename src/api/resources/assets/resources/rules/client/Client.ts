@@ -64,7 +64,7 @@ export class RulesClient {
             method: "DELETE",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: request,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -80,11 +80,20 @@ export class RulesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -98,7 +107,7 @@ export class RulesClient {
     }
 
     /**
-     * Export a specific rule by its ID.
+     * Export a specific rule by its ID. This response preserves the raw rule document casing (for example, `requestSchema`, `sampleRequest`, and `createdAt`) so it can round-trip through `/admin/rules/import` and `.rbm` workflows.
      *
      * @param {Rulebricks.assets.PullRulesRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -124,8 +133,9 @@ export class RulesClient {
         requestOptions?: RulesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.RuleExport>> {
         const { id } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        _queryParams.id = id;
+        const _queryParams: Record<string, unknown> = {
+            id,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -141,7 +151,11 @@ export class RulesClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -155,11 +169,20 @@ export class RulesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -173,7 +196,7 @@ export class RulesClient {
     }
 
     /**
-     * Import or update a rule. Existing rule IDs support partial updates; new rule IDs require a full rule payload.
+     * Create or update a rule. If `id` is provided, the matching rule is partially updated (all other fields optional). If `id` is omitted, a new rule is created (`id` and `slug` are auto-generated; all other fields required).
      *
      * @param {Rulebricks.assets.ImportRuleRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -185,14 +208,11 @@ export class RulesClient {
      * @example
      *     await client.assets.rules.push({
      *         rule: {
-     *             id: "11111111-2222-4333-8444-555555555555",
-     *             slug: "basic-pricing-rule",
      *             name: "Basic Pricing Rule",
      *             description: "",
      *             createdAt: "2026-02-12T01:29:23.000Z",
      *             updatedAt: "2026-02-12T01:29:23.000Z",
      *             published: false,
-     *             _publish: true,
      *             testRequest: {
      *                 "customer_tier": "STANDARD",
      *                 "order_total": 250,
@@ -332,7 +352,7 @@ export class RulesClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: request,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -348,11 +368,20 @@ export class RulesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Rulebricks.ForbiddenError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -366,7 +395,7 @@ export class RulesClient {
     }
 
     /**
-     * List all rules in the organization. Optionally filter by folder name or ID.
+     * List all rules in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, or by user group name or ID when the API key has access to that group.
      *
      * @param {Rulebricks.assets.ListRulesRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -390,12 +419,11 @@ export class RulesClient {
         request: Rulebricks.assets.ListRulesRequest = {},
         requestOptions?: RulesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.RuleListResponse>> {
-        const { folder } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (folder != null) {
-            _queryParams.folder = folder;
-        }
-
+        const { folder, user_group: userGroup } = request;
+        const _queryParams: Record<string, unknown> = {
+            folder,
+            user_group: userGroup,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -411,7 +439,11 @@ export class RulesClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -425,9 +457,15 @@ export class RulesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,

@@ -7,22 +7,22 @@ import type * as Rulebricks from "../index.js";
  */
 export interface ContextListItem extends Rulebricks.ContextBase {
     /** The field key used as the unique identifier for instances. */
-    identity_fact?: string | null;
-    schema?: Rulebricks.ContextSchema;
-    folder?: ContextListItem.Folder | null;
+    identity_fact?: (string | null) | undefined;
+    schema?: Rulebricks.ContextSchema | undefined;
+    folder?: (ContextListItem.Folder | null) | undefined;
     /** Number of rules bound to this context. */
-    bound_rules_count?: number;
+    bound_rules_count?: number | undefined;
     /** Number of flows bound to this context. */
-    bound_flows_count?: number;
+    bound_flows_count?: number | undefined;
     /** Total number of relationships for this context. */
-    relationships_count?: number;
-    created_at?: string;
-    updated_at?: string;
+    relationships_count?: number | undefined;
+    created_at?: string | undefined;
+    updated_at?: string | undefined;
 }
 
 export namespace ContextListItem {
     export interface Folder {
-        id?: string;
-        name?: string;
+        id?: string | undefined;
+        name?: string | undefined;
     }
 }

@@ -10,11 +10,11 @@ export interface DynamicValue {
     /** Type identifier for the value (e.g., 'string', 'number', 'boolean', 'list', 'function', etc.) */
     type: string;
     /** The actual value - can be any valid JSON type */
-    value?: DynamicValue.Value;
+    value?: DynamicValue.Value | undefined;
     /** Rules that use this dynamic value (only included when 'include=usage' parameter is used). */
-    usages?: Rulebricks.RuleUsage[];
+    usages?: Rulebricks.RuleUsage[] | undefined;
     /** User groups assigned to this value. */
-    user_groups?: string[];
+    user_groups?: string[] | undefined;
 }
 
 export namespace DynamicValue {

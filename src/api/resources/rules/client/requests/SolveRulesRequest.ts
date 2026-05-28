@@ -7,11 +7,9 @@ import type * as Rulebricks from "../../../../index.js";
  *     {
  *         slug: "slug",
  *         body: {
- *             "body": {
- *                 "name": "Alice Johnson",
- *                 "age": 28,
- *                 "email": "alice.johnson@example.com"
- *             }
+ *             "name": "John Doe",
+ *             "age": 30,
+ *             "email": "jdoe@acme.co"
  *         }
  *     }
  */

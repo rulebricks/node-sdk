@@ -1,2 +1,2 @@
-export type { ExportManifestRequest } from "./ExportManifestRequest.js";
-export type { ImportManifestRequest } from "./ImportManifestRequest.js";
+export { ExportManifestRequest } from "./ExportManifestRequest.js";
+export { ImportManifestRequest } from "./ImportManifestRequest.js";

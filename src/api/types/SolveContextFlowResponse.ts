@@ -5,15 +5,15 @@
  */
 export interface SolveContextFlowResponse {
     /** Whether the flow executed successfully. */
-    status?: SolveContextFlowResponse.Status;
+    status?: SolveContextFlowResponse.Status | undefined;
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** The slug of the flow that was executed. */
-    flow?: string;
+    flow?: string | undefined;
     /** The flow execution output. */
-    result?: Record<string, unknown>;
+    result?: Record<string, unknown> | undefined;
     /** Resource usage information for the flow execution. */
-    usage?: Record<string, unknown>;
+    usage?: Record<string, unknown> | undefined;
 }
 
 export namespace SolveContextFlowResponse {

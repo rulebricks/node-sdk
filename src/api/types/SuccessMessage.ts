@@ -2,5 +2,5 @@
 
 export interface SuccessMessage {
     /** Success message */
-    message?: string;
+    message?: string | undefined;
 }

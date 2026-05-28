@@ -7,21 +7,21 @@ import type * as Rulebricks from "../index.js";
  */
 export interface SubmitContextDataResponse {
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** The merged state after submitting data and any auto-executed rules/flows. */
-    state?: Record<string, unknown>;
+    state?: Record<string, unknown> | undefined;
     /** Whether all required fields are present ('complete') or some are missing ('pending'). */
-    status?: SubmitContextDataResponse.Status;
+    status?: SubmitContextDataResponse.Status | undefined;
     /** List of field keys that are currently populated. */
-    have?: string[];
+    have?: string[] | undefined;
     /** List of required field keys that are still missing. */
-    need?: string[];
+    need?: string[] | undefined;
     /** Whether this submission created a new instance (true) or updated an existing one (false). */
-    is_new?: boolean;
+    is_new?: boolean | undefined;
     /** When the instance will expire based on context TTL. */
-    expires_at?: string | null;
+    expires_at?: (string | null) | undefined;
     /** Results from auto-executed rules/flows and pending evaluation cascades. */
-    cascaded?: Rulebricks.CascadeResult[];
+    cascaded?: Rulebricks.CascadeResult[] | undefined;
 }
 
 export namespace SubmitContextDataResponse {

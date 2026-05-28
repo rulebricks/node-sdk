@@ -2,21 +2,21 @@
 
 export interface UsageStatistics {
     /** The current plan of the organization. */
-    plan?: string;
+    plan?: string | undefined;
     /** The start date of the current monthly period (MM-DD-YYYY). */
-    monthly_period_start?: string;
+    monthly_period_start?: string | undefined;
     /** The end date of the current monthly period (MM-DD-YYYY). */
-    monthly_period_end?: string;
+    monthly_period_end?: string | undefined;
     /** The number of rule executions used this month. */
-    monthly_executions_usage?: number;
+    monthly_executions_usage?: number | undefined;
     /** The total number of rule executions allowed this month. -1 indicates unlimited. */
-    monthly_executions_limit?: number;
+    monthly_executions_limit?: number | undefined;
     /** The number of rule executions remaining this month. -1 indicates unlimited. */
-    monthly_executions_remaining?: number;
+    monthly_executions_remaining?: number | undefined;
     /** Whether the plan has unlimited executions (true when monthly_executions_limit is -1). */
-    unlimited_plan?: boolean;
+    unlimited_plan?: boolean | undefined;
     /** Number of days remaining in the current billing period. */
-    days_remaining_in_period?: number;
+    days_remaining_in_period?: number | undefined;
     /** Average number of executions per day in the current period. */
-    daily_average_usage?: number;
+    daily_average_usage?: number | undefined;
 }

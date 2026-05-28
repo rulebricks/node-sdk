@@ -2,11 +2,11 @@
 
 export interface RuleBase {
     /** The unique identifier for the rule. */
-    id?: string;
+    id?: string | undefined;
     /** The name of the rule. */
-    name?: string;
+    name?: string | undefined;
     /** The description of the rule. */
-    description?: string;
+    description?: string | undefined;
     /** The unique slug for the rule used in API requests. */
-    slug?: string;
+    slug?: string | undefined;
 }

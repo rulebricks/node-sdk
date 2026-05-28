@@ -2,15 +2,15 @@
 
 export interface Folder {
     /** Unique identifier for the folder. */
-    id?: string;
+    id?: string | undefined;
     /** Name of the folder. */
-    name?: string;
+    name?: string | undefined;
     /** Description of the folder. */
-    description?: string;
+    description?: string | undefined;
     /** Timestamp of when the folder was created. */
-    created_at?: string;
+    created_at?: string | undefined;
     /** Timestamp of when the folder was last updated. */
-    updated_at?: string;
+    updated_at?: string | undefined;
     /** User groups that can view this folder. */
-    user_groups?: string[];
+    user_groups?: string[] | undefined;
 }

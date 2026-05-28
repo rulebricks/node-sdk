@@ -63,7 +63,7 @@ export class RelationshipsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -80,9 +80,15 @@ export class RelationshipsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -147,7 +153,7 @@ export class RelationshipsClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: _body,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -166,11 +172,20 @@ export class RelationshipsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -230,7 +245,7 @@ export class RelationshipsClient {
             ),
             method: "DELETE",
             headers: _headers,
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -247,9 +262,15 @@ export class RelationshipsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,

@@ -5,7 +5,7 @@
  */
 export interface ContextInstanceHistoryEntry {
     /** When this value was recorded. */
-    timestamp?: string;
+    timestamp?: string | undefined;
     /** The field value at this point in time. */
-    value?: unknown;
+    value?: unknown | undefined;
 }

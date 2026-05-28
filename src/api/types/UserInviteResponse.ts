@@ -2,17 +2,17 @@
 
 export interface UserInviteResponse {
     /** Success message indicating whether a new user was invited or an existing user's permissions were updated. */
-    message?: string;
-    user?: UserInviteResponse.User;
+    message?: string | undefined;
+    user?: UserInviteResponse.User | undefined;
 }
 
 export namespace UserInviteResponse {
     export interface User {
         /** Email of the invited user. */
-        email?: string;
+        email?: string | undefined;
         /** Role assigned to the user. */
-        role?: string;
+        role?: string | undefined;
         /** User groups assigned to the user. */
-        user_groups?: string[];
+        user_groups?: string[] | undefined;
     }
 }

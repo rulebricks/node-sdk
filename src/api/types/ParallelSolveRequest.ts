@@ -8,9 +8,9 @@ export type ParallelSolveRequest = Record<string, ParallelSolveRequest.Value>;
 export namespace ParallelSolveRequest {
     export interface Value {
         /** Slug of the rule to execute */
-        $rule?: string;
+        $rule?: string | undefined;
         /** Slug of the flow to execute */
-        $flow?: string;
+        $flow?: string | undefined;
         /** Accepts any additional properties */
         [key: string]: any;
     }

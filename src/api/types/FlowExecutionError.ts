@@ -5,9 +5,9 @@
  */
 export interface FlowExecutionError {
     /** Error message describing what went wrong during flow execution */
-    error?: string;
+    error?: string | undefined;
     /** Identifier of the node where the error occurred (if applicable) */
-    node?: string;
+    node?: string | undefined;
     /** Additional error details */
-    details?: Record<string, unknown>;
+    details?: Record<string, unknown> | undefined;
 }

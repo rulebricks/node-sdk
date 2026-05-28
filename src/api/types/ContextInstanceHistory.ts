@@ -7,7 +7,7 @@ import type * as Rulebricks from "../index.js";
  */
 export interface ContextInstanceHistory {
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** Map of field keys to arrays of historical values, newest first. */
-    history?: Record<string, Rulebricks.ContextInstanceHistoryEntry[]>;
+    history?: Record<string, Rulebricks.ContextInstanceHistoryEntry[]> | undefined;
 }

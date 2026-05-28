@@ -2,21 +2,21 @@
 
 export interface SchemaField {
     /** The unique key for this field. */
-    key?: string;
+    key?: string | undefined;
     /** Whether this field is visible in the UI. */
-    show?: boolean;
+    show?: boolean | undefined;
     /** Display name for this field. */
-    name?: string;
+    name?: string | undefined;
     /** Description of this field. */
-    description?: string;
+    description?: string | undefined;
     /** Data type of this field. */
-    type?: SchemaField.Type;
+    type?: SchemaField.Type | undefined;
     /** Default value for this field. */
-    default_value?: SchemaField.DefaultValue | null;
+    default_value?: (SchemaField.DefaultValue | null) | undefined;
     /** Computed default value for this field. */
-    default_computed_value?: string | null;
+    default_computed_value?: (string | null) | undefined;
     /** Transformation expression to apply to this field. */
-    transform?: string;
+    transform?: string | undefined;
 }
 
 export namespace SchemaField {

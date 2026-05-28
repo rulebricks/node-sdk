@@ -3,22 +3,22 @@
 import type * as Rulebricks from "../index.js";
 
 export interface ContextDetail extends Rulebricks.ContextBase {
-    schema?: Rulebricks.ContextSchema;
+    schema?: Rulebricks.ContextSchema | undefined;
     /** The field key used as the unique identifier for instances. */
-    identity_fact?: string | null;
+    identity_fact?: (string | null) | undefined;
     /** User groups that can interact with this context. */
-    user_groups?: string[] | null;
+    user_groups?: (string[] | null) | undefined;
     /** Folder/tag this context belongs to. */
-    folder?: ContextDetail.Folder | null;
+    folder?: (ContextDetail.Folder | null) | undefined;
     /** Rules bound to this context. */
-    bound_rules?: ContextDetail.BoundRules.Item[];
+    bound_rules?: ContextDetail.BoundRules.Item[] | undefined;
     /** Flows bound to this context (via their origin rule). */
-    bound_flows?: ContextDetail.BoundFlows.Item[];
-    relationships?: ContextDetail.Relationships;
+    bound_flows?: ContextDetail.BoundFlows.Item[] | undefined;
+    relationships?: ContextDetail.Relationships | undefined;
     /** When the context was created. */
-    created_at?: string;
+    created_at?: string | undefined;
     /** When the context was last updated. */
-    updated_at?: string;
+    updated_at?: string | undefined;
 }
 
 export namespace ContextDetail {
@@ -26,18 +26,18 @@ export namespace ContextDetail {
      * Folder/tag this context belongs to.
      */
     export interface Folder {
-        id?: string;
-        name?: string;
+        id?: string | undefined;
+        name?: string | undefined;
     }
 
     export type BoundRules = BoundRules.Item[];
 
     export namespace BoundRules {
         export interface Item {
-            id?: string;
-            name?: string;
-            slug?: string;
-            published?: boolean;
+            id?: string | undefined;
+            name?: string | undefined;
+            slug?: string | undefined;
+            published?: boolean | undefined;
         }
     }
 
@@ -45,24 +45,24 @@ export namespace ContextDetail {
 
     export namespace BoundFlows {
         export interface Item {
-            id?: string;
-            name?: string;
-            slug?: string;
-            published?: boolean;
-            origin_rule?: Item.OriginRule | null;
+            id?: string | undefined;
+            name?: string | undefined;
+            slug?: string | undefined;
+            published?: boolean | undefined;
+            origin_rule?: (Item.OriginRule | null) | undefined;
         }
 
         export namespace Item {
             export interface OriginRule {
-                id?: string;
-                name?: string;
-                slug?: string;
+                id?: string | undefined;
+                name?: string | undefined;
+                slug?: string | undefined;
             }
         }
     }
 
     export interface Relationships {
-        outgoing?: Rulebricks.ContextRelationshipOutgoing[];
-        incoming?: Rulebricks.ContextRelationshipIncoming[];
+        outgoing?: Rulebricks.ContextRelationshipOutgoing[] | undefined;
+        incoming?: Rulebricks.ContextRelationshipIncoming[] | undefined;
     }
 }

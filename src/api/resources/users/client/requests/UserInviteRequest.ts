@@ -14,20 +14,6 @@
  *         role: "custom-role",
  *         user_groups: ["group1"]
  *     }
- *
- * @example
- *     {
- *         email: "newuser@example.com",
- *         role: "developer",
- *         user_groups: ["group1", "group2"]
- *     }
- *
- * @example
- *     {
- *         email: "newuser@example.com",
- *         role: "developer",
- *         user_groups: ["group1", "group2"]
- *     }
  */
 export interface UserInviteRequest {
     /** Email of the user to invite. */

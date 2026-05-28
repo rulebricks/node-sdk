@@ -79,7 +79,7 @@ export class ContextsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -93,9 +93,15 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -156,7 +162,7 @@ export class ContextsClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: _body,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -172,11 +178,20 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -231,7 +246,7 @@ export class ContextsClient {
             ),
             method: "DELETE",
             headers: _headers,
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -248,9 +263,15 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -295,15 +316,10 @@ export class ContextsClient {
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ContextInstanceHistory>> {
         const { slug, instance, field, limit } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (field != null) {
-            _queryParams.field = field;
-        }
-
-        if (limit != null) {
-            _queryParams.limit = limit.toString();
-        }
-
+        const _queryParams: Record<string, unknown> = {
+            field,
+            limit,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -319,7 +335,11 @@ export class ContextsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -333,9 +353,15 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -395,7 +421,7 @@ export class ContextsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -412,9 +438,15 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -478,7 +510,7 @@ export class ContextsClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: _body,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -494,11 +526,20 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -560,7 +601,7 @@ export class ContextsClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: _body,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -576,9 +617,15 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -642,7 +689,7 @@ export class ContextsClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: _body,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -658,11 +705,20 @@ export class ContextsClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,

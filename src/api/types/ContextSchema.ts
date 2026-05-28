@@ -7,7 +7,7 @@ import type * as Rulebricks from "../index.js";
  */
 export interface ContextSchema {
     /** User-defined base fields for the context. */
-    base?: Rulebricks.ContextSchemaField[];
+    base?: Rulebricks.ContextSchemaField[] | undefined;
     /** Fields derived from bound rule/flow outputs. */
-    derived?: Rulebricks.ContextSchemaField[];
+    derived?: Rulebricks.ContextSchemaField[] | undefined;
 }

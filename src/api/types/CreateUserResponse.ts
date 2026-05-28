@@ -4,26 +4,24 @@
  * Response after successfully creating a user.
  */
 export interface CreateUserResponse {
-    /** Status of the operation. */
-    status?: string;
     /** Success message. */
-    message?: string;
-    user?: CreateUserResponse.User;
+    message?: string | undefined;
+    user?: CreateUserResponse.User | undefined;
 }
 
 export namespace CreateUserResponse {
     export interface User {
         /** Unique identifier for the created user. */
-        id?: string;
+        id?: string | undefined;
         /** Email address of the created user. */
-        email?: string;
+        email?: string | undefined;
         /** Display name of the user. */
-        name?: string | null;
+        name?: (string | null) | undefined;
         /** Role assigned to the user. */
-        role?: string;
+        role?: string | undefined;
         /** User groups assigned to the user. */
-        user_groups?: string[];
+        user_groups?: string[] | undefined;
         /** API key generated for the user. */
-        api_key?: string | null;
+        api_key?: (string | null) | undefined;
     }
 }

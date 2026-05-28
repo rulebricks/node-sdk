@@ -4,20 +4,24 @@ import type * as Rulebricks from "../index.js";
 
 export interface RuleDetail extends Rulebricks.RuleBase {
     /** The date this rule was created. */
-    created_at?: string;
+    created_at?: string | undefined;
     /** The date this rule was last updated. */
-    updated_at?: string;
+    updated_at?: string | undefined;
     /** Whether the rule is currently published. */
-    published?: boolean;
+    published?: boolean | undefined;
+    /** The number of condition rows configured for the rule. Uses the published condition count when the rule is published, otherwise the draft condition count. */
+    no_conditions?: number | undefined;
     /** Optional user-defined metadata for API-first integrations. */
-    metadata?: Record<string, unknown>;
-    folder?: Rulebricks.Folder;
+    metadata?: Record<string, unknown> | undefined;
+    /** User groups that can access this rule. */
+    user_groups?: string[] | undefined;
+    folder?: Rulebricks.Folder | undefined;
     /** The context this rule is bound to (if any). Rules bound to a context have their inputs/outputs mapped to context fields. */
-    context?: RuleDetail.Context | null;
+    context?: (RuleDetail.Context | null) | undefined;
     /** The request schema for the rule. Uses published schema when published, otherwise draft schema. */
-    request_schema?: Rulebricks.SchemaField[];
+    request_schema?: Rulebricks.SchemaField[] | undefined;
     /** The response schema for the rule. Uses published schema when published, otherwise draft schema. */
-    response_schema?: Rulebricks.SchemaField[];
+    response_schema?: Rulebricks.SchemaField[] | undefined;
 }
 
 export namespace RuleDetail {
@@ -26,10 +30,10 @@ export namespace RuleDetail {
      */
     export interface Context {
         /** The context ID. */
-        id?: string;
+        id?: string | undefined;
         /** The context name. */
-        name?: string;
+        name?: string | undefined;
         /** The context slug. */
-        slug?: string;
+        slug?: string | undefined;
     }
 }

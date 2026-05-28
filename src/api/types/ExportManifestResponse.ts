@@ -2,32 +2,32 @@
 
 export interface ExportManifestResponse {
     /** Whether the export completed successfully. */
-    success?: boolean;
-    /** The exported manifest data. */
-    manifest?: ExportManifestResponse.Manifest;
+    success?: boolean | undefined;
+    /** The exported manifest data. The wrapper uses snake_case, while asset objects inside `contexts`, `values`, `rules`, and `flows` intentionally preserve `.rbm`/database casing for round-trip compatibility. */
+    manifest?: ExportManifestResponse.Manifest | undefined;
     /** Error message if export failed. */
-    error?: string;
+    error?: string | undefined;
 }
 
 export namespace ExportManifestResponse {
     /**
-     * The exported manifest data.
+     * The exported manifest data. The wrapper uses snake_case, while asset objects inside `contexts`, `values`, `rules`, and `flows` intentionally preserve `.rbm`/database casing for round-trip compatibility.
      */
     export interface Manifest {
         /** Manifest format version. */
-        version?: string;
+        version?: string | undefined;
         /** Manifest name. */
-        name?: string;
+        name?: string | undefined;
         /** Manifest description. */
-        description?: string;
-        exported_at?: string;
+        description?: string | undefined;
+        exported_at?: string | undefined;
         /** Exported contexts. */
-        contexts?: Record<string, unknown>[];
+        contexts?: Record<string, unknown>[] | undefined;
         /** Exported dynamic values. */
-        values?: Record<string, unknown>[];
+        values?: Record<string, unknown>[] | undefined;
         /** Exported rules. */
-        rules?: Record<string, unknown>[];
+        rules?: Record<string, unknown>[] | undefined;
         /** Exported flows. */
-        flows?: Record<string, unknown>[];
+        flows?: Record<string, unknown>[] | undefined;
     }
 }

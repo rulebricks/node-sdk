@@ -12,13 +12,13 @@ export interface Test {
     /** Indicates whether the test is critical. */
     critical: boolean;
     /** Indicates if the test resulted in an error. Null if test has not been executed. */
-    error?: boolean | null;
+    error?: (boolean | null) | undefined;
     /** Indicates if the test was successful. Null if test has not been executed. */
-    success?: boolean | null;
+    success?: (boolean | null) | undefined;
     /** The state of the test after execution. */
-    test_state?: Test.TestState | null;
+    test_state?: (Test.TestState | null) | undefined;
     /** The timestamp when the test was last executed. */
-    last_executed?: string | null;
+    last_executed?: (string | null) | undefined;
 }
 
 export namespace Test {
@@ -27,15 +27,15 @@ export namespace Test {
      */
     export interface TestState {
         /** Execution time in seconds */
-        duration?: number;
+        duration?: number | undefined;
         /** Actual response returned */
-        response?: Record<string, unknown> | null;
-        conditions?: Record<string, unknown>[];
+        response?: (Record<string, unknown> | null) | undefined;
+        conditions?: Record<string, unknown>[] | undefined;
         /** HTTP status code returned */
-        http_status?: number;
-        success_idxs?: number[];
+        http_status?: number | undefined;
+        success_idxs?: number[] | undefined;
         /** Error message or flag indicating if evaluation error occurred */
-        evaluation_error?: TestState.EvaluationError;
+        evaluation_error?: TestState.EvaluationError | undefined;
     }
 
     export namespace TestState {

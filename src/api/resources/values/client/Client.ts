@@ -51,15 +51,10 @@ export class ValuesClient {
         requestOptions?: ValuesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DynamicValueListResponse>> {
         const { name, include } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (name != null) {
-            _queryParams.name = name;
-        }
-
-        if (include != null) {
-            _queryParams.include = include;
-        }
-
+        const _queryParams: Record<string, unknown> = {
+            name,
+            include,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -75,7 +70,11 @@ export class ValuesClient {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -89,9 +88,15 @@ export class ValuesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -202,7 +207,7 @@ export class ValuesClient {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: requestOptions?.queryParams,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
             body: request,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -218,11 +223,20 @@ export class ValuesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Rulebricks.ForbiddenError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,
@@ -262,8 +276,9 @@ export class ValuesClient {
         requestOptions?: ValuesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.SuccessMessage>> {
         const { id } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        _queryParams.id = id;
+        const _queryParams: Record<string, unknown> = {
+            id,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -279,7 +294,11 @@ export class ValuesClient {
             ),
             method: "DELETE",
             headers: _headers,
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -293,11 +312,20 @@ export class ValuesClient {
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Rulebricks.BadRequestError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Rulebricks.NotFoundError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Rulebricks.InternalServerError(_response.error.body as unknown, _response.rawResponse);
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.RulebricksError({
                         statusCode: _response.error.statusCode,

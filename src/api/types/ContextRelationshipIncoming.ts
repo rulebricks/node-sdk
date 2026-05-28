@@ -3,13 +3,13 @@
 import type * as Rulebricks from "../index.js";
 
 export interface ContextRelationshipIncoming extends Rulebricks.ContextRelationshipBase {
-    source_context?: ContextRelationshipIncoming.SourceContext;
+    source_context?: ContextRelationshipIncoming.SourceContext | undefined;
 }
 
 export namespace ContextRelationshipIncoming {
     export interface SourceContext {
-        id?: string;
-        name?: string;
-        slug?: string;
+        id?: string | undefined;
+        name?: string | undefined;
+        slug?: string | undefined;
     }
 }

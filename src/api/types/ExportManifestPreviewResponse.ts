@@ -2,35 +2,35 @@
 
 export interface ExportManifestPreviewResponse {
     /** Whether the preview completed successfully. */
-    success?: boolean;
-    /** Preview of assets that would be exported. */
-    preview?: ExportManifestPreviewResponse.Preview;
+    success?: boolean | undefined;
+    /** Preview of assets that would be exported. The preview wrapper uses snake_case, while asset items intentionally preserve `.rbm`/database casing (for example, `valueType` and `updatedAt`) because the same items feed manifest preview/import UI. */
+    preview?: ExportManifestPreviewResponse.Preview | undefined;
     /** Error message if preview failed. */
-    error?: string;
+    error?: string | undefined;
 }
 
 export namespace ExportManifestPreviewResponse {
     /**
-     * Preview of assets that would be exported.
+     * Preview of assets that would be exported. The preview wrapper uses snake_case, while asset items intentionally preserve `.rbm`/database casing (for example, `valueType` and `updatedAt`) because the same items feed manifest preview/import UI.
      */
     export interface Preview {
-        counts?: Preview.Counts;
-        items?: Preview.Items;
+        counts?: Preview.Counts | undefined;
+        items?: Preview.Items | undefined;
     }
 
     export namespace Preview {
         export interface Counts {
-            rules?: number;
-            flows?: number;
-            contexts?: number;
-            values?: number;
+            rules?: number | undefined;
+            flows?: number | undefined;
+            contexts?: number | undefined;
+            values?: number | undefined;
         }
 
         export interface Items {
-            rules?: Items.Rules.Item[];
-            flows?: Items.Flows.Item[];
-            contexts?: Items.Contexts.Item[];
-            values?: Items.Values.Item[];
+            rules?: Items.Rules.Item[] | undefined;
+            flows?: Items.Flows.Item[] | undefined;
+            contexts?: Items.Contexts.Item[] | undefined;
+            values?: Items.Values.Item[] | undefined;
         }
 
         export namespace Items {
@@ -38,9 +38,9 @@ export namespace ExportManifestPreviewResponse {
 
             export namespace Rules {
                 export interface Item {
-                    id?: string;
-                    name?: string;
-                    slug?: string;
+                    id?: string | undefined;
+                    name?: string | undefined;
+                    slug?: string | undefined;
                 }
             }
 
@@ -48,9 +48,9 @@ export namespace ExportManifestPreviewResponse {
 
             export namespace Flows {
                 export interface Item {
-                    id?: string;
-                    name?: string;
-                    slug?: string;
+                    id?: string | undefined;
+                    name?: string | undefined;
+                    slug?: string | undefined;
                 }
             }
 
@@ -58,9 +58,9 @@ export namespace ExportManifestPreviewResponse {
 
             export namespace Contexts {
                 export interface Item {
-                    id?: string;
-                    name?: string;
-                    slug?: string;
+                    id?: string | undefined;
+                    name?: string | undefined;
+                    slug?: string | undefined;
                 }
             }
 
@@ -68,8 +68,8 @@ export namespace ExportManifestPreviewResponse {
 
             export namespace Values {
                 export interface Item {
-                    id?: string;
-                    name?: string;
+                    id?: string | undefined;
+                    name?: string | undefined;
                 }
             }
         }

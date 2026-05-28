@@ -5,11 +5,11 @@
  */
 export interface UpdateContextResponse {
     /** The unique identifier of the updated context. */
-    id?: string;
+    id?: string | undefined;
     /** The slug of the updated context. */
-    slug?: string;
+    slug?: string | undefined;
     /** The name of the updated context. */
-    name?: string;
+    name?: string | undefined;
     /** Timestamp of when the context was updated. */
-    updated_at?: string;
+    updated_at?: string | undefined;
 }

@@ -2,9 +2,10 @@
 
 import type * as core from "../../core/index.js";
 import * as errors from "../../errors/index.js";
+import type * as Rulebricks from "../index.js";
 
 export class InternalServerError extends errors.RulebricksError {
-    constructor(body?: unknown, rawResponse?: core.RawResponse) {
+    constructor(body: Rulebricks.Error_, rawResponse?: core.RawResponse) {
         super({
             message: "InternalServerError",
             statusCode: 500,

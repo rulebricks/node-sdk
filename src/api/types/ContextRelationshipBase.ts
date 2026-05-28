@@ -2,17 +2,17 @@
 
 export interface ContextRelationshipBase {
     /** The unique identifier for the relationship. */
-    id?: string;
+    id?: string | undefined;
     /** The type of relationship. */
-    type?: ContextRelationshipBase.Type;
+    type?: ContextRelationshipBase.Type | undefined;
     /** The field key used as the foreign key. */
-    foreign_key?: string;
+    foreign_key?: string | undefined;
     /** Display name for the relationship. */
-    name?: string;
+    name?: string | undefined;
     /** Description of the relationship. */
-    description?: string;
+    description?: string | undefined;
     /** When the relationship was created. */
-    created_at?: string;
+    created_at?: string | undefined;
 }
 
 export namespace ContextRelationshipBase {

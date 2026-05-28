@@ -2,11 +2,11 @@
 
 export interface FlowBase {
     /** The unique identifier for the flow. */
-    id?: string;
+    id?: string | undefined;
     /** The name of the flow. */
-    name?: string;
+    name?: string | undefined;
     /** The description of the flow. */
-    description?: string;
+    description?: string | undefined;
     /** The unique slug for the flow used in API requests. */
-    slug?: string;
+    slug?: string | undefined;
 }

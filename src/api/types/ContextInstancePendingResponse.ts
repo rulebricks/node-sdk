@@ -7,5 +7,5 @@ import type * as Rulebricks from "../index.js";
  */
 export interface ContextInstancePendingResponse {
     /** Pending rule and flow evaluations. */
-    pending?: Rulebricks.ContextInstancePendingEvaluation[];
+    pending?: Rulebricks.ContextInstancePendingEvaluation[] | undefined;
 }

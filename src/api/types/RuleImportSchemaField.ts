@@ -11,15 +11,15 @@ export interface RuleImportSchemaField {
     /** Display name for this field. */
     name: string;
     /** Optional field description. */
-    description?: string;
+    description?: string | undefined;
     /** Data type for this field. */
     type: RuleImportSchemaField.Type;
     /** Optional default value for this field. */
-    defaultValue?: unknown | null;
+    defaultValue?: (unknown | null) | undefined;
     /** When true, this field should only accept values from a value collection. */
-    valuesOnly?: boolean;
+    valuesOnly?: boolean | undefined;
     /** Prefix used to scope available dynamic values for this field. */
-    valuesPrefix?: string;
+    valuesPrefix?: string | undefined;
     /** Accepts any additional properties */
     [key: string]: any;
 }

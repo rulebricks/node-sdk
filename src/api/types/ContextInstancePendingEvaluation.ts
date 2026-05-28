@@ -5,21 +5,21 @@
  */
 export interface ContextInstancePendingEvaluation {
     /** Whether this is a rule or flow evaluation. */
-    type?: ContextInstancePendingEvaluation.Type;
+    type?: ContextInstancePendingEvaluation.Type | undefined;
     /** The rule slug (if type is 'rule'). */
-    rule?: string | null;
+    rule?: (string | null) | undefined;
     /** The rule ID (if type is 'rule'). */
-    rule_id?: string | null;
+    rule_id?: (string | null) | undefined;
     /** The flow slug (if type is 'flow'). */
-    flow?: string | null;
+    flow?: (string | null) | undefined;
     /** The flow ID (if type is 'flow'). */
-    flow_id?: string | null;
+    flow_id?: (string | null) | undefined;
     /** List of field keys or dependency objects this evaluation is waiting for. Can contain simple strings for direct fields or objects for relationship dependencies. */
-    waiting_on?: ContextInstancePendingEvaluation.WaitingOn.Item[];
+    waiting_on?: ContextInstancePendingEvaluation.WaitingOn.Item[] | undefined;
     /** When this pending evaluation was registered. */
-    created_at?: string;
+    created_at?: string | undefined;
     /** When this pending evaluation will expire. */
-    expires_at?: string;
+    expires_at?: string | undefined;
 }
 
 export namespace ContextInstancePendingEvaluation {

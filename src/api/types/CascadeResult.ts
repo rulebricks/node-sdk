@@ -5,21 +5,21 @@
  */
 export interface CascadeResult {
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** The rule slug (if this was a rule evaluation). */
-    rule?: string | null;
+    rule?: (string | null) | undefined;
     /** The flow slug (if this was a flow evaluation). */
-    flow?: string | null;
+    flow?: (string | null) | undefined;
     /** Whether the evaluation succeeded. */
-    status?: CascadeResult.Status;
+    status?: CascadeResult.Status | undefined;
     /** The evaluation output. */
-    result?: Record<string, unknown>;
+    result?: Record<string, unknown> | undefined;
     /** Whether this was auto-executed (true) or from a registered pending evaluation (false). */
-    auto_executed?: boolean;
+    auto_executed?: boolean | undefined;
     /** List of field keys written back to the context (for rule evaluations). */
-    written_to_context?: string[];
+    written_to_context?: string[] | undefined;
     /** Error message if the evaluation failed. */
-    error?: string | null;
+    error?: (string | null) | undefined;
 }
 
 export namespace CascadeResult {

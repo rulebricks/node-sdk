@@ -7,17 +7,17 @@ import type * as Rulebricks from "../index.js";
  */
 export interface SolveContextRuleResponse {
     /** Whether the rule executed successfully. */
-    status?: SolveContextRuleResponse.Status;
+    status?: SolveContextRuleResponse.Status | undefined;
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** The slug of the rule that was executed. */
-    rule?: string;
+    rule?: string | undefined;
     /** The rule evaluation result (output values). */
-    result?: Record<string, unknown>;
+    result?: Record<string, unknown> | undefined;
     /** List of field keys that were written back to the context instance. */
-    written_to_context?: string[];
+    written_to_context?: string[] | undefined;
     /** Results from any cascaded evaluations triggered by the rule outputs. */
-    cascaded?: Rulebricks.CascadeResult[];
+    cascaded?: Rulebricks.CascadeResult[] | undefined;
 }
 
 export namespace SolveContextRuleResponse {

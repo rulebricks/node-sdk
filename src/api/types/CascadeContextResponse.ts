@@ -7,7 +7,7 @@ import type * as Rulebricks from "../index.js";
  */
 export interface CascadeContextResponse {
     /** Combined identifier in format 'contextSlug:instanceId'. */
-    context?: string;
+    context?: string | undefined;
     /** Results from all cascaded evaluations. */
-    cascaded?: Rulebricks.CascadeResult[];
+    cascaded?: Rulebricks.CascadeResult[] | undefined;
 }

@@ -92,12 +92,17 @@ export class BooleanField implements Field {
             any: { name: "any", args: [], description: "Match any boolean value", skipTypecheck: true },
             is_true: { name: "is true", args: [], description: "Check if value is true" },
             is_false: { name: "is false", args: [], description: "Check if value is false" },
+            is_null: { name: "is null", args: [], description: "Check if value is null" },
         };
     }
 
     equals(value: boolean | DynamicValue): OperatorResult {
         const opName = value ? "is true" : "is false";
         return [opName, []];
+    }
+
+    is_null(): OperatorResult {
+        return ["is null", []];
     }
 }
 
@@ -203,6 +208,7 @@ export class NumberField implements Field {
                 args: [{ name: "base", type: "number", description: "The base number" }],
                 validate: (args: any[]) => args[0] > 0,
             },
+            is_null: { name: "is null", args: [], description: "Check if value is null" },
         };
     }
 
@@ -295,6 +301,10 @@ export class NumberField implements Field {
         }
         return ["is a power of", [new Argument(base, DynamicValueType.NUMBER).toDict()]];
     }
+
+    is_null(): OperatorResult {
+        return ["is null", []];
+    }
 }
 
 export class DateField implements Field {
@@ -336,6 +346,13 @@ export class DateField implements Field {
                     },
                 ],
             },
+            between_n_and_m_days_ago: {
+                name: "is between N and M days ago",
+                args: [
+                    { name: "minDays", type: "number", description: "Minimum number of days ago", placeholder: "Min days" },
+                    { name: "maxDays", type: "number", description: "Maximum number of days ago", placeholder: "Max days" },
+                ],
+            },
             days_from_now: {
                 name: "days from now",
                 args: [
@@ -359,6 +376,77 @@ export class DateField implements Field {
                         name: "days",
                         type: "number",
                         description: "Number of days from now that the date is more than or equal to",
+                    },
+                ],
+            },
+            months_ago: {
+                name: "months ago",
+                args: [{ name: "months", type: "number", description: "Number of months ago that the date is equal to" }],
+            },
+            less_than_months_ago: {
+                name: "is less than N months ago",
+                args: [
+                    {
+                        name: "months",
+                        type: "number",
+                        description: "Number of months ago that the date is less than or equal to",
+                    },
+                ],
+            },
+            more_than_months_ago: {
+                name: "is more than N months ago",
+                args: [
+                    {
+                        name: "months",
+                        type: "number",
+                        description: "Number of months ago that the date is more than or equal to",
+                    },
+                ],
+            },
+            between_n_and_m_months_ago: {
+                name: "is between N and M months ago",
+                args: [
+                    {
+                        name: "minMonths",
+                        type: "number",
+                        description: "Minimum number of months ago",
+                        placeholder: "Min months",
+                    },
+                    {
+                        name: "maxMonths",
+                        type: "number",
+                        description: "Maximum number of months ago",
+                        placeholder: "Max months",
+                    },
+                ],
+            },
+            months_from_now: {
+                name: "months from now",
+                args: [
+                    {
+                        name: "months",
+                        type: "number",
+                        description: "Number of months from now that the date is equal to",
+                    },
+                ],
+            },
+            less_than_months_from_now: {
+                name: "is less than N months from now",
+                args: [
+                    {
+                        name: "months",
+                        type: "number",
+                        description: "Number of months from now that the date is less than or equal to",
+                    },
+                ],
+            },
+            more_than_months_from_now: {
+                name: "is more than N months from now",
+                args: [
+                    {
+                        name: "months",
+                        type: "number",
+                        description: "Number of months from now that the date is more than or equal to",
                     },
                 ],
             },
@@ -388,6 +476,14 @@ export class DateField implements Field {
                 name: "on or before",
                 args: [{ name: "date", type: "date", description: "Date that value must be on or before" }],
             },
+            equals: {
+                name: "equals",
+                args: [{ name: "date", type: "date", description: "Date that value must be equal to" }],
+            },
+            does_not_equal: {
+                name: "does not equal",
+                args: [{ name: "date", type: "date", description: "Date that value must not be equal to" }],
+            },
             between: {
                 name: "between",
                 args: [
@@ -402,6 +498,7 @@ export class DateField implements Field {
                     { name: "end", type: "date", description: "Date that value must be after", placeholder: "To" },
                 ],
             },
+            is_null: { name: "is null", args: [], description: "Check if value is null" },
         };
     }
 
@@ -425,6 +522,13 @@ export class DateField implements Field {
         return ["is more than N days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
     }
 
+    between_n_and_m_days_ago(minDays: number | DynamicValue, maxDays: number | DynamicValue): OperatorResult {
+        return [
+            "is between N and M days ago",
+            [new Argument(minDays, DynamicValueType.NUMBER).toDict(), new Argument(maxDays, DynamicValueType.NUMBER).toDict()],
+        ];
+    }
+
     days_from_now(days: number | DynamicValue): OperatorResult {
         return ["days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
     }
@@ -435,6 +539,40 @@ export class DateField implements Field {
 
     more_than_days_from_now(days: number | DynamicValue): OperatorResult {
         return ["is more than N days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    months_ago(months: number | DynamicValue): OperatorResult {
+        return ["months ago", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    less_than_months_ago(months: number | DynamicValue): OperatorResult {
+        return ["is less than N months ago", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    more_than_months_ago(months: number | DynamicValue): OperatorResult {
+        return ["is more than N months ago", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    between_n_and_m_months_ago(minMonths: number | DynamicValue, maxMonths: number | DynamicValue): OperatorResult {
+        return [
+            "is between N and M months ago",
+            [
+                new Argument(minMonths, DynamicValueType.NUMBER).toDict(),
+                new Argument(maxMonths, DynamicValueType.NUMBER).toDict(),
+            ],
+        ];
+    }
+
+    months_from_now(months: number | DynamicValue): OperatorResult {
+        return ["months from now", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    less_than_months_from_now(months: number | DynamicValue): OperatorResult {
+        return ["is less than N months from now", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    more_than_months_from_now(months: number | DynamicValue): OperatorResult {
+        return ["is more than N months from now", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
     }
 
     is_today(): OperatorResult {
@@ -493,11 +631,30 @@ export class DateField implements Field {
         return ["on or before", [new Argument(date, DynamicValueType.DATE).toDict()]];
     }
 
+    equals(date: Date | string | DynamicValue): OperatorResult {
+        return ["equals", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    }
+
+    not_equals(date: Date | string | DynamicValue): OperatorResult {
+        return ["does not equal", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    }
+
     between(start: Date | string | DynamicValue, end: Date | string | DynamicValue): OperatorResult {
         return [
             "between",
             [new Argument(start, DynamicValueType.DATE).toDict(), new Argument(end, DynamicValueType.DATE).toDict()],
         ];
+    }
+
+    not_between(start: Date | string | DynamicValue, end: Date | string | DynamicValue): OperatorResult {
+        return [
+            "not between",
+            [new Argument(start, DynamicValueType.DATE).toDict(), new Argument(end, DynamicValueType.DATE).toDict()],
+        ];
+    }
+
+    is_null(): OperatorResult {
+        return ["is null", []];
     }
 }
 
@@ -540,8 +697,16 @@ export class StringField implements Field {
                 name: "equals",
                 args: [{ name: "value", type: "string", description: "The value to compare against" }],
             },
+            equals_case_insensitive: {
+                name: "equals (case-insensitive)",
+                args: [{ name: "value", type: "string", description: "The value to compare against" }],
+            },
             does_not_equal: {
                 name: "does not equal",
+                args: [{ name: "value", type: "string", description: "The value to compare against" }],
+            },
+            does_not_equal_case_insensitive: {
+                name: "does not equal (case-insensitive)",
                 args: [{ name: "value", type: "string", description: "The value to compare against" }],
             },
             is_empty: { name: "is empty", args: [], description: "Check if string is empty" },
@@ -587,6 +752,124 @@ export class StringField implements Field {
                         type: "list",
                         description: "A list of values the string should not be in",
                         validate: (v: any[]) => v.length > 0,
+                    },
+                ],
+            },
+            contains_any_of: {
+                name: "contains any of",
+                args: [
+                    {
+                        name: "value",
+                        type: "list",
+                        description: "A list of values the string should contain at least one of",
+                        validate: (v: any[]) => v.length > 0,
+                    },
+                ],
+            },
+            does_not_contain_any_of: {
+                name: "does not contain any of",
+                args: [
+                    {
+                        name: "value",
+                        type: "list",
+                        description: "A list of values the string should not contain",
+                        validate: (v: any[]) => v.length > 0,
+                    },
+                ],
+            },
+            is_of_length: {
+                name: "is of length",
+                args: [
+                    {
+                        name: "length",
+                        type: "number",
+                        description: "The length the string should be",
+                        validate: (v: number) => v > 0,
+                    },
+                ],
+            },
+            is_not_of_length: {
+                name: "is not of length",
+                args: [
+                    {
+                        name: "length",
+                        type: "number",
+                        description: "The length the string should not be",
+                        validate: (v: number) => v > 0,
+                    },
+                ],
+            },
+            is_longer_than: {
+                name: "is longer than",
+                args: [
+                    {
+                        name: "length",
+                        type: "number",
+                        description: "The length the string should be longer than",
+                        validate: (v: number) => v > 0,
+                    },
+                ],
+            },
+            is_shorter_than: {
+                name: "is shorter than",
+                args: [
+                    {
+                        name: "length",
+                        type: "number",
+                        description: "The length the string should be shorter than",
+                        validate: (v: number) => v > 0,
+                    },
+                ],
+            },
+            is_longer_than_or_equal: {
+                name: "is longer than or equal to",
+                args: [
+                    {
+                        name: "length",
+                        type: "number",
+                        description: "The length the string should be longer than or equal to",
+                        validate: (v: number) => v > 0,
+                    },
+                ],
+            },
+            is_shorter_than_or_equal: {
+                name: "is shorter than or equal to",
+                args: [
+                    {
+                        name: "length",
+                        type: "number",
+                        description: "The length the string should be shorter than or equal to",
+                        validate: (v: number) => v > 0,
+                    },
+                ],
+            },
+            starts_with_case_insensitive: {
+                name: "starts with (case-insensitive)",
+                args: [
+                    {
+                        name: "prefix",
+                        type: "string",
+                        description: "The string that the value should start with (case-insensitive)",
+                    },
+                ],
+            },
+            ends_with_case_insensitive: {
+                name: "ends with (case-insensitive)",
+                args: [
+                    {
+                        name: "suffix",
+                        type: "string",
+                        description: "The string that the value should end with (case-insensitive)",
+                    },
+                ],
+            },
+            contains_case_insensitive: {
+                name: "contains (case-insensitive)",
+                args: [
+                    {
+                        name: "substring",
+                        type: "string",
+                        description: "The string that should be contained within the value (case-insensitive)",
                     },
                 ],
             },
@@ -672,6 +955,7 @@ export class StringField implements Field {
                 args: [],
                 description: "Check if string contains only digits and letters",
             },
+            is_null: { name: "is null", args: [], description: "Check if value is null" },
         };
     }
 
@@ -701,8 +985,16 @@ export class StringField implements Field {
         return ["equals", [new Argument(value, DynamicValueType.STRING).toDict()]];
     }
 
+    equals_case_insensitive(value: string | DynamicValue): OperatorResult {
+        return ["equals (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    }
+
     not_equals(value: string | DynamicValue): OperatorResult {
         return ["does not equal", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    }
+
+    not_equals_case_insensitive(value: string | DynamicValue): OperatorResult {
+        return ["does not equal (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
     }
 
     is_empty(): OperatorResult {
@@ -735,6 +1027,18 @@ export class StringField implements Field {
         return ["ends with", [arg.toDict()]];
     }
 
+    contains_case_insensitive(value: string | DynamicValue): OperatorResult {
+        return ["contains (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    }
+
+    starts_with_case_insensitive(value: string | DynamicValue): OperatorResult {
+        return ["starts with (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    }
+
+    ends_with_case_insensitive(value: string | DynamicValue): OperatorResult {
+        return ["ends with (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    }
+
     is_included_in(values: string[] | DynamicValue): OperatorResult {
         if (values instanceof DynamicValue) {
             if (values.valueType !== DynamicValueType.LIST) {
@@ -751,6 +1055,108 @@ export class StringField implements Field {
         }
 
         return ["is included in", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+    }
+
+    is_not_included_in(values: string[] | DynamicValue): OperatorResult {
+        if (values instanceof DynamicValue) {
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
+            return ["is not included in", [new Argument(values, DynamicValueType.LIST).toDict()]];
+        }
+
+        const op = this.operators["is_not_included_in"];
+        if (op.args[0].validate && !op.args[0].validate(values)) {
+            throw new Error("List must not be empty");
+        }
+
+        return ["is not included in", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+    }
+
+    contains_any_of(values: string[] | DynamicValue): OperatorResult {
+        if (values instanceof DynamicValue) {
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
+            return ["contains any of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+        }
+
+        const op = this.operators["contains_any_of"];
+        if (op.args[0].validate && !op.args[0].validate(values)) {
+            throw new Error("List must not be empty");
+        }
+
+        return ["contains any of", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+    }
+
+    does_not_contain_any_of(values: string[] | DynamicValue): OperatorResult {
+        if (values instanceof DynamicValue) {
+            if (values.valueType !== DynamicValueType.LIST) {
+                throw new TypeMismatchError(
+                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                );
+            }
+            return ["does not contain any of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+        }
+
+        const op = this.operators["does_not_contain_any_of"];
+        if (op.args[0].validate && !op.args[0].validate(values)) {
+            throw new Error("List must not be empty");
+        }
+
+        return ["does not contain any of", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+    }
+
+    length_equals(length: number | DynamicValue): OperatorResult {
+        return ["is of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_of_length(length: number | DynamicValue): OperatorResult {
+        return this.length_equals(length);
+    }
+
+    length_not_equals(length: number | DynamicValue): OperatorResult {
+        return ["is not of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_not_of_length(length: number | DynamicValue): OperatorResult {
+        return this.length_not_equals(length);
+    }
+
+    longer_than(length: number | DynamicValue): OperatorResult {
+        return ["is longer than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_longer_than(length: number | DynamicValue): OperatorResult {
+        return this.longer_than(length);
+    }
+
+    shorter_than(length: number | DynamicValue): OperatorResult {
+        return ["is shorter than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_shorter_than(length: number | DynamicValue): OperatorResult {
+        return this.shorter_than(length);
+    }
+
+    longer_than_or_equal(length: number | DynamicValue): OperatorResult {
+        return ["is longer than or equal to", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_longer_than_or_equal(length: number | DynamicValue): OperatorResult {
+        return this.longer_than_or_equal(length);
+    }
+
+    shorter_than_or_equal(length: number | DynamicValue): OperatorResult {
+        return ["is shorter than or equal to", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    }
+
+    is_shorter_than_or_equal(length: number | DynamicValue): OperatorResult {
+        return this.shorter_than_or_equal(length);
     }
 
     matches_regex(pattern: string | DynamicValue): OperatorResult {
@@ -821,6 +1227,10 @@ export class StringField implements Field {
 
     contains_only_digits_and_letters(): OperatorResult {
         return ["contains only digits and letters", []];
+    }
+
+    is_null(): OperatorResult {
+        return ["is null", []];
     }
 }
 
@@ -910,6 +1320,21 @@ export class ListField implements Field {
                     { name: "value", type: "generic", description: "Value that the key must be equal to" },
                 ],
             },
+            does_not_contain_object_with_key_value: {
+                name: "does not contain object with key & value",
+                args: [
+                    { name: "key", type: "string", description: "Key of any object contained in the list" },
+                    { name: "value", type: "generic", description: "Value that the key must not be equal to" },
+                ],
+            },
+            contains_object_with_key: {
+                name: "contains object with key",
+                args: [{ name: "key", type: "string", description: "Key of any object contained in the list" }],
+            },
+            does_not_contain_object_with_key: {
+                name: "does not contain object with key",
+                args: [{ name: "key", type: "string", description: "Key of any object contained in the list" }],
+            },
             has_unique_elements: {
                 name: "has unique elements",
                 args: [],
@@ -923,6 +1348,7 @@ export class ListField implements Field {
                 name: "is a superlist of",
                 args: [{ name: "sublist", type: "list", description: "List that should be contained in this list" }],
             },
+            is_null: { name: "is null", args: [], description: "Check if value is null" },
         };
     }
 
@@ -1036,6 +1462,24 @@ export class ListField implements Field {
         ];
     }
 
+    does_not_contain_object_with_key_value(key: string | DynamicValue, value: any | DynamicValue): OperatorResult {
+        return [
+            "does not contain object with key & value",
+            [
+                new Argument(key, DynamicValueType.STRING).toDict(),
+                new Argument(value, DynamicValueType.OBJECT).toDict(),
+            ],
+        ];
+    }
+
+    contains_object_with_key(key: string | DynamicValue): OperatorResult {
+        return ["contains object with key", [new Argument(key, DynamicValueType.STRING).toDict()]];
+    }
+
+    does_not_contain_object_with_key(key: string | DynamicValue): OperatorResult {
+        return ["does not contain object with key", [new Argument(key, DynamicValueType.STRING).toDict()]];
+    }
+
     has_unique_elements(): OperatorResult {
         return ["has unique elements", []];
     }
@@ -1062,5 +1506,9 @@ export class ListField implements Field {
             return ["is a superlist of", [new Argument(sublist, DynamicValueType.LIST).toDict()]];
         }
         return ["is a superlist of", [sublist.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+    }
+
+    is_null(): OperatorResult {
+        return ["is null", []];
     }
 }

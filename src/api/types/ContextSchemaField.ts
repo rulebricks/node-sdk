@@ -5,23 +5,23 @@
  */
 export interface ContextSchemaField {
     /** The unique key for this field. */
-    key?: string;
+    key?: string | undefined;
     /** Display name for this field. */
-    name?: string;
+    name?: string | undefined;
     /** Description of this field. */
-    description?: string;
+    description?: string | undefined;
     /** Data type of this field. 'function' type fields compute values dynamically. */
-    type?: ContextSchemaField.Type;
+    type?: ContextSchemaField.Type | undefined;
     /** Default value for this field. */
-    default_value?: unknown | null;
+    default_value?: (unknown | null) | undefined;
     /** Whether this field is derived from rule/flow outputs. */
-    derived?: boolean;
+    derived?: boolean | undefined;
     /** The rule ID that derives this field (if derived). */
-    source_rule?: string | null;
+    source_rule?: (string | null) | undefined;
     /** The flow ID that derives this field (if derived). */
-    source_flow?: string | null;
+    source_flow?: (string | null) | undefined;
     /** The source field key in the rule/flow output. */
-    source_field?: string | null;
+    source_field?: (string | null) | undefined;
 }
 
 export namespace ContextSchemaField {

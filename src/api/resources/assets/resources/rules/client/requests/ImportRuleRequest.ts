@@ -6,14 +6,11 @@ import type * as Rulebricks from "../../../../../../index.js";
  * @example
  *     {
  *         rule: {
- *             id: "11111111-2222-4333-8444-555555555555",
- *             slug: "basic-pricing-rule",
  *             name: "Basic Pricing Rule",
  *             description: "",
  *             createdAt: "2026-02-12T01:29:23.000Z",
  *             updatedAt: "2026-02-12T01:29:23.000Z",
  *             published: false,
- *             _publish: true,
  *             testRequest: {
  *                 "customer_tier": "STANDARD",
  *                 "order_total": 250,
