@@ -1,18 +1,18 @@
-import { Field, RuleType, OperatorDef, DynamicValueType, TypeMismatchError } from "./types.js";
-import { DynamicValue } from "./values.js";
+import { Field, RuleType, OperatorDef, VocabularyValueType, TypeMismatchError } from "./types.js";
+import { VocabularyValue } from "./values.js";
 
 export type OperatorResult = [string, any[]];
 
 export class Argument<T> {
-    constructor(private value: T | DynamicValue, private expectedType: DynamicValueType) {
+    constructor(private value: T | VocabularyValue, private expectedType: VocabularyValueType) {
         this.validateType();
     }
 
     private validateType(): void {
-        if (this.value instanceof DynamicValue) {
+        if (this.value instanceof VocabularyValue) {
             if (this.value.valueType !== this.expectedType) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${this.value.name}' has type ${this.value.valueType}, ` +
+                    `Vocabulary value '${this.value.name}' has type ${this.value.valueType}, ` +
                         `but ${this.expectedType} was expected`
                 );
             }
@@ -29,16 +29,16 @@ export class Argument<T> {
 
     private getExpectedJsType(): string {
         switch (this.expectedType) {
-            case DynamicValueType.STRING:
+            case VocabularyValueType.STRING:
                 return "string";
-            case DynamicValueType.NUMBER:
+            case VocabularyValueType.NUMBER:
                 return "number";
-            case DynamicValueType.BOOLEAN:
+            case VocabularyValueType.BOOLEAN:
                 return "boolean";
-            case DynamicValueType.DATE:
+            case VocabularyValueType.DATE:
                 return "object";
-            case DynamicValueType.LIST:
-            case DynamicValueType.OBJECT:
+            case VocabularyValueType.LIST:
+            case VocabularyValueType.OBJECT:
                 return "object";
             default:
                 throw new Error(`Unknown type: ${this.expectedType}`);
@@ -46,16 +46,16 @@ export class Argument<T> {
     }
 
     toDict(): any {
-        if (this.value instanceof DynamicValue) {
+        if (this.value instanceof VocabularyValue) {
             return this.value.toDict();
         }
         return this.value;
     }
 
-    static process(arg: any, expectedType: DynamicValueType): any {
+    static process(arg: any, expectedType: VocabularyValueType): any {
         if (arg instanceof Argument) {
             return arg.toDict();
-        } else if (arg instanceof DynamicValue) {
+        } else if (arg instanceof VocabularyValue) {
             return arg.toDict();
         } else if (Array.isArray(arg)) {
             return arg.map((item) => this.process(item, expectedType));
@@ -70,7 +70,7 @@ export class Argument<T> {
     }
 
     toString(): string {
-        if (this.value instanceof DynamicValue) {
+        if (this.value instanceof VocabularyValue) {
             return `<${this.value.name.toUpperCase()}>`;
         }
         return `${this.value}`;
@@ -96,7 +96,7 @@ export class BooleanField implements Field {
         };
     }
 
-    equals(value: boolean | DynamicValue): OperatorResult {
+    equals(value: boolean | VocabularyValue): OperatorResult {
         const opName = value ? "is true" : "is false";
         return [opName, []];
     }
@@ -212,34 +212,34 @@ export class NumberField implements Field {
         };
     }
 
-    equals(value: number | DynamicValue): OperatorResult {
-        return ["equals", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    equals(value: number | VocabularyValue): OperatorResult {
+        return ["equals", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    not_equals(value: number | DynamicValue): OperatorResult {
-        return ["does not equal", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    not_equals(value: number | VocabularyValue): OperatorResult {
+        return ["does not equal", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    greater_than(value: number | DynamicValue): OperatorResult {
-        return ["greater than", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    greater_than(value: number | VocabularyValue): OperatorResult {
+        return ["greater than", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    less_than(value: number | DynamicValue): OperatorResult {
-        return ["less than", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    less_than(value: number | VocabularyValue): OperatorResult {
+        return ["less than", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    greater_than_or_equal(value: number | DynamicValue): OperatorResult {
-        return ["greater than or equal to", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    greater_than_or_equal(value: number | VocabularyValue): OperatorResult {
+        return ["greater than or equal to", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    less_than_or_equal(value: number | DynamicValue): OperatorResult {
-        return ["less than or equal to", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    less_than_or_equal(value: number | VocabularyValue): OperatorResult {
+        return ["less than or equal to", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    between(start: number | DynamicValue, end: number | DynamicValue): OperatorResult {
-        const startArg = new Argument(start, DynamicValueType.NUMBER);
-        const endArg = new Argument(end, DynamicValueType.NUMBER);
-        if (!(start instanceof DynamicValue) && !(end instanceof DynamicValue)) {
+    between(start: number | VocabularyValue, end: number | VocabularyValue): OperatorResult {
+        const startArg = new Argument(start, VocabularyValueType.NUMBER);
+        const endArg = new Argument(end, VocabularyValueType.NUMBER);
+        if (!(start instanceof VocabularyValue) && !(end instanceof VocabularyValue)) {
             const op = this.operators["between"];
             if (op.validate && !op.validate([start, end])) {
                 throw new Error(`Invalid range for between: start (${start}) must be less than end (${end})`);
@@ -248,10 +248,10 @@ export class NumberField implements Field {
         return ["between", [startArg.toDict(), endArg.toDict()]];
     }
 
-    not_between(start: number | DynamicValue, end: number | DynamicValue): OperatorResult {
-        const startArg = new Argument(start, DynamicValueType.NUMBER);
-        const endArg = new Argument(end, DynamicValueType.NUMBER);
-        if (!(start instanceof DynamicValue) && !(end instanceof DynamicValue)) {
+    not_between(start: number | VocabularyValue, end: number | VocabularyValue): OperatorResult {
+        const startArg = new Argument(start, VocabularyValueType.NUMBER);
+        const endArg = new Argument(end, VocabularyValueType.NUMBER);
+        if (!(start instanceof VocabularyValue) && !(end instanceof VocabularyValue)) {
             const op = this.operators["not_between"];
             if (op.validate && !op.validate([start, end])) {
                 throw new Error(`Invalid range for not between: start (${start}) must be less than end (${end})`);
@@ -284,22 +284,22 @@ export class NumberField implements Field {
         return ["is not zero", []];
     }
 
-    is_multiple_of(value: number | DynamicValue): OperatorResult {
-        return ["is a multiple of", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    is_multiple_of(value: number | VocabularyValue): OperatorResult {
+        return ["is a multiple of", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_not_multiple_of(value: number | DynamicValue): OperatorResult {
-        return ["is not a multiple of", [new Argument(value, DynamicValueType.NUMBER).toDict()]];
+    is_not_multiple_of(value: number | VocabularyValue): OperatorResult {
+        return ["is not a multiple of", [new Argument(value, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_power_of(base: number | DynamicValue): OperatorResult {
-        if (!(base instanceof DynamicValue)) {
+    is_power_of(base: number | VocabularyValue): OperatorResult {
+        if (!(base instanceof VocabularyValue)) {
             const op = this.operators["is_power_of"];
             if (op.validate && !op.validate([base])) {
                 throw new Error(`Invalid base for is power of: ${base}. Base must be positive.`);
             }
         }
-        return ["is a power of", [new Argument(base, DynamicValueType.NUMBER).toDict()]];
+        return ["is a power of", [new Argument(base, VocabularyValueType.NUMBER).toDict()]];
     }
 
     is_null(): OperatorResult {
@@ -510,69 +510,69 @@ export class DateField implements Field {
         return ["is in the future", []];
     }
 
-    days_ago(days: number | DynamicValue): OperatorResult {
-        return ["days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    days_ago(days: number | VocabularyValue): OperatorResult {
+        return ["days ago", [new Argument(days, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    less_than_days_ago(days: number | DynamicValue): OperatorResult {
-        return ["is less than N days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    less_than_days_ago(days: number | VocabularyValue): OperatorResult {
+        return ["is less than N days ago", [new Argument(days, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    more_than_days_ago(days: number | DynamicValue): OperatorResult {
-        return ["is more than N days ago", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    more_than_days_ago(days: number | VocabularyValue): OperatorResult {
+        return ["is more than N days ago", [new Argument(days, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    between_n_and_m_days_ago(minDays: number | DynamicValue, maxDays: number | DynamicValue): OperatorResult {
+    between_n_and_m_days_ago(minDays: number | VocabularyValue, maxDays: number | VocabularyValue): OperatorResult {
         return [
             "is between N and M days ago",
-            [new Argument(minDays, DynamicValueType.NUMBER).toDict(), new Argument(maxDays, DynamicValueType.NUMBER).toDict()],
+            [new Argument(minDays, VocabularyValueType.NUMBER).toDict(), new Argument(maxDays, VocabularyValueType.NUMBER).toDict()],
         ];
     }
 
-    days_from_now(days: number | DynamicValue): OperatorResult {
-        return ["days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    days_from_now(days: number | VocabularyValue): OperatorResult {
+        return ["days from now", [new Argument(days, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    less_than_days_from_now(days: number | DynamicValue): OperatorResult {
-        return ["is less than N days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    less_than_days_from_now(days: number | VocabularyValue): OperatorResult {
+        return ["is less than N days from now", [new Argument(days, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    more_than_days_from_now(days: number | DynamicValue): OperatorResult {
-        return ["is more than N days from now", [new Argument(days, DynamicValueType.NUMBER).toDict()]];
+    more_than_days_from_now(days: number | VocabularyValue): OperatorResult {
+        return ["is more than N days from now", [new Argument(days, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    months_ago(months: number | DynamicValue): OperatorResult {
-        return ["months ago", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    months_ago(months: number | VocabularyValue): OperatorResult {
+        return ["months ago", [new Argument(months, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    less_than_months_ago(months: number | DynamicValue): OperatorResult {
-        return ["is less than N months ago", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    less_than_months_ago(months: number | VocabularyValue): OperatorResult {
+        return ["is less than N months ago", [new Argument(months, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    more_than_months_ago(months: number | DynamicValue): OperatorResult {
-        return ["is more than N months ago", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    more_than_months_ago(months: number | VocabularyValue): OperatorResult {
+        return ["is more than N months ago", [new Argument(months, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    between_n_and_m_months_ago(minMonths: number | DynamicValue, maxMonths: number | DynamicValue): OperatorResult {
+    between_n_and_m_months_ago(minMonths: number | VocabularyValue, maxMonths: number | VocabularyValue): OperatorResult {
         return [
             "is between N and M months ago",
             [
-                new Argument(minMonths, DynamicValueType.NUMBER).toDict(),
-                new Argument(maxMonths, DynamicValueType.NUMBER).toDict(),
+                new Argument(minMonths, VocabularyValueType.NUMBER).toDict(),
+                new Argument(maxMonths, VocabularyValueType.NUMBER).toDict(),
             ],
         ];
     }
 
-    months_from_now(months: number | DynamicValue): OperatorResult {
-        return ["months from now", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    months_from_now(months: number | VocabularyValue): OperatorResult {
+        return ["months from now", [new Argument(months, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    less_than_months_from_now(months: number | DynamicValue): OperatorResult {
-        return ["is less than N months from now", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    less_than_months_from_now(months: number | VocabularyValue): OperatorResult {
+        return ["is less than N months from now", [new Argument(months, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    more_than_months_from_now(months: number | DynamicValue): OperatorResult {
-        return ["is more than N months from now", [new Argument(months, DynamicValueType.NUMBER).toDict()]];
+    more_than_months_from_now(months: number | VocabularyValue): OperatorResult {
+        return ["is more than N months from now", [new Argument(months, VocabularyValueType.NUMBER).toDict()]];
     }
 
     is_today(): OperatorResult {
@@ -615,41 +615,41 @@ export class DateField implements Field {
         return ["is last year", []];
     }
 
-    after(date: Date | string | DynamicValue): OperatorResult {
-        return ["after", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    after(date: Date | string | VocabularyValue): OperatorResult {
+        return ["after", [new Argument(date, VocabularyValueType.DATE).toDict()]];
     }
 
-    on_or_after(date: Date | string | DynamicValue): OperatorResult {
-        return ["on or after", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    on_or_after(date: Date | string | VocabularyValue): OperatorResult {
+        return ["on or after", [new Argument(date, VocabularyValueType.DATE).toDict()]];
     }
 
-    before(date: Date | string | DynamicValue): OperatorResult {
-        return ["before", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    before(date: Date | string | VocabularyValue): OperatorResult {
+        return ["before", [new Argument(date, VocabularyValueType.DATE).toDict()]];
     }
 
-    on_or_before(date: Date | string | DynamicValue): OperatorResult {
-        return ["on or before", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    on_or_before(date: Date | string | VocabularyValue): OperatorResult {
+        return ["on or before", [new Argument(date, VocabularyValueType.DATE).toDict()]];
     }
 
-    equals(date: Date | string | DynamicValue): OperatorResult {
-        return ["equals", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    equals(date: Date | string | VocabularyValue): OperatorResult {
+        return ["equals", [new Argument(date, VocabularyValueType.DATE).toDict()]];
     }
 
-    not_equals(date: Date | string | DynamicValue): OperatorResult {
-        return ["does not equal", [new Argument(date, DynamicValueType.DATE).toDict()]];
+    not_equals(date: Date | string | VocabularyValue): OperatorResult {
+        return ["does not equal", [new Argument(date, VocabularyValueType.DATE).toDict()]];
     }
 
-    between(start: Date | string | DynamicValue, end: Date | string | DynamicValue): OperatorResult {
+    between(start: Date | string | VocabularyValue, end: Date | string | VocabularyValue): OperatorResult {
         return [
             "between",
-            [new Argument(start, DynamicValueType.DATE).toDict(), new Argument(end, DynamicValueType.DATE).toDict()],
+            [new Argument(start, VocabularyValueType.DATE).toDict(), new Argument(end, VocabularyValueType.DATE).toDict()],
         ];
     }
 
-    not_between(start: Date | string | DynamicValue, end: Date | string | DynamicValue): OperatorResult {
+    not_between(start: Date | string | VocabularyValue, end: Date | string | VocabularyValue): OperatorResult {
         return [
             "not between",
-            [new Argument(start, DynamicValueType.DATE).toDict(), new Argument(end, DynamicValueType.DATE).toDict()],
+            [new Argument(start, VocabularyValueType.DATE).toDict(), new Argument(end, VocabularyValueType.DATE).toDict()],
         ];
     }
 
@@ -959,9 +959,9 @@ export class StringField implements Field {
         };
     }
 
-    contains(value: string | DynamicValue): OperatorResult {
-        const arg = new Argument(value, DynamicValueType.STRING);
-        if (!(value instanceof DynamicValue)) {
+    contains(value: string | VocabularyValue): OperatorResult {
+        const arg = new Argument(value, VocabularyValueType.STRING);
+        if (!(value instanceof VocabularyValue)) {
             const op = this.operators["contains"];
             if (op.args[0].validate && !op.args[0].validate(value)) {
                 throw new Error(`Invalid value for contains: ${value}`);
@@ -970,9 +970,9 @@ export class StringField implements Field {
         return ["contains", [arg.toDict()]];
     }
 
-    not_contains(value: string | DynamicValue): OperatorResult {
-        const arg = new Argument(value, DynamicValueType.STRING);
-        if (!(value instanceof DynamicValue)) {
+    not_contains(value: string | VocabularyValue): OperatorResult {
+        const arg = new Argument(value, VocabularyValueType.STRING);
+        if (!(value instanceof VocabularyValue)) {
             const op = this.operators["does_not_contain"];
             if (op.args[0].validate && !op.args[0].validate(value)) {
                 throw new Error(`Invalid value for does not contain: ${value}`);
@@ -981,20 +981,20 @@ export class StringField implements Field {
         return ["does not contain", [arg.toDict()]];
     }
 
-    equals(value: string | DynamicValue): OperatorResult {
-        return ["equals", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    equals(value: string | VocabularyValue): OperatorResult {
+        return ["equals", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
-    equals_case_insensitive(value: string | DynamicValue): OperatorResult {
-        return ["equals (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    equals_case_insensitive(value: string | VocabularyValue): OperatorResult {
+        return ["equals (case-insensitive)", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
-    not_equals(value: string | DynamicValue): OperatorResult {
-        return ["does not equal", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    not_equals(value: string | VocabularyValue): OperatorResult {
+        return ["does not equal", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
-    not_equals_case_insensitive(value: string | DynamicValue): OperatorResult {
-        return ["does not equal (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    not_equals_case_insensitive(value: string | VocabularyValue): OperatorResult {
+        return ["does not equal (case-insensitive)", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
     is_empty(): OperatorResult {
@@ -1005,9 +1005,9 @@ export class StringField implements Field {
         return ["is not empty", []];
     }
 
-    starts_with(value: string | DynamicValue): OperatorResult {
-        const arg = new Argument(value, DynamicValueType.STRING);
-        if (!(value instanceof DynamicValue)) {
+    starts_with(value: string | VocabularyValue): OperatorResult {
+        const arg = new Argument(value, VocabularyValueType.STRING);
+        if (!(value instanceof VocabularyValue)) {
             const op = this.operators["starts_with"];
             if (op.args[0].validate && !op.args[0].validate(value)) {
                 throw new Error(`Invalid value for starts with: ${value}`);
@@ -1016,9 +1016,9 @@ export class StringField implements Field {
         return ["starts with", [arg.toDict()]];
     }
 
-    ends_with(value: string | DynamicValue): OperatorResult {
-        const arg = new Argument(value, DynamicValueType.STRING);
-        if (!(value instanceof DynamicValue)) {
+    ends_with(value: string | VocabularyValue): OperatorResult {
+        const arg = new Argument(value, VocabularyValueType.STRING);
+        if (!(value instanceof VocabularyValue)) {
             const op = this.operators["ends_with"];
             if (op.args[0].validate && !op.args[0].validate(value)) {
                 throw new Error(`Invalid value for ends with: ${value}`);
@@ -1027,26 +1027,26 @@ export class StringField implements Field {
         return ["ends with", [arg.toDict()]];
     }
 
-    contains_case_insensitive(value: string | DynamicValue): OperatorResult {
-        return ["contains (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    contains_case_insensitive(value: string | VocabularyValue): OperatorResult {
+        return ["contains (case-insensitive)", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
-    starts_with_case_insensitive(value: string | DynamicValue): OperatorResult {
-        return ["starts with (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    starts_with_case_insensitive(value: string | VocabularyValue): OperatorResult {
+        return ["starts with (case-insensitive)", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
-    ends_with_case_insensitive(value: string | DynamicValue): OperatorResult {
-        return ["ends with (case-insensitive)", [new Argument(value, DynamicValueType.STRING).toDict()]];
+    ends_with_case_insensitive(value: string | VocabularyValue): OperatorResult {
+        return ["ends with (case-insensitive)", [new Argument(value, VocabularyValueType.STRING).toDict()]];
     }
 
-    is_included_in(values: string[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    is_included_in(values: string[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["is included in", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["is included in", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
 
         const op = this.operators["is_included_in"];
@@ -1054,17 +1054,17 @@ export class StringField implements Field {
             throw new Error("List must not be empty");
         }
 
-        return ["is included in", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+        return ["is included in", [values.map((v) => new Argument(v, VocabularyValueType.STRING).toDict())]];
     }
 
-    is_not_included_in(values: string[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    is_not_included_in(values: string[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["is not included in", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["is not included in", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
 
         const op = this.operators["is_not_included_in"];
@@ -1072,17 +1072,17 @@ export class StringField implements Field {
             throw new Error("List must not be empty");
         }
 
-        return ["is not included in", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+        return ["is not included in", [values.map((v) => new Argument(v, VocabularyValueType.STRING).toDict())]];
     }
 
-    contains_any_of(values: string[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    contains_any_of(values: string[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["contains any of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["contains any of", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
 
         const op = this.operators["contains_any_of"];
@@ -1090,17 +1090,17 @@ export class StringField implements Field {
             throw new Error("List must not be empty");
         }
 
-        return ["contains any of", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+        return ["contains any of", [values.map((v) => new Argument(v, VocabularyValueType.STRING).toDict())]];
     }
 
-    does_not_contain_any_of(values: string[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    does_not_contain_any_of(values: string[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["does not contain any of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["does not contain any of", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
 
         const op = this.operators["does_not_contain_any_of"];
@@ -1108,60 +1108,60 @@ export class StringField implements Field {
             throw new Error("List must not be empty");
         }
 
-        return ["does not contain any of", [values.map((v) => new Argument(v, DynamicValueType.STRING).toDict())]];
+        return ["does not contain any of", [values.map((v) => new Argument(v, VocabularyValueType.STRING).toDict())]];
     }
 
-    length_equals(length: number | DynamicValue): OperatorResult {
-        return ["is of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    length_equals(length: number | VocabularyValue): OperatorResult {
+        return ["is of length", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_of_length(length: number | DynamicValue): OperatorResult {
+    is_of_length(length: number | VocabularyValue): OperatorResult {
         return this.length_equals(length);
     }
 
-    length_not_equals(length: number | DynamicValue): OperatorResult {
-        return ["is not of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    length_not_equals(length: number | VocabularyValue): OperatorResult {
+        return ["is not of length", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_not_of_length(length: number | DynamicValue): OperatorResult {
+    is_not_of_length(length: number | VocabularyValue): OperatorResult {
         return this.length_not_equals(length);
     }
 
-    longer_than(length: number | DynamicValue): OperatorResult {
-        return ["is longer than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    longer_than(length: number | VocabularyValue): OperatorResult {
+        return ["is longer than", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_longer_than(length: number | DynamicValue): OperatorResult {
+    is_longer_than(length: number | VocabularyValue): OperatorResult {
         return this.longer_than(length);
     }
 
-    shorter_than(length: number | DynamicValue): OperatorResult {
-        return ["is shorter than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    shorter_than(length: number | VocabularyValue): OperatorResult {
+        return ["is shorter than", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_shorter_than(length: number | DynamicValue): OperatorResult {
+    is_shorter_than(length: number | VocabularyValue): OperatorResult {
         return this.shorter_than(length);
     }
 
-    longer_than_or_equal(length: number | DynamicValue): OperatorResult {
-        return ["is longer than or equal to", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    longer_than_or_equal(length: number | VocabularyValue): OperatorResult {
+        return ["is longer than or equal to", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_longer_than_or_equal(length: number | DynamicValue): OperatorResult {
+    is_longer_than_or_equal(length: number | VocabularyValue): OperatorResult {
         return this.longer_than_or_equal(length);
     }
 
-    shorter_than_or_equal(length: number | DynamicValue): OperatorResult {
-        return ["is shorter than or equal to", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    shorter_than_or_equal(length: number | VocabularyValue): OperatorResult {
+        return ["is shorter than or equal to", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    is_shorter_than_or_equal(length: number | DynamicValue): OperatorResult {
+    is_shorter_than_or_equal(length: number | VocabularyValue): OperatorResult {
         return this.shorter_than_or_equal(length);
     }
 
-    matches_regex(pattern: string | DynamicValue): OperatorResult {
-        const arg = new Argument(pattern, DynamicValueType.STRING);
-        if (!(pattern instanceof DynamicValue)) {
+    matches_regex(pattern: string | VocabularyValue): OperatorResult {
+        const arg = new Argument(pattern, VocabularyValueType.STRING);
+        if (!(pattern instanceof VocabularyValue)) {
             const op = this.operators["matches_regex"];
             if (op.args[0].validate && !op.args[0].validate(pattern)) {
                 throw new Error(`Invalid regex pattern: ${pattern}`);
@@ -1170,9 +1170,9 @@ export class StringField implements Field {
         return ["matches RegEx", [arg.toDict()]];
     }
 
-    not_matches_regex(pattern: string | DynamicValue): OperatorResult {
-        const arg = new Argument(pattern, DynamicValueType.STRING);
-        if (!(pattern instanceof DynamicValue)) {
+    not_matches_regex(pattern: string | VocabularyValue): OperatorResult {
+        const arg = new Argument(pattern, VocabularyValueType.STRING);
+        if (!(pattern instanceof VocabularyValue)) {
             const op = this.operators["does_not_match_regex"];
             if (op.args[0].validate && !op.args[0].validate(pattern)) {
                 throw new Error(`Invalid regex pattern: ${pattern}`);
@@ -1352,8 +1352,8 @@ export class ListField implements Field {
         };
     }
 
-    contains(value: any | DynamicValue): OperatorResult {
-        return ["contains", [new Argument(value, DynamicValueType.OBJECT).toDict()]];
+    contains(value: any | VocabularyValue): OperatorResult {
+        return ["contains", [new Argument(value, VocabularyValueType.OBJECT).toDict()]];
     }
 
     is_empty(): OperatorResult {
@@ -1364,84 +1364,84 @@ export class ListField implements Field {
         return ["is not empty", []];
     }
 
-    length_equals(length: number | DynamicValue): OperatorResult {
-        return ["is of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    length_equals(length: number | VocabularyValue): OperatorResult {
+        return ["is of length", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    length_not_equals(length: number | DynamicValue): OperatorResult {
-        return ["is not of length", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    length_not_equals(length: number | VocabularyValue): OperatorResult {
+        return ["is not of length", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    longer_than(length: number | DynamicValue): OperatorResult {
-        return ["is longer than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    longer_than(length: number | VocabularyValue): OperatorResult {
+        return ["is longer than", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    shorter_than(length: number | DynamicValue): OperatorResult {
-        return ["is shorter than", [new Argument(length, DynamicValueType.NUMBER).toDict()]];
+    shorter_than(length: number | VocabularyValue): OperatorResult {
+        return ["is shorter than", [new Argument(length, VocabularyValueType.NUMBER).toDict()]];
     }
 
-    contains_all(values: any[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    contains_all(values: any[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["contains all of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["contains all of", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
-        return ["contains all of", [values.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["contains all of", [values.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
-    contains_any(values: any[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    contains_any(values: any[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["contains any of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["contains any of", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
-        return ["contains any of", [values.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["contains any of", [values.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
-    contains_none(values: any[] | DynamicValue): OperatorResult {
-        if (values instanceof DynamicValue) {
-            if (values.valueType !== DynamicValueType.LIST) {
+    contains_none(values: any[] | VocabularyValue): OperatorResult {
+        if (values instanceof VocabularyValue) {
+            if (values.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${values.name}' has type ${values.valueType}, but list was expected`
+                    `Vocabulary value '${values.name}' has type ${values.valueType}, but list was expected`
                 );
             }
-            return ["contains none of", [new Argument(values, DynamicValueType.LIST).toDict()]];
+            return ["contains none of", [new Argument(values, VocabularyValueType.LIST).toDict()]];
         }
-        return ["contains none of", [values.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["contains none of", [values.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
-    not_contains(value: any | DynamicValue): OperatorResult {
-        return ["does not contain", [new Argument(value, DynamicValueType.OBJECT).toDict()]];
+    not_contains(value: any | VocabularyValue): OperatorResult {
+        return ["does not contain", [new Argument(value, VocabularyValueType.OBJECT).toDict()]];
     }
 
-    equals(other: any[] | DynamicValue): OperatorResult {
-        if (other instanceof DynamicValue) {
-            if (other.valueType !== DynamicValueType.LIST) {
+    equals(other: any[] | VocabularyValue): OperatorResult {
+        if (other instanceof VocabularyValue) {
+            if (other.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${other.name}' has type ${other.valueType}, but list was expected`
+                    `Vocabulary value '${other.name}' has type ${other.valueType}, but list was expected`
                 );
             }
-            return ["is equal to", [new Argument(other, DynamicValueType.LIST).toDict()]];
+            return ["is equal to", [new Argument(other, VocabularyValueType.LIST).toDict()]];
         }
-        return ["is equal to", [other.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["is equal to", [other.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
-    not_equals(other: any[] | DynamicValue): OperatorResult {
-        if (other instanceof DynamicValue) {
-            if (other.valueType !== DynamicValueType.LIST) {
+    not_equals(other: any[] | VocabularyValue): OperatorResult {
+        if (other instanceof VocabularyValue) {
+            if (other.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${other.name}' has type ${other.valueType}, but list was expected`
+                    `Vocabulary value '${other.name}' has type ${other.valueType}, but list was expected`
                 );
             }
-            return ["is not equal to", [new Argument(other, DynamicValueType.LIST).toDict()]];
+            return ["is not equal to", [new Argument(other, VocabularyValueType.LIST).toDict()]];
         }
-        return ["is not equal to", [other.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["is not equal to", [other.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
     has_duplicates(): OperatorResult {
@@ -1452,60 +1452,60 @@ export class ListField implements Field {
         return ["does not contain duplicates", []];
     }
 
-    contains_object_with_key_value(key: string | DynamicValue, value: any | DynamicValue): OperatorResult {
+    contains_object_with_key_value(key: string | VocabularyValue, value: any | VocabularyValue): OperatorResult {
         return [
             "contains object with key & value",
             [
-                new Argument(key, DynamicValueType.STRING).toDict(),
-                new Argument(value, DynamicValueType.OBJECT).toDict(),
+                new Argument(key, VocabularyValueType.STRING).toDict(),
+                new Argument(value, VocabularyValueType.OBJECT).toDict(),
             ],
         ];
     }
 
-    does_not_contain_object_with_key_value(key: string | DynamicValue, value: any | DynamicValue): OperatorResult {
+    does_not_contain_object_with_key_value(key: string | VocabularyValue, value: any | VocabularyValue): OperatorResult {
         return [
             "does not contain object with key & value",
             [
-                new Argument(key, DynamicValueType.STRING).toDict(),
-                new Argument(value, DynamicValueType.OBJECT).toDict(),
+                new Argument(key, VocabularyValueType.STRING).toDict(),
+                new Argument(value, VocabularyValueType.OBJECT).toDict(),
             ],
         ];
     }
 
-    contains_object_with_key(key: string | DynamicValue): OperatorResult {
-        return ["contains object with key", [new Argument(key, DynamicValueType.STRING).toDict()]];
+    contains_object_with_key(key: string | VocabularyValue): OperatorResult {
+        return ["contains object with key", [new Argument(key, VocabularyValueType.STRING).toDict()]];
     }
 
-    does_not_contain_object_with_key(key: string | DynamicValue): OperatorResult {
-        return ["does not contain object with key", [new Argument(key, DynamicValueType.STRING).toDict()]];
+    does_not_contain_object_with_key(key: string | VocabularyValue): OperatorResult {
+        return ["does not contain object with key", [new Argument(key, VocabularyValueType.STRING).toDict()]];
     }
 
     has_unique_elements(): OperatorResult {
         return ["has unique elements", []];
     }
 
-    is_sublist_of(superlist: any[] | DynamicValue): OperatorResult {
-        if (superlist instanceof DynamicValue) {
-            if (superlist.valueType !== DynamicValueType.LIST) {
+    is_sublist_of(superlist: any[] | VocabularyValue): OperatorResult {
+        if (superlist instanceof VocabularyValue) {
+            if (superlist.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${superlist.name}' has type ${superlist.valueType}, but list was expected`
+                    `Vocabulary value '${superlist.name}' has type ${superlist.valueType}, but list was expected`
                 );
             }
-            return ["is a sublist of", [new Argument(superlist, DynamicValueType.LIST).toDict()]];
+            return ["is a sublist of", [new Argument(superlist, VocabularyValueType.LIST).toDict()]];
         }
-        return ["is a sublist of", [superlist.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["is a sublist of", [superlist.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
-    is_superlist_of(sublist: any[] | DynamicValue): OperatorResult {
-        if (sublist instanceof DynamicValue) {
-            if (sublist.valueType !== DynamicValueType.LIST) {
+    is_superlist_of(sublist: any[] | VocabularyValue): OperatorResult {
+        if (sublist instanceof VocabularyValue) {
+            if (sublist.valueType !== VocabularyValueType.LIST) {
                 throw new TypeMismatchError(
-                    `Dynamic value '${sublist.name}' has type ${sublist.valueType}, but list was expected`
+                    `Vocabulary value '${sublist.name}' has type ${sublist.valueType}, but list was expected`
                 );
             }
-            return ["is a superlist of", [new Argument(sublist, DynamicValueType.LIST).toDict()]];
+            return ["is a superlist of", [new Argument(sublist, VocabularyValueType.LIST).toDict()]];
         }
-        return ["is a superlist of", [sublist.map((v) => new Argument(v, DynamicValueType.OBJECT).toDict())]];
+        return ["is a superlist of", [sublist.map((v) => new Argument(v, VocabularyValueType.OBJECT).toDict())]];
     }
 
     is_null(): OperatorResult {

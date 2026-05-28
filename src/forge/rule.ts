@@ -116,15 +116,15 @@ export class Condition {
         };
     }
 
-    // Helper to process dynamic values
-    private processDynamicValues(arg: any): any {
+    // Helper to process vocabulary values
+    private processVocabularyValues(arg: any): any {
         if (arg && typeof arg === "object" && arg.$rb) {
             return arg;
         } else if (Array.isArray(arg)) {
-            return arg.map((item) => this.processDynamicValues(item));
+            return arg.map((item) => this.processVocabularyValues(item));
         } else if (arg && typeof arg === "object") {
             return Object.entries(arg).reduce((acc, [key, value]) => {
-                acc[key] = this.processDynamicValues(value);
+                acc[key] = this.processVocabularyValues(value);
                 return acc;
             }, {} as Record<string, any>);
         }
@@ -141,7 +141,7 @@ export class Condition {
                 // Editing existing condition
                 this.rule.conditions[this.index].request[fieldName] = {
                     op: operator,
-                    args: args.map((arg) => this.processDynamicValues(arg)),
+                    args: args.map((arg) => this.processVocabularyValues(arg)),
                 };
             } else {
                 // Creating new condition
@@ -162,7 +162,7 @@ export class Condition {
             // Editing existing condition
             for (const [fieldName, value] of Object.entries(responses)) {
                 this.rule.conditions[this.index].response[fieldName] = {
-                    value: this.processDynamicValues(value),
+                    value: this.processVocabularyValues(value),
                 };
             }
             return this;
@@ -179,14 +179,14 @@ export class Condition {
             for (const [fieldName, [operator, args]] of Object.entries(this.conditions)) {
                 (condition.request as Record<string, any>)[fieldName] = {
                     op: operator,
-                    args: args.map((arg) => this.processDynamicValues(arg)),
+                    args: args.map((arg) => this.processVocabularyValues(arg)),
                 };
             }
 
             // Process responses
             for (const [fieldName, value] of Object.entries(this.response)) {
                 (condition.response as Record<string, any>)[fieldName] = {
-                    value: this.processDynamicValues(value),
+                    value: this.processVocabularyValues(value),
                 };
             }
 
@@ -495,7 +495,7 @@ export class Rule {
 
                     if (request.op !== operator) return false;
 
-                    // Handle dynamic values
+                    // Handle vocabulary values
                     const requestArgs = request.args.map((arg) =>
                         typeof arg === "object" && arg.$rb ? arg.name.toUpperCase() : String(arg)
                     );

@@ -1,6 +1,6 @@
 export type OperatorResult = [string, any[]];
 
-export enum DynamicValueType {
+export enum VocabularyValueType {
     STRING = "string",
     NUMBER = "number",
     BOOLEAN = "boolean",
@@ -61,9 +61,9 @@ export class TypeMismatchError extends Error {
     }
 }
 
-export class DynamicValueNotFoundError extends Error {
+export class VocabularyValueNotFoundError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = "DynamicValueNotFoundError";
+        this.name = "VocabularyValueNotFoundError";
     }
 }

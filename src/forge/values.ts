@@ -1,14 +1,14 @@
 import { RulebricksClient } from "../Client.js";
 import { DynamicValue as DynamicValueModel } from "../api/types";
-import { DynamicValueType, DynamicValueNotFoundError } from "./types.js";
+import { VocabularyValueType, VocabularyValueNotFoundError } from "./types.js";
 
-export class DynamicValue {
+export class VocabularyValue {
     private _rb_type = "globalValue";
 
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly valueType: DynamicValueType
+        public readonly valueType: VocabularyValueType
     ) {}
 
     toDict(): Record<string, any> {
@@ -19,15 +19,15 @@ export class DynamicValue {
         };
     }
 
-    static getExpectedType(valueType: DynamicValueType): any {
-        const typeMapping: Record<DynamicValueType, any> = {
-            [DynamicValueType.STRING]: String,
-            [DynamicValueType.NUMBER]: Number,
-            [DynamicValueType.BOOLEAN]: Boolean,
-            [DynamicValueType.DATE]: Date,
-            [DynamicValueType.LIST]: Array,
-            [DynamicValueType.OBJECT]: Object,
-            [DynamicValueType.FUNCTION]: Function,
+    static getExpectedType(valueType: VocabularyValueType): any {
+        const typeMapping: Record<VocabularyValueType, any> = {
+            [VocabularyValueType.STRING]: String,
+            [VocabularyValueType.NUMBER]: Number,
+            [VocabularyValueType.BOOLEAN]: Boolean,
+            [VocabularyValueType.DATE]: Date,
+            [VocabularyValueType.LIST]: Array,
+            [VocabularyValueType.OBJECT]: Object,
+            [VocabularyValueType.FUNCTION]: Function,
         };
         return typeMapping[valueType];
     }
@@ -37,18 +37,18 @@ export class DynamicValue {
     }
 }
 
-export class DynamicValues {
+export class Vocabulary {
     private static workspace?: RulebricksClient;
-    private static cache: Map<string, DynamicValue> = new Map();
+    private static cache: Map<string, VocabularyValue> = new Map();
 
     static configure(client: RulebricksClient): void {
         this.workspace = client;
         this.cache.clear();
     }
 
-    static async get(name: string): Promise<DynamicValue> {
+    static async get(name: string): Promise<VocabularyValue> {
         if (!this.workspace) {
-            throw new Error("DynamicValues not configured. Call DynamicValues.configure(workspace) first");
+            throw new Error("Vocabulary not configured. Call Vocabulary.configure(workspace) first");
         }
 
         const cachedValue = this.cache.get(name);
@@ -60,29 +60,29 @@ export class DynamicValues {
         const value = values.find((v: DynamicValueModel) => v.name === name);
 
         if (!value) {
-            throw new DynamicValueNotFoundError(`Dynamic value '${name}' not found`);
+            throw new VocabularyValueNotFoundError(`Vocabulary value '${name}' not found`);
         }
 
         try {
             const valueType = value.type || "string";
-            const dynamicValue = new DynamicValue(value.id || "", name, valueType as DynamicValueType);
-            this.cache.set(name, dynamicValue);
-            return dynamicValue;
+            const vocabularyValue = new VocabularyValue(value.id || "", name, valueType as VocabularyValueType);
+            this.cache.set(name, vocabularyValue);
+            return vocabularyValue;
         } catch (error) {
-            throw new Error(`Invalid type '${value.type}' for dynamic value '${name}'`);
+            throw new Error(`Invalid type '${value.type}' for vocabulary value '${name}'`);
         }
     }
 
     static async set(
-        dynamicValues: Record<string, any>,
+        vocabularyValues: Record<string, any>,
         user_groups: string[] = [],
         metadata_by_name?: Record<string, Record<string, any>>
     ): Promise<void> {
         if (!this.workspace) {
-            throw new Error("Workspace not configured. Call configure() first.");
+            throw new Error("Vocabulary not configured. Call Vocabulary.configure(workspace) first.");
         }
 
-        const request: any = { values: dynamicValues, user_groups };
+        const request: any = { values: vocabularyValues, user_groups };
         if (metadata_by_name) {
             request.metadata_by_name = metadata_by_name;
         }
