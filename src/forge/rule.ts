@@ -312,7 +312,6 @@ export class Rule {
 
     setName(name: string): Rule {
         this.name = name;
-        this.slug = this.generateSlug();
         return this;
     }
 
