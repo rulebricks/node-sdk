@@ -33,17 +33,20 @@ const rb = new RulebricksClient({
     process.env.RULEBRICKS_API_KEY || "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
 });
 
-rb.rules.solve('tJOCd8XXXX', {
-  customer_id: 'anc39as3',
-  purchase_history: ['t-shirt', 'mug'],,
-  account_age_days: 4,
-  last_purchase_days_ago: 3,
-  email_subscription: false,
-}, {
-  // Request options (Optional, leave empty for default values)
-  // timeoutInSeconds: 10, (Optional: Use this to override the default timeout in seconds)
-  // maxRetries: 3, (Optional: Use this to override the default number of retries)
-}).then((result) => {
+rb.rules.solve({ 
+  slug: 'tJOCd8XXXX', 
+  version: '2',
+  body: {
+    customer_id: 'anc39as3',
+    purchase_history: ['t-shirt', 'mug'],
+    account_age_days: 4,
+    last_purchase_days_ago: 3,
+    email_subscription: false,
+  } }, {
+    // Request options (Optional, leave empty for default values)
+    // timeoutInSeconds: 10, (Optional: Use this to override the default timeout in seconds)
+    // maxRetries: 3, (Optional: Use this to override the default number of retries)
+  }).then((result) => {
   console.log(result);
 }).catch((err) => {
   console.error(err);
@@ -66,7 +69,7 @@ try {
 }
 ```
 
-Error codes are as followed:
+Common errors:
 
 | Status Code | Error Type            |
 | ----------- | --------------------- |
