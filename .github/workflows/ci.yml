@@ -33,8 +33,11 @@ jobs:
                   node-version: 26
                   registry-url: https://registry.npmjs.org
 
-            - name: Install dependencies
+            - name: Upgrade npm for trusted publishing
               run: npm install -g npm@latest
+
+            - name: Install dependencies
+              run: npm install
 
             - name: Build
               run: npm run build
