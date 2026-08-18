@@ -6,6 +6,7 @@ import type * as Rulebricks from "../../../../index.js";
  * @example
  *     {
  *         slug: "slug",
+ *         version: "version",
  *         body: {
  *             "name": "John Doe",
  *             "age": 30,
@@ -16,5 +17,7 @@ import type * as Rulebricks from "../../../../index.js";
 export interface ExecuteFlowsRequest {
     /** The unique identifier for the resource. */
     slug: string;
+    /** The version of the resource to target: a published version number (e.g. `3`), a release environment slug (e.g. `production`, always lowercase), or `latest` (default) to use the current published version. */
+    version?: string;
     body: Rulebricks.DynamicRequestPayload;
 }

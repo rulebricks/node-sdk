@@ -26,7 +26,7 @@ export class FlowsClient {
     }
 
     /**
-     * Execute a flow by its slug.
+     * Execute a flow by its slug. Optionally target a specific published version (e.g. `3`) or a release environment (e.g. `production`) via the `version` path segment; `latest` (the default) executes the current published version.
      *
      * @param {Rulebricks.ExecuteFlowsRequest} request
      * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -37,6 +37,7 @@ export class FlowsClient {
      * @example
      *     await client.flows.execute({
      *         slug: "slug",
+     *         version: "version",
      *         body: {
      *             "name": "John Doe",
      *             "age": 30,
@@ -55,7 +56,7 @@ export class FlowsClient {
         request: Rulebricks.ExecuteFlowsRequest,
         requestOptions?: FlowsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DynamicResponsePayload>> {
-        const { slug, body: _body } = request;
+        const { slug, version, body: _body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -67,7 +68,7 @@ export class FlowsClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.RulebricksEnvironment.Default,
-                `flows/${core.url.encodePathParam(slug)}`,
+                `flows/${core.url.encodePathParam(slug)}/${core.url.encodePathParam(version ?? "latest")}`,
             ),
             method: "POST",
             headers: _headers,
@@ -106,6 +107,6 @@ export class FlowsClient {
             }
         }
 
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/flows/{slug}");
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/flows/{slug}/{version}");
     }
 }

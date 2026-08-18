@@ -26,7 +26,7 @@ export class RulesClient {
     }
 
     /**
-     * Executes a single rule identified by a unique slug. The request and response formats are dynamic, dependent on the rule configuration.
+     * Executes a single rule identified by a unique slug. The request and response formats are dynamic, dependent on the rule configuration. Optionally target a specific published version (e.g. `3`) or a release environment (e.g. `production`) via the `version` path segment; `latest` (the default) executes the current published version.
      *
      * @param {Rulebricks.SolveRulesRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -37,6 +37,7 @@ export class RulesClient {
      * @example
      *     await client.rules.solve({
      *         slug: "slug",
+     *         version: "version",
      *         body: {
      *             "name": "John Doe",
      *             "age": 30,
@@ -55,7 +56,7 @@ export class RulesClient {
         request: Rulebricks.SolveRulesRequest,
         requestOptions?: RulesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DynamicResponsePayload>> {
-        const { slug, body: _body } = request;
+        const { slug, version, body: _body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -67,7 +68,7 @@ export class RulesClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.RulebricksEnvironment.Default,
-                `solve/${core.url.encodePathParam(slug)}`,
+                `solve/${core.url.encodePathParam(slug)}/${core.url.encodePathParam(version ?? "latest")}`,
             ),
             method: "POST",
             headers: _headers,
@@ -106,11 +107,11 @@ export class RulesClient {
             }
         }
 
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/solve/{slug}");
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/solve/{slug}/{version}");
     }
 
     /**
-     * Executes a particular rule against multiple request data payloads provided in a list.
+     * Executes a particular rule against multiple request data payloads provided in a list. Optionally target a specific published version (e.g. `3`) or a release environment (e.g. `production`) via the `version` path segment; `latest` (the default) executes the current published version.
      *
      * @param {Rulebricks.BulkSolveRulesRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -121,6 +122,7 @@ export class RulesClient {
      * @example
      *     await client.rules.bulkSolve({
      *         slug: "slug",
+     *         version: "version",
      *         body: [{
      *                 "name": "John Doe",
      *                 "age": 30,
@@ -143,7 +145,7 @@ export class RulesClient {
         request: Rulebricks.BulkSolveRulesRequest,
         requestOptions?: RulesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.BulkRuleResponseItem[]>> {
-        const { slug, body: _body } = request;
+        const { slug, version, body: _body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -155,7 +157,7 @@ export class RulesClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.RulebricksEnvironment.Default,
-                `bulk-solve/${core.url.encodePathParam(slug)}`,
+                `bulk-solve/${core.url.encodePathParam(slug)}/${core.url.encodePathParam(version ?? "latest")}`,
             ),
             method: "POST",
             headers: _headers,
@@ -194,7 +196,7 @@ export class RulesClient {
             }
         }
 
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/bulk-solve/{slug}");
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/bulk-solve/{slug}/{version}");
     }
 
     /**

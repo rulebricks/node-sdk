@@ -38,6 +38,8 @@ export namespace ContextDetail {
             name?: string | undefined;
             slug?: string | undefined;
             published?: boolean | undefined;
+            /** Version target for this binding: `null` or `latest` follows the current published version, a version number (e.g. `3`) pins that published version, and any other value is a release environment slug resolved at execution time. */
+            context_version?: (string | null) | undefined;
         }
     }
 
@@ -49,6 +51,8 @@ export namespace ContextDetail {
             name?: string | undefined;
             slug?: string | undefined;
             published?: boolean | undefined;
+            /** Version target for this binding: `null` or `latest` follows the current published version, a version number (e.g. `3`) pins that published version, and any other value is a release environment slug resolved at execution time. */
+            context_version?: (string | null) | undefined;
             origin_rule?: (Item.OriginRule | null) | undefined;
         }
 

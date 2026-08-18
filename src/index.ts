@@ -14,4 +14,5 @@ export {
     TypeMismatchError,
     RuleTest,
     RuleSettings,
+    RulePublishError,
 } from "./forge";

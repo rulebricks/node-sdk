@@ -276,7 +276,7 @@ export class FlowsClient {
     }
 
     /**
-     * Executes every test in the flow's test suite (or only the critical tests when `critical_only` is true) against the flow's current graph and returns a summary of which passed, which failed, and whether any CRITICAL test failed.
+     * Executes every test in the flow's test suite (or only the critical tests when `critical_only` is true) against the flow's current graph and returns a summary of which passed, which failed, and whether any CRITICAL test failed. Tests always run against the latest draft of the flow; version targeting does not apply.
      *
      * @param {Rulebricks.tests.RunFlowsRequest} request
      * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.

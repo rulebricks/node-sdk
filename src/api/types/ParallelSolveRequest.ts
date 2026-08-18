@@ -7,9 +7,9 @@ export type ParallelSolveRequest = Record<string, ParallelSolveRequest.Value>;
 
 export namespace ParallelSolveRequest {
     export interface Value {
-        /** Slug of the rule to execute */
+        /** Slug of the rule to execute, optionally suffixed with a published version number or release environment slug (e.g. `my-rule`, `my-rule/3`, or `my-rule/production`). A bare slug executes the current published version. */
         $rule?: string | undefined;
-        /** Slug of the flow to execute */
+        /** Slug of the flow to execute, optionally suffixed with a published version number or release environment slug (e.g. `my-flow`, `my-flow/3`, or `my-flow/production`). A bare slug executes the current published version. */
         $flow?: string | undefined;
         /** Accepts any additional properties */
         [key: string]: any;

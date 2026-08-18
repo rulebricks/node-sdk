@@ -203,6 +203,9 @@ export class RulesClient {
      *
      * @throws {@link Rulebricks.BadRequestError}
      * @throws {@link Rulebricks.ForbiddenError}
+     * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.ConflictError}
+     * @throws {@link Rulebricks.UnprocessableEntityError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
@@ -374,6 +377,21 @@ export class RulesClient {
                     );
                 case 403:
                     throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Rulebricks.ConflictError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Rulebricks.UnprocessableEntityError(
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );

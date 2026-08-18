@@ -6,3 +6,4 @@ export * from "./InternalServerError.js";
 export * from "./NotFoundError.js";
 export * from "./PaymentRequiredError.js";
 export * from "./ServiceUnavailableError.js";
+export * from "./UnprocessableEntityError.js";

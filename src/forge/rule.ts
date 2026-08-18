@@ -1,7 +1,50 @@
 import { RulebricksClient } from "../Client.js";
 import type { RuleImportPayload } from "../api/types/RuleImportPayload.js";
+import { RulebricksError } from "../errors/index.js";
 import { RuleType, Field, RuleSettings, OperatorResult } from "./types.js";
 import { BooleanField, NumberField, StringField, DateField, ListField } from "./operators.js";
+
+/** Request-specific configuration accepted by the underlying rule import endpoint. */
+type PushRequestOptions = Parameters<RulebricksClient["assets"]["rules"]["push"]>[1];
+
+/**
+ * Raised when the workspace rejects a rule update or publish — for example,
+ * when a publish is blocked because critical tests are failing. The message
+ * is the human-readable error returned by the API; the HTTP status code and
+ * response body are preserved for programmatic handling.
+ */
+export class RulePublishError extends Error {
+    public readonly statusCode?: number;
+    public readonly body?: unknown;
+
+    constructor(message: string, statusCode?: number, body?: unknown) {
+        super(message);
+        Object.setPrototypeOf(this, new.target.prototype);
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, this.constructor);
+        }
+        this.name = "RulePublishError";
+        this.statusCode = statusCode;
+        this.body = body;
+    }
+}
+
+/**
+ * Convert an API error from the rule import endpoint into a RulePublishError
+ * carrying the API's message. Non-API errors (timeouts, network failures)
+ * are returned unchanged.
+ */
+function toRulePublishError(error: unknown): unknown {
+    if (!(error instanceof RulebricksError)) {
+        return error;
+    }
+    const body = error.body;
+    const apiMessage =
+        body !== null && typeof body === "object" && typeof (body as Record<string, unknown>).error === "string"
+            ? ((body as Record<string, unknown>).error as string)
+            : undefined;
+    return new RulePublishError(apiMessage ?? error.message, error.statusCode, body);
+}
 
 export class RuleTest {
     id: string;
@@ -312,7 +355,6 @@ export class Rule {
 
     setName(name: string): Rule {
         this.name = name;
-        this.slug = this.generateSlug();
         return this;
     }
 
@@ -601,22 +643,30 @@ export class Rule {
         return this.testSuite.find((t) => t.name === name);
     }
 
-    async update(): Promise<Rule> {
+    async update(requestOptions?: PushRequestOptions): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("Workspace not set. Call setWorkspace() before updating the rule.");
         }
         const ruleData = this.toDict();
-        await this.workspace.assets.rules.push({ rule: ruleData });
+        try {
+            await this.workspace.assets.rules.push({ rule: ruleData }, requestOptions);
+        } catch (error) {
+            throw toRulePublishError(error);
+        }
         return this;
     }
 
-    async publish(): Promise<Rule> {
+    async publish(requestOptions?: PushRequestOptions): Promise<Rule> {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to publish a rule");
         }
         const ruleData = this.toDict();
         ruleData._publish = true;
-        await this.workspace.assets.rules.push({ rule: ruleData });
+        try {
+            await this.workspace.assets.rules.push({ rule: ruleData }, requestOptions);
+        } catch (error) {
+            throw toRulePublishError(error);
+        }
         return this;
     }
 
@@ -795,6 +845,22 @@ export class Rule {
         return `https://rulebricks.com/dashboard/${this.id}`;
     }
 
+    /**
+     * Format a condition argument or response value for table display.
+     * Vocabulary value references render as their uppercased name, and lists
+     * are formatted item by item so references nested inside list payloads
+     * (which may mix literals and references) stay readable.
+     */
+    private formatTableValue(value: any): string {
+        if (Array.isArray(value)) {
+            return `[${value.map((item) => this.formatTableValue(item)).join(", ")}]`;
+        }
+        if (value && typeof value === "object" && "$rb" in value) {
+            return String(value.name).toUpperCase();
+        }
+        return String(value);
+    }
+
     toTable(): string {
         const header = ["Condition", ...Object.keys(this.fields), "Response"];
         const rows: string[][] = [];
@@ -805,12 +871,14 @@ export class Rule {
             // Add request conditions
             Object.keys(this.fields).forEach((fieldName) => {
                 const cond = condition.request[fieldName];
-                row.push(cond ? `${cond.op} ${cond.args.join(", ")}` : "-");
+                row.push(
+                    cond ? `${cond.op} ${cond.args.map((arg) => this.formatTableValue(arg)).join(", ")}` : "-"
+                );
             });
 
             // Add response
             const responseStr = Object.entries(condition.response)
-                .map(([key, value]) => `${key}: ${value.value}`)
+                .map(([key, value]) => `${key}: ${this.formatTableValue(value.value)}`)
                 .join(", ");
             row.push(responseStr || "-");
 
