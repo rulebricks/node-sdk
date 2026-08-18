@@ -18,7 +18,7 @@ export interface RuleImportSchemaField {
     defaultValue?: (unknown | null) | undefined;
     /** When true, this field should only accept values from a value collection. */
     valuesOnly?: boolean | undefined;
-    /** Prefix used to scope available dynamic values for this field. */
+    /** Prefix used to scope available vocabulary values for this field. */
     valuesPrefix?: string | undefined;
     /** Accepts any additional properties */
     [key: string]: any;

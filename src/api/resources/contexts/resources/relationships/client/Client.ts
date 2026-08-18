@@ -113,7 +113,9 @@ export class RelationshipsClient {
      * @param {RelationshipsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.ConflictError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
@@ -122,7 +124,7 @@ export class RelationshipsClient {
      *         to_context_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
      *         relation_type: "has_many",
      *         foreign_key_fact: "customer_id",
-     *         name: "Customer Orders"
+     *         name: "customer_orders"
      *     })
      */
     public create(
@@ -176,8 +178,18 @@ export class RelationshipsClient {
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Rulebricks.ConflictError(
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
@@ -209,6 +221,7 @@ export class RelationshipsClient {
      * @param {Rulebricks.contexts.DeleteRelationshipsRequest} request
      * @param {RelationshipsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
@@ -261,6 +274,11 @@ export class RelationshipsClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Rulebricks.NotFoundError(
                         _response.error.body as Rulebricks.Error_,

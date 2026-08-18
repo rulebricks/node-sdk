@@ -7,6 +7,6 @@
  *     }
  */
 export interface DeleteValuesRequest {
-    /** ID of the dynamic value to delete */
+    /** ID of the vocabulary value to delete */
     id: string;
 }

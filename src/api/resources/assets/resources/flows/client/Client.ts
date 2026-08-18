@@ -23,8 +23,9 @@ export class FlowsClient {
     }
 
     /**
-     * List all flows in the organization.
+     * List all flows in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, by user group name or ID when the API key has access to that group, or by name.
      *
+     * @param {Rulebricks.assets.ListFlowsRequest} request
      * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.InternalServerError}
@@ -32,13 +33,23 @@ export class FlowsClient {
      * @example
      *     await client.assets.flows.list()
      */
-    public list(requestOptions?: FlowsClient.RequestOptions): core.HttpResponsePromise<Rulebricks.FlowListResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
+    public list(
+        request: Rulebricks.assets.ListFlowsRequest = {},
+        requestOptions?: FlowsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.FlowListResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__list(request, requestOptions));
     }
 
     private async __list(
+        request: Rulebricks.assets.ListFlowsRequest = {},
         requestOptions?: FlowsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.FlowListResponse>> {
+        const { folder, user_group: userGroup, name } = request;
+        const _queryParams: Record<string, unknown> = {
+            folder,
+            user_group: userGroup,
+            name,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -54,7 +65,11 @@ export class FlowsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -82,5 +97,301 @@ export class FlowsClient {
         }
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/admin/flows/list");
+    }
+
+    /**
+     * Create or update a flow from the Rulebricks Flow Schema (a list of `nodes` and `connections`). The server expands the Rulebricks Flow Schema definition into the full flow graph - laying it out, wiring property/control handles, resolving referenced published rules, and backfilling node defaults - so the result both renders in the editor and executes via `/flows/{slug}` without any manual editing. If `id` is provided the matching flow is updated; otherwise a new flow is created (`id`/`slug` auto-generated). Flows auto-publish unless `_publish` is set to `false`.
+     *
+     * @param {Rulebricks.assets.ImportFlowRequest} request
+     * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.InternalServerError}
+     *
+     * @example
+     *     await client.assets.flows.push({
+     *         flow: {
+     *             name: "Underwriting Flow",
+     *             _publish: true,
+     *             nodes: [{
+     *                     ref: "input",
+     *                     type: "origin",
+     *                     rule: "customer-eligibility"
+     *                 }, {
+     *                     ref: "gate",
+     *                     type: "continue_if",
+     *                     condition: {
+     *                         property: "approved",
+     *                         operator: "equals",
+     *                         args: [true]
+     *                     }
+     *                 }, {
+     *                     ref: "enrich",
+     *                     type: "code",
+     *                     code: "outputs.tier = inputs.score > 700 ? 'A' : 'B'",
+     *                     outputs: [{
+     *                             key: "tier",
+     *                             type: "string"
+     *                         }]
+     *                 }, {
+     *                     ref: "out",
+     *                     type: "result",
+     *                     key: "data"
+     *                 }],
+     *             connections: [{
+     *                     from: "input",
+     *                     output: "approved",
+     *                     to: "gate"
+     *                 }, {
+     *                     from: "input",
+     *                     output: "score",
+     *                     to: "enrich",
+     *                     input: "score"
+     *                 }, {
+     *                     from: "gate",
+     *                     to: "out",
+     *                     control: true
+     *                 }, {
+     *                     from: "enrich",
+     *                     output: "tier",
+     *                     to: "out"
+     *                 }]
+     *         }
+     *     })
+     */
+    public push(
+        request: Rulebricks.assets.ImportFlowRequest,
+        requestOptions?: FlowsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.FlowImportResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__push(request, requestOptions));
+    }
+
+    private async __push(
+        request: Rulebricks.assets.ImportFlowRequest,
+        requestOptions?: FlowsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.FlowImportResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                "admin/flows/import",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.FlowImportResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/admin/flows/import");
+    }
+
+    /**
+     * Export a flow into the Rulebricks Flow Schema (nodes + connections), the same shape accepted by `/admin/flows/import`. Works for flows built entirely by hand in the editor, so they can be round-tripped or version-controlled. This is distinct from the top-level `/admin/export`, which produces `.rbm` manifests.
+     *
+     * @param {Rulebricks.assets.PullFlowsRequest} request
+     * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.InternalServerError}
+     *
+     * @example
+     *     await client.assets.flows.pull()
+     */
+    public pull(
+        request: Rulebricks.assets.PullFlowsRequest = {},
+        requestOptions?: FlowsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.FlowImportPayload> {
+        return core.HttpResponsePromise.fromPromise(this.__pull(request, requestOptions));
+    }
+
+    private async __pull(
+        request: Rulebricks.assets.PullFlowsRequest = {},
+        requestOptions?: FlowsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.FlowImportPayload>> {
+        const { id, slug } = request;
+        const _queryParams: Record<string, unknown> = {
+            id,
+            slug,
+        };
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                "admin/flows/export",
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.FlowImportPayload, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/admin/flows/export");
+    }
+
+    /**
+     * Delete a specific flow by its ID.
+     *
+     * @param {Rulebricks.assets.DeleteFlowRequest} request
+     * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.InternalServerError}
+     *
+     * @example
+     *     await client.assets.flows.delete({
+     *         id: "3855f8da-2654-4df9-8903-8f797cbfe8ec"
+     *     })
+     */
+    public delete(
+        request: Rulebricks.assets.DeleteFlowRequest,
+        requestOptions?: FlowsClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.SuccessMessage> {
+        return core.HttpResponsePromise.fromPromise(this.__delete(request, requestOptions));
+    }
+
+    private async __delete(
+        request: Rulebricks.assets.DeleteFlowRequest,
+        requestOptions?: FlowsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.SuccessMessage>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                "admin/flows/delete",
+            ),
+            method: "DELETE",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.SuccessMessage, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "DELETE", "/admin/flows/delete");
     }
 }

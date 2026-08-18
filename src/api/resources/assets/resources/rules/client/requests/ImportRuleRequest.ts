@@ -91,7 +91,7 @@ import type * as Rulebricks from "../../../../../../index.js";
  *                     settings: {
  *                         enabled: true,
  *                         groupId: null,
- *                         priority: 1,
+ *                         priority: 0,
  *                         schedule: []
  *                     }
  *                 }, {
@@ -107,7 +107,7 @@ import type * as Rulebricks from "../../../../../../index.js";
  *                     settings: {
  *                         enabled: true,
  *                         groupId: null,
- *                         priority: 2,
+ *                         priority: 0,
  *                         schedule: []
  *                     }
  *                 }],

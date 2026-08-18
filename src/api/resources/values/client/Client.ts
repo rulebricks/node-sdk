@@ -16,7 +16,7 @@ export declare namespace ValuesClient {
 }
 
 /**
- * Operations for managing dynamic values referenced in rules
+ * Operations for managing vocabulary values referenced in rules
  */
 export class ValuesClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<ValuesClient.Options>;
@@ -26,7 +26,7 @@ export class ValuesClient {
     }
 
     /**
-     * Retrieve all dynamic values for the authenticated user. Use the 'include' parameter to control whether usage information is returned.
+     * Retrieve vocabulary values for the authenticated user. Results are scoped to the API key holder's user groups. Optionally filter by user group name or ID when the API key has access to that group. Use the 'include' parameter to control whether usage information is returned. Small workspaces may omit pagination to receive the full catalog as an array (legacy behavior); workspaces above the catalog threshold must paginate with 'limit'/'cursor', which returns { data, next_cursor, total? } ordered by name. The 'prefix' and 'type' filters narrow results to a collection or value type.
      *
      * @param {Rulebricks.ListValuesRequest} request
      * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -42,18 +42,24 @@ export class ValuesClient {
     public list(
         request: Rulebricks.ListValuesRequest = {},
         requestOptions?: ValuesClient.RequestOptions,
-    ): core.HttpResponsePromise<Rulebricks.DynamicValueListResponse> {
+    ): core.HttpResponsePromise<Rulebricks.ListValuesResponse> {
         return core.HttpResponsePromise.fromPromise(this.__list(request, requestOptions));
     }
 
     private async __list(
         request: Rulebricks.ListValuesRequest = {},
         requestOptions?: ValuesClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Rulebricks.DynamicValueListResponse>> {
-        const { name, include } = request;
+    ): Promise<core.WithRawResponse<Rulebricks.ListValuesResponse>> {
+        const { name, prefix, type: type_, limit, cursor, user_group: userGroup, include, resolve } = request;
         const _queryParams: Record<string, unknown> = {
             name,
+            prefix,
+            type: type_,
+            limit,
+            cursor,
+            user_group: userGroup,
             include,
+            resolve,
         };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -82,7 +88,7 @@ export class ValuesClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Rulebricks.DynamicValueListResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Rulebricks.ListValuesResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -110,7 +116,7 @@ export class ValuesClient {
     }
 
     /**
-     * Update existing dynamic values or add new ones for the authenticated user. Supports both flat and nested object structures. Nested objects are automatically flattened using dot notation and keys are converted to readable format (e.g., 'user_name' becomes 'User Name', nested 'user.contact_info.email' becomes 'User.Contact Info.Email').
+     * Update existing vocabulary values or add new ones for the authenticated user. Supports both flat and nested object structures. Nested objects are automatically flattened using dot notation with keys preserved exactly as sent (e.g. nested 'user_profile.first_name' becomes the value name 'user_profile.first_name'). Writes are set-based upserts keyed by value name - existing values keep their ids, so rule references stay valid - and each call is idempotent, so retrying a failed request is always safe. Imports of any size go through this endpoint (POST /values/bulk is an equivalent alias): drive large dictionaries as a sequence of chunked calls, each bounded by your deployment's request body limit. Payloads may compose values from other values with reference markers: { "$ref": "<value name>" } references a value by name (existing values first, then values created by the same request), and { "$rb": "globalValue", "id": "<value id>" } references by id. A scalar payload may be a single reference; list payloads may mix literal items and references. References are validated (existence, type match, cycles) before anything is written. Workspaces at or below the catalog threshold receive the full value list back (legacy behavior); larger workspaces receive summary counts ({ created, updated, processed }).
      *
      * @param {Rulebricks.UpdateValuesRequest} request
      * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -183,14 +189,14 @@ export class ValuesClient {
     public update(
         request: Rulebricks.UpdateValuesRequest,
         requestOptions?: ValuesClient.RequestOptions,
-    ): core.HttpResponsePromise<Rulebricks.DynamicValueListResponse> {
+    ): core.HttpResponsePromise<Rulebricks.UpdateValuesResponse> {
         return core.HttpResponsePromise.fromPromise(this.__update(request, requestOptions));
     }
 
     private async __update(
         request: Rulebricks.UpdateValuesRequest,
         requestOptions?: ValuesClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Rulebricks.DynamicValueListResponse>> {
+    ): Promise<core.WithRawResponse<Rulebricks.UpdateValuesResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -217,7 +223,7 @@ export class ValuesClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Rulebricks.DynamicValueListResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Rulebricks.UpdateValuesResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -250,7 +256,7 @@ export class ValuesClient {
     }
 
     /**
-     * Delete a specific dynamic value for the authenticated user by its ID.
+     * Delete a specific vocabulary value for the authenticated user by its ID. Deletion is blocked while the value is referenced by any rule or flow. Values whose entire payload references the deleted value are deleted with it (cascade), and list values referencing it lose the referencing items; both effects are reported in the response.
      *
      * @param {Rulebricks.DeleteValuesRequest} request
      * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -267,14 +273,14 @@ export class ValuesClient {
     public delete(
         request: Rulebricks.DeleteValuesRequest,
         requestOptions?: ValuesClient.RequestOptions,
-    ): core.HttpResponsePromise<Rulebricks.SuccessMessage> {
+    ): core.HttpResponsePromise<Rulebricks.DeleteValueResponse> {
         return core.HttpResponsePromise.fromPromise(this.__delete(request, requestOptions));
     }
 
     private async __delete(
         request: Rulebricks.DeleteValuesRequest,
         requestOptions?: ValuesClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Rulebricks.SuccessMessage>> {
+    ): Promise<core.WithRawResponse<Rulebricks.DeleteValueResponse>> {
         const { id } = request;
         const _queryParams: Record<string, unknown> = {
             id,
@@ -306,7 +312,7 @@ export class ValuesClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Rulebricks.SuccessMessage, rawResponse: _response.rawResponse };
+            return { data: _response.body as Rulebricks.DeleteValueResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -336,5 +342,117 @@ export class ValuesClient {
         }
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "DELETE", "/values");
+    }
+
+    /**
+     * Declaratively makes a collection exactly equal to the payload. Values in the payload are upserted (Existing values keep their IDs), and values under the collection that are absent from the payload are archived by default. The `sync` endpoint supports uploading a particularly large amount of values (100k+) in chunks, using the `sync_id` parameter to track the run.
+     *
+     * @param {Rulebricks.SyncValuesRequest} request
+     * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.ForbiddenError}
+     * @throws {@link Rulebricks.ConflictError}
+     * @throws {@link Rulebricks.InternalServerError}
+     * @throws {@link Rulebricks.ServiceUnavailableError}
+     *
+     * @example
+     *     await client.values.sync({
+     *         collection: "Medical Codes",
+     *         values: {
+     *             "A123": "A123",
+     *             "B456": "B456",
+     *             "C789": "C789"
+     *         }
+     *     })
+     *
+     * @example
+     *     await client.values.sync({
+     *         collection: "Medical Codes",
+     *         values: {
+     *             "Y998": "Y998",
+     *             "Z999": "Z999"
+     *         },
+     *         sync_id: "fabric-2026-08-13T02:00Z",
+     *         complete: true
+     *     })
+     */
+    public sync(
+        request: Rulebricks.SyncValuesRequest,
+        requestOptions?: ValuesClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.SyncValuesResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__sync(request, requestOptions));
+    }
+
+    private async __sync(
+        request: Rulebricks.SyncValuesRequest,
+        requestOptions?: ValuesClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.SyncValuesResponse>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                "values/sync",
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.SyncValuesResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Rulebricks.ConflictError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Rulebricks.ServiceUnavailableError(
+                        _response.error.body as unknown,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/values/sync");
     }
 }

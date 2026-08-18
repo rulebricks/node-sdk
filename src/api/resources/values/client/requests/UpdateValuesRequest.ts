@@ -63,10 +63,10 @@
  *     }
  */
 export interface UpdateValuesRequest {
-    /** A dictionary of keys and values to update or add. Supports both flat key-value pairs and nested objects. Nested objects will be automatically flattened using dot notation with readable key names (e.g., 'user.contact_info.email' becomes 'User.Contact Info.Email'). */
+    /** A dictionary of keys and values to update or add. Supports both flat key-value pairs and nested objects. Nested objects are automatically flattened using dot notation with keys preserved exactly as sent (e.g. 'user.contact_info.email' stays 'user.contact_info.email'). Individual payloads may be value-to-value references (see ValueReference): a scalar payload may be a single { "$ref": "<value name>" } marker, and list payloads may mix literal items with reference markers. */
     values: Record<string, unknown>;
     /** Optional array of user group names or IDs. If omitted and user belongs to user groups, values will be assigned to all user's user groups. Required if values should be restricted to specific user groups. */
     user_groups?: string[];
-    /** Optional metadata keyed by dynamic value name. This is the canonical snake_case field; legacy clients may still send `metadataByName`. */
+    /** Optional metadata keyed by vocabulary value name. This is the canonical snake_case field; legacy clients may still send `metadataByName`. System-owned keys (managedBy, source, lockedReason, previousTokens, and archive/tombstone fields) are stripped from user payloads - managed provenance and archive state cannot be forged. */
     metadata_by_name?: Record<string, Record<string, unknown>>;
 }

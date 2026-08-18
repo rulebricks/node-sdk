@@ -3,7 +3,7 @@
 export interface ExportManifestResponse {
     /** Whether the export completed successfully. */
     success?: boolean | undefined;
-    /** The exported manifest data. The wrapper uses snake_case, while asset objects inside `contexts`, `values`, `rules`, and `flows` intentionally preserve `.rbm`/database casing for round-trip compatibility. */
+    /** The exported manifest data. The wrapper uses snake_case, while asset objects inside `contexts`, `values`, `rules`, and `flows` intentionally preserve `.rbm`/database casing for round-trip compatibility. When the request sets `compress: true`, this field is instead the compress-json array encoding of the same manifest (a JSON array, not the object described below). */
     manifest?: ExportManifestResponse.Manifest | undefined;
     /** Error message if export failed. */
     error?: string | undefined;
@@ -11,7 +11,7 @@ export interface ExportManifestResponse {
 
 export namespace ExportManifestResponse {
     /**
-     * The exported manifest data. The wrapper uses snake_case, while asset objects inside `contexts`, `values`, `rules`, and `flows` intentionally preserve `.rbm`/database casing for round-trip compatibility.
+     * The exported manifest data. The wrapper uses snake_case, while asset objects inside `contexts`, `values`, `rules`, and `flows` intentionally preserve `.rbm`/database casing for round-trip compatibility. When the request sets `compress: true`, this field is instead the compress-json array encoding of the same manifest (a JSON array, not the object described below).
      */
     export interface Manifest {
         /** Manifest format version. */
@@ -23,7 +23,7 @@ export namespace ExportManifestResponse {
         exported_at?: string | undefined;
         /** Exported contexts. */
         contexts?: Record<string, unknown>[] | undefined;
-        /** Exported dynamic values. */
+        /** Exported vocabulary values. */
         values?: Record<string, unknown>[] | undefined;
         /** Exported rules. */
         rules?: Record<string, unknown>[] | undefined;

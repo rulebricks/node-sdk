@@ -16,7 +16,7 @@ export declare namespace DecisionsClient {
 }
 
 /**
- * Query highly detailed logs of prior rule executions within the last 90 days
+ * Query highly detailed logs of prior rule executions within the configured retention window
  */
 export class DecisionsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<DecisionsClient.Options>;
@@ -33,12 +33,17 @@ export class DecisionsClient {
      *
      * @throws {@link Rulebricks.BadRequestError}
      * @throws {@link Rulebricks.InternalServerError}
+     * @throws {@link Rulebricks.ServiceUnavailableError}
      *
      * @example
      *     await client.decisions.query({
      *         search: "status=200",
      *         rules: "Lead Qualification,Pricing Calculator",
-     *         statuses: "200,400,500"
+     *         flows: "Loan Approval Flow",
+     *         contexts: "loans",
+     *         trace: "7db50259-31a0-42c1-aa3c-36409ad3c756",
+     *         statuses: "200,400,500",
+     *         item_filter: "customer.id=cst_8f3a12"
      *     })
      */
     public query(
@@ -52,17 +57,39 @@ export class DecisionsClient {
         request: Rulebricks.QueryDecisionsRequest = {},
         requestOptions?: DecisionsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.DecisionLogResponse>> {
-        const { search, rules, statuses, start, end, cursor, limit, count, slug } = request;
+        const {
+            search,
+            rules,
+            flows,
+            contexts,
+            trace,
+            statuses,
+            include_traces: includeTraces,
+            item_filter: itemFilter,
+            start,
+            end,
+            sort,
+            order,
+            cursor,
+            limit,
+            count,
+        } = request;
         const _queryParams: Record<string, unknown> = {
             search,
             rules,
+            flows,
+            contexts,
+            trace,
             statuses,
+            include_traces: includeTraces != null ? includeTraces : undefined,
+            item_filter: itemFilter,
             start: start != null ? start : undefined,
             end: end != null ? end : undefined,
+            sort: sort != null ? sort : undefined,
+            order: order != null ? order : undefined,
             cursor,
             limit,
             count: count != null ? count : undefined,
-            slug,
         };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -104,6 +131,11 @@ export class DecisionsClient {
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Rulebricks.ServiceUnavailableError(
+                        _response.error.body as unknown,
                         _response.rawResponse,
                     );
                 default:

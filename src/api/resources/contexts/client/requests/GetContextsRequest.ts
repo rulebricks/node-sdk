@@ -12,4 +12,6 @@ export interface GetContextsRequest {
     slug: string;
     /** The unique identifier for the context instance. */
     instance: string;
+    /** Comma-separated relationship names to include in the response under a 'relations' key (has_many relations return a list of related instance states; has_one/belongs_to return a single state or null). Use '*' for all relationships. Omitted by default - related instances are never fetched into the payload unrequested. */
+    include_relations?: string;
 }

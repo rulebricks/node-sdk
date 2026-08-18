@@ -6,9 +6,9 @@
 export interface ContextInstanceState {
     /** Combined identifier in format 'contextSlug:instanceId'. */
     context?: string | undefined;
-    /** The current base field values for this instance. */
+    /** The current base fact values for this instance (derived facts are reported separately under `derived`; note that POST responses combine both under `state`). */
     state?: Record<string, unknown> | undefined;
-    /** Computed/derived field values from bound rules. */
+    /** Expression-computed derived fact values (recomputed on read from base facts, relations, and history). */
     derived?: Record<string, unknown> | undefined;
     /** Whether all required fields are present ('complete') or some are missing ('pending'). */
     status?: ContextInstanceState.Status | undefined;
@@ -16,6 +16,10 @@ export interface ContextInstanceState {
     have?: string[] | undefined;
     /** List of required field keys that are missing (empty when status is 'complete'). */
     need?: string[] | undefined;
+    /** Related instance data, present only when include_relations was requested. Keys are relationship names; has_many relations map to a list of related instance states, has_one/belongs_to to a single state or null. */
+    relations?: Record<string, unknown> | undefined;
+    /** Per-asset execution metadata, present after a bound rule or flow has run for this instance. */
+    executions?: Record<string, unknown> | undefined;
     /** When the instance was first created. */
     created_at?: string | undefined;
     /** When the instance was last updated. */

@@ -7,26 +7,42 @@ import type * as Rulebricks from "../../../../index.js";
  *     {
  *         search: "status=200",
  *         rules: "Lead Qualification,Pricing Calculator",
- *         statuses: "200,400,500"
+ *         flows: "Loan Approval Flow",
+ *         contexts: "loans",
+ *         trace: "7db50259-31a0-42c1-aa3c-36409ad3c756",
+ *         statuses: "200,400,500",
+ *         item_filter: "customer.id=cst_8f3a12"
  *     }
  */
 export interface QueryDecisionsRequest {
-    /** Decision data query language expression to filter logs by request/response data. Supports field comparisons (`field=value`, `field>10`), contains (`field:text`), not-contains (`field!:text`), boolean operators (`AND`, `OR`), and parentheses. */
+    /** Decision data query language expression to filter logs by request/response data. Supports field comparisons (`field=value`, `field>10`), contains (`field:text`), not-contains (`field!:text`), boolean operators (`AND`, `OR`), and parentheses. A bare UUID or 32-hex term resolves as an execution/correlation-id lookup automatically. */
     search?: string;
-    /** Comma-separated list of rule names to filter logs by. */
+    /** Comma-separated list of rule names, IDs, or slugs to filter logs by. Names match partially; IDs and slugs match exactly. */
     rules?: string;
+    /** Comma-separated list of flow names, IDs, or slugs to filter logs by. Matches only flow-level execution logs; the rule executions that ran inside a flow are separate records and are not included. */
+    flows?: string;
+    /** Comma-separated list of context names or slugs to filter logs by. Matches the rule and flow executions that were triggered by those contexts (batch and interactive updates). */
+    contexts?: string;
+    /** Execution-trace correlation id. Returns every decision log from one execution tree: pass a log's `decision.root_flow_execution_id` (or any `flow_execution_id` / `parallel_execution_id`, including a bulk run's per-item `item_execution_ids` entries) to retrieve the flow-level record plus all subflow and rule records from that run. On self-hosted deployments, a log's observability `trace_id` is also accepted. Combine with `rules` or `search` to narrow to a specific rule or payload within the run. */
+    trace?: string;
     /** Comma-separated list of HTTP status codes to filter logs by. */
     statuses?: string;
-    /** Start date for the query range (ISO8601 format). */
+    /** When `true`, each flow record in the response includes a decompressed `path_trace` field: the run's executed steps with their full inputs and outputs (an object for single runs, a null-aligned array matching the request array for bulk runs). Off by default - traces are stored compressed and can be large, so only enable this when you need them. Ignored in count mode. */
+    include_traces?: Rulebricks.QueryDecisionsRequestIncludeTraces;
+    /** Bulk payload filter in the form `path=value`. For each bulk record in the results (array-shaped request/response), keeps only the items whose payload value at `path` equals `value`, slicing the `request` and `response` arrays and every index-aligned field (`decision.item_execution_ids`, `decision.item_indexes`, `decision.success_idxs`, and `path_trace` when `include_traces=true`) in lockstep so input/output alignment is preserved. Filtered records gain a `matched_items` array with the surviving items' original zero-based positions. Paths use dot notation into each item (`customer.id`, `lines.0.sku`); prefix with `request.` or `response.` to match only that side (unprefixed paths match either side). Values compare as exact scalar strings (`status=200`, `approved=true`). Non-bulk records are returned unchanged; bulk records with no matching items are returned with empty item arrays. Typical use: combine with `search`, `flows`, or `trace` to locate a bulk run, then isolate one item's payloads and its `item_execution_ids` entry without tracking indexes. Ignored in count mode. */
+    item_filter?: string;
+    /** Start date for the query range (ISO8601 format). Hosted queries may span at most 90 days. Persistent self-hosted queries may use any range within local ClickHouse retention; PVC-less archive mode is limited to 7 days. Defaults to the applicable maximum before `end` (or before now). */
     start?: string;
-    /** End date for the query range (ISO8601 format). */
+    /** End date for the query range (ISO8601 format). Defaults to now. When supplied without `start`, the query covers the preceding 90 days on hosted/table mode or 7 days in PVC-less archive mode. */
     end?: string;
-    /** Cursor for pagination (returned from previous query). */
+    /** Column to sort results by. `time` orders by execution timestamp, `name` by rule/flow name, `status` by HTTP status code, and `type` by operation (solve, bulk-solve, flows, etc.). Defaults to `time`. */
+    sort?: Rulebricks.QueryDecisionsRequestSort;
+    /** Sort direction. Defaults to `desc`. */
+    order?: Rulebricks.QueryDecisionsRequestOrder;
+    /** Opaque pagination token returned by the previous response. Pass it back verbatim to fetch the next page; do not construct or modify cursor values. */
     cursor?: string;
-    /** Number of results to return per page (default: 100). */
+    /** Number of results to return per page (default: 100, maximum: 1000). Logs carry full request/response payloads, so use smaller limits when querying workspaces with large bulk operations. Time-sorted pagination uses a keyset cursor, so its scan cost does not grow with page depth. */
     limit?: number;
     /** If set to 'true', returns only the count of matching logs instead of the log data. */
     count?: Rulebricks.QueryDecisionsRequestCount;
-    /** (Deprecated) Legacy parameter for filtering by rule slug. Use 'rules' parameter instead. */
-    slug?: string;
 }

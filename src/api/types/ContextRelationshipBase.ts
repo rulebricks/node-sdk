@@ -4,10 +4,10 @@ export interface ContextRelationshipBase {
     /** The unique identifier for the relationship. */
     id?: string | undefined;
     /** The type of relationship. */
-    type?: ContextRelationshipBase.Type | undefined;
+    relation_type?: ContextRelationshipBase.RelationType | undefined;
     /** The field key used as the foreign key. */
-    foreign_key?: string | undefined;
-    /** Display name for the relationship. */
+    foreign_key_fact?: string | undefined;
+    /** Runtime relationship key used by derived expressions. It is normalized to lowercase snake_case. */
     name?: string | undefined;
     /** Description of the relationship. */
     description?: string | undefined;
@@ -17,10 +17,10 @@ export interface ContextRelationshipBase {
 
 export namespace ContextRelationshipBase {
     /** The type of relationship. */
-    export const Type = {
+    export const RelationType = {
         HasMany: "has_many",
         HasOne: "has_one",
         BelongsTo: "belongs_to",
     } as const;
-    export type Type = (typeof Type)[keyof typeof Type];
+    export type RelationType = (typeof RelationType)[keyof typeof RelationType];
 }

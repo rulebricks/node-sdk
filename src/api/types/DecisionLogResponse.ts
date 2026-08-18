@@ -8,7 +8,7 @@ import type * as Rulebricks from "../index.js";
 export interface DecisionLogResponse {
     /** Array of decision log entries. Only present when count parameter is not 'true'. */
     data?: Rulebricks.DecisionLog[] | undefined;
-    /** Pagination cursor for fetching the next page. Null if no more results. Only present when count parameter is not 'true'. */
+    /** Opaque pagination token for fetching the next page - pass it back verbatim via the cursor parameter. Null if no more results. Only present when count parameter is not 'true'. */
     cursor?: (string | null) | undefined;
     /** Total count of matching logs. Only present when count parameter is 'true'. When this is returned, data and cursor are not included. */
     count?: number | undefined;

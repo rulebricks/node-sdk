@@ -25,6 +25,7 @@ export class FoldersClient {
     /**
      * Retrieve all rule folders for the authenticated user.
      *
+     * @param {Rulebricks.assets.ListFoldersRequest} request
      * @param {FoldersClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.InternalServerError}
@@ -33,14 +34,21 @@ export class FoldersClient {
      *     await client.assets.folders.list()
      */
     public list(
+        request: Rulebricks.assets.ListFoldersRequest = {},
         requestOptions?: FoldersClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.FolderListResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__list(request, requestOptions));
     }
 
     private async __list(
+        request: Rulebricks.assets.ListFoldersRequest = {},
         requestOptions?: FoldersClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.FolderListResponse>> {
+        const { user_group: userGroup, name } = request;
+        const _queryParams: Record<string, unknown> = {
+            user_group: userGroup,
+            name,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -56,7 +64,11 @@ export class FoldersClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -87,7 +99,7 @@ export class FoldersClient {
     }
 
     /**
-     * Create a new rule folder or update an existing one for the authenticated user.
+     * Create a new folder or update an existing one for the authenticated user. Folders are typed to organize rules (the default), flows, or contexts.
      *
      * @param {Rulebricks.assets.UpsertFolderRequest} request
      * @param {FoldersClient.RequestOptions} requestOptions - Request-specific configuration.

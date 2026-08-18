@@ -7,7 +7,7 @@
  *         to_context_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
  *         relation_type: "has_many",
  *         foreign_key_fact: "customer_id",
- *         name: "Customer Orders"
+ *         name: "customer_orders"
  *     }
  */
 export interface CreateRelationshipRequest {
@@ -19,7 +19,7 @@ export interface CreateRelationshipRequest {
     relation_type: CreateRelationshipRequest.RelationType;
     /** The field key to use as the foreign key. */
     foreign_key_fact: string;
-    /** Display name for the relationship. */
+    /** Optional runtime relationship key. It is normalized to lowercase snake_case; the target context slug is used when omitted. */
     name?: string;
     /** Description of the relationship. */
     description?: string;

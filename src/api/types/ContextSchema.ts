@@ -8,6 +8,6 @@ import type * as Rulebricks from "../index.js";
 export interface ContextSchema {
     /** User-defined base fields for the context. */
     base?: Rulebricks.ContextSchemaField[] | undefined;
-    /** Fields derived from bound rule/flow outputs. */
+    /** Expression-computed fields. Each entry supplies an `expression` evaluated from base facts, tracked history, and configured relationships. */
     derived?: Rulebricks.ContextSchemaField[] | undefined;
 }

@@ -26,7 +26,7 @@
  *     }
  */
 export interface ImportManifestRequest {
-    /** The RBM manifest object containing assets to import. Asset objects inside the manifest intentionally preserve `.rbm`/database casing so exported manifests can be imported without rewriting asset payloads. */
+    /** The RBM manifest object containing assets to import. Asset objects inside the manifest intentionally preserve `.rbm`/database casing so exported manifests can be imported without rewriting asset payloads. A compressed manifest is also accepted: the JSON array produced by the compress-json library (for example, the contents of a compressed .rbm file exported with `compress: true`); it is detected and decompressed automatically. */
     manifest: ImportManifestRequest.Manifest;
     /** How to handle conflicts with existing assets. 'update' overwrites, 'skip' ignores, 'error' fails. */
     conflict_strategy?: ImportManifestRequest.ConflictStrategy;
@@ -38,7 +38,7 @@ export interface ImportManifestRequest {
 
 export namespace ImportManifestRequest {
     /**
-     * The RBM manifest object containing assets to import. Asset objects inside the manifest intentionally preserve `.rbm`/database casing so exported manifests can be imported without rewriting asset payloads.
+     * The RBM manifest object containing assets to import. Asset objects inside the manifest intentionally preserve `.rbm`/database casing so exported manifests can be imported without rewriting asset payloads. A compressed manifest is also accepted: the JSON array produced by the compress-json library (for example, the contents of a compressed .rbm file exported with `compress: true`); it is detected and decompressed automatically.
      */
     export interface Manifest {
         /** Manifest format version. */
@@ -49,7 +49,9 @@ export namespace ImportManifestRequest {
         flows?: Record<string, unknown>[] | undefined;
         /** Contexts to import. */
         entities?: Record<string, unknown>[] | undefined;
-        /** Dynamic values to import. */
+        /** Alias for `entities`, accepted so manifests produced by the export endpoint (which names this array `contexts`) can be imported without modification. Ignored when `entities` is present and non-empty. */
+        contexts?: Record<string, unknown>[] | undefined;
+        /** Vocabulary values to import. */
         values?: Record<string, unknown>[] | undefined;
     }
 

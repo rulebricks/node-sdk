@@ -11,6 +11,10 @@ export interface FlowDetail extends Rulebricks.FlowBase {
     origin_rule?: (FlowDetail.OriginRule | null) | undefined;
     /** The context this flow is bound to (via its origin rule). Flows inherit context binding from their origin rule. */
     context?: (FlowDetail.Context | null) | undefined;
+    /** The user groups this flow is assigned to. */
+    user_groups?: string[] | undefined;
+    /** The folder this flow belongs to, if any. */
+    folder?: (Rulebricks.Folder | null) | undefined;
 }
 
 export namespace FlowDetail {

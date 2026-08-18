@@ -9,6 +9,8 @@ export interface ContextListItem extends Rulebricks.ContextBase {
     /** The field key used as the unique identifier for instances. */
     identity_fact?: (string | null) | undefined;
     schema?: Rulebricks.ContextSchema | undefined;
+    /** The user groups this context is assigned to. */
+    user_groups?: string[] | undefined;
     folder?: (ContextListItem.Folder | null) | undefined;
     /** Number of rules bound to this context. */
     bound_rules_count?: number | undefined;

@@ -14,4 +14,16 @@ export interface UpsertFolderRequest {
     name: string;
     /** Description of the folder */
     description?: string;
+    /** The type of assets the folder organizes. Applies on creation; ignored when updating an existing folder. */
+    type?: UpsertFolderRequest.Type;
+}
+
+export namespace UpsertFolderRequest {
+    /** The type of assets the folder organizes. Applies on creation; ignored when updating an existing folder. */
+    export const Type = {
+        Rule: "rule",
+        Flow: "flow",
+        Context: "context",
+    } as const;
+    export type Type = (typeof Type)[keyof typeof Type];
 }

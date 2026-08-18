@@ -274,4 +274,91 @@ export class RulesClient {
             "/admin/rules/{slug}/tests/{testId}",
         );
     }
+
+    /**
+     * Executes every test in the rule's test suite (or only the critical tests when `critical_only` is true) and returns a summary of which passed, which failed, and whether any CRITICAL test failed. Use the `critical_failure` flag as the signal for whether a release should be blocked.
+     *
+     * @param {Rulebricks.tests.RunRulesRequest} request
+     * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.InternalServerError}
+     *
+     * @example
+     *     await client.tests.rules.run({
+     *         slug: "slug",
+     *         body: {
+     *             critical_only: false
+     *         }
+     *     })
+     */
+    public run(
+        request: Rulebricks.tests.RunRulesRequest,
+        requestOptions?: RulesClient.RequestOptions,
+    ): core.HttpResponsePromise<Rulebricks.RunTestsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__run(request, requestOptions));
+    }
+
+    private async __run(
+        request: Rulebricks.tests.RunRulesRequest,
+        requestOptions?: RulesClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Rulebricks.RunTestsResponse>> {
+        const { slug, body: _body } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.RulebricksEnvironment.Default,
+                `admin/rules/${core.url.encodePathParam(slug)}/tests/run`,
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: _body,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Rulebricks.RunTestsResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 404:
+                    throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Rulebricks.InternalServerError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.RulebricksError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/admin/rules/{slug}/tests/run",
+        );
+    }
 }

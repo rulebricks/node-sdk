@@ -10,28 +10,33 @@ export interface ContextSchemaField {
     name?: string | undefined;
     /** Description of this field. */
     description?: string | undefined;
-    /** Data type of this field. 'function' type fields compute values dynamically. */
+    /** Data type of this field. `object` fields are parent nodes for dotted child facts; `function` fields are output-only. */
     type?: ContextSchemaField.Type | undefined;
     /** Default value for this field. */
     default_value?: (unknown | null) | undefined;
-    /** Whether this field is derived from rule/flow outputs. */
-    derived?: boolean | undefined;
-    /** The rule ID that derives this field (if derived). */
-    source_rule?: (string | null) | undefined;
-    /** The flow ID that derives this field (if derived). */
-    source_flow?: (string | null) | undefined;
-    /** The source field key in the rule/flow output. */
-    source_field?: (string | null) | undefined;
+    /** Whether this base fact is required for overall context completeness. */
+    required?: boolean | undefined;
+    /** Whether external submissions are rejected for this base fact. Rule writebacks may still set it. */
+    output_only?: boolean | undefined;
+    /** Whether changed values for this base fact are retained for history expressions and the history endpoint. */
+    track_history?: boolean | undefined;
+    /** Whether values must come from the configured vocabulary collection. */
+    values_only?: boolean | undefined;
+    /** Vocabulary collection identifier, when configured. */
+    values_collection?: (string | null) | undefined;
+    /** Required for derived facts: the expression evaluated from base, history, and relation values. */
+    expression?: string | undefined;
 }
 
 export namespace ContextSchemaField {
-    /** Data type of this field. 'function' type fields compute values dynamically. */
+    /** Data type of this field. `object` fields are parent nodes for dotted child facts; `function` fields are output-only. */
     export const Type = {
         String: "string",
         Number: "number",
         Boolean: "boolean",
         Date: "date",
         List: "list",
+        Object: "object",
         Function: "function",
     } as const;
     export type Type = (typeof Type)[keyof typeof Type];

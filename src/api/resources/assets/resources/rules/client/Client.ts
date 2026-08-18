@@ -293,7 +293,7 @@ export class RulesClient {
      *                     settings: {
      *                         enabled: true,
      *                         groupId: null,
-     *                         priority: 1,
+     *                         priority: 0,
      *                         schedule: []
      *                     }
      *                 }, {
@@ -309,7 +309,7 @@ export class RulesClient {
      *                     settings: {
      *                         enabled: true,
      *                         groupId: null,
-     *                         priority: 2,
+     *                         priority: 0,
      *                         schedule: []
      *                     }
      *                 }],
@@ -395,7 +395,7 @@ export class RulesClient {
     }
 
     /**
-     * List all rules in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, or by user group name or ID when the API key has access to that group.
+     * List all rules in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, by user group name or ID when the API key has access to that group, or by name.
      *
      * @param {Rulebricks.assets.ListRulesRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -419,10 +419,11 @@ export class RulesClient {
         request: Rulebricks.assets.ListRulesRequest = {},
         requestOptions?: RulesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.RuleListResponse>> {
-        const { folder, user_group: userGroup } = request;
+        const { folder, user_group: userGroup, name } = request;
         const _queryParams: Record<string, unknown> = {
             folder,
             user_group: userGroup,
+            name,
         };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(

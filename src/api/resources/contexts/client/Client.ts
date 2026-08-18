@@ -63,7 +63,10 @@ export class ContextsClient {
         request: Rulebricks.GetContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ContextInstanceState>> {
-        const { slug, instance } = request;
+        const { slug, instance, include_relations: includeRelations } = request;
+        const _queryParams: Record<string, unknown> = {
+            include_relations: includeRelations,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -79,7 +82,11 @@ export class ContextsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -465,100 +472,7 @@ export class ContextsClient {
     }
 
     /**
-     * Execute a specific rule using the context instance's state as input.
-     *
-     * @param {Rulebricks.SolveContextsRequest} request
-     * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @throws {@link Rulebricks.BadRequestError}
-     * @throws {@link Rulebricks.NotFoundError}
-     * @throws {@link Rulebricks.InternalServerError}
-     *
-     * @example
-     *     await client.contexts.solve({
-     *         slug: "customer",
-     *         instance: "cust-12345",
-     *         ruleSlug: "eligibility-check",
-     *         body: {}
-     *     })
-     */
-    public solve(
-        request: Rulebricks.SolveContextsRequest,
-        requestOptions?: ContextsClient.RequestOptions,
-    ): core.HttpResponsePromise<Rulebricks.SolveContextRuleResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__solve(request, requestOptions));
-    }
-
-    private async __solve(
-        request: Rulebricks.SolveContextsRequest,
-        requestOptions?: ContextsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Rulebricks.SolveContextRuleResponse>> {
-        const { slug, instance, ruleSlug, body: _body } = request;
-        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
-        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            _authRequest.headers,
-            this._options?.headers,
-            requestOptions?.headers,
-        );
-        const _response = await core.fetcher({
-            url: core.url.join(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.RulebricksEnvironment.Default,
-                `contexts/${core.url.encodePathParam(slug)}/${core.url.encodePathParam(instance)}/solve/${core.url.encodePathParam(ruleSlug)}`,
-            ),
-            method: "POST",
-            headers: _headers,
-            contentType: "application/json",
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
-            requestType: "json",
-            body: _body,
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
-            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
-            abortSignal: requestOptions?.abortSignal,
-            fetchFn: this._options?.fetch,
-            logging: this._options.logging,
-        });
-        if (_response.ok) {
-            return { data: _response.body as Rulebricks.SolveContextRuleResponse, rawResponse: _response.rawResponse };
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 400:
-                    throw new Rulebricks.BadRequestError(
-                        _response.error.body as Rulebricks.Error_,
-                        _response.rawResponse,
-                    );
-                case 404:
-                    throw new Rulebricks.NotFoundError(
-                        _response.error.body as Rulebricks.Error_,
-                        _response.rawResponse,
-                    );
-                case 500:
-                    throw new Rulebricks.InternalServerError(
-                        _response.error.body as Rulebricks.Error_,
-                        _response.rawResponse,
-                    );
-                default:
-                    throw new errors.RulebricksError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                        rawResponse: _response.rawResponse,
-                    });
-            }
-        }
-
-        return handleNonStatusCodeError(
-            _response.error,
-            _response.rawResponse,
-            "POST",
-            "/contexts/{slug}/{instance}/solve/{ruleSlug}",
-        );
-    }
-
-    /**
-     * Trigger re-evaluation of all bound rules and flows for the instance.
+     * Re-evaluate registered pending rule and flow executions for this instance after their fact or relationship dependencies may have become available. This does not run every bound asset.
      *
      * @param {Rulebricks.CascadeContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -644,35 +558,44 @@ export class ContextsClient {
     }
 
     /**
-     * Execute a specific flow using the context instance's state as input.
+     * Submit an array of records to any context in one synchronous call. Records merge into their context instances (matched by the context's identity fact), bound rules and flows whose inputs became satisfied execute, and the response returns the resolved state of every touched instance. Retries are always safe: merges are idempotent and executions are deduplicated by input hash. Fact history is recorded for tracked facts exactly as on individual writes. Clients chunk large datasets across requests. On the cloud platform, a batch may not exceed the plan's remaining monthly rule executions (402 above it) or a 4.5MB request body, and executed rules count toward plan usage. Private (self-hosted) deployments run batches through the high-performance server with no plan gating, a 10,000-records-per-request default cap (CONTEXT_BATCH_MAX_ITEMS), and NDJSON support (Content-Type: application/x-ndjson).
      *
-     * @param {Rulebricks.ExecuteContextsRequest} request
+     * @param {Rulebricks.BulkIngestContextsRequest} request
      * @param {ContextsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.PaymentRequiredError}
      * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.ContentTooLargeError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
-     *     await client.contexts.execute({
-     *         slug: "customer",
-     *         instance: "cust-12345",
-     *         flowSlug: "onboarding-flow",
-     *         body: {}
+     *     await client.contexts.bulkIngest({
+     *         slug: "loan-application",
+     *         body: [{
+     *                 "loan_id": "APP-1",
+     *                 "amount": 12000
+     *             }, {
+     *                 "loan_id": "APP-2",
+     *                 "amount": 7300
+     *             }]
      *     })
      */
-    public execute(
-        request: Rulebricks.ExecuteContextsRequest,
+    public bulkIngest(
+        request: Rulebricks.BulkIngestContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
-    ): core.HttpResponsePromise<Rulebricks.SolveContextFlowResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__execute(request, requestOptions));
+    ): core.HttpResponsePromise<Rulebricks.ContextBatchResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__bulkIngest(request, requestOptions));
     }
 
-    private async __execute(
-        request: Rulebricks.ExecuteContextsRequest,
+    private async __bulkIngest(
+        request: Rulebricks.BulkIngestContextsRequest,
         requestOptions?: ContextsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Rulebricks.SolveContextFlowResponse>> {
-        const { slug, instance, flowSlug, body: _body } = request;
+    ): Promise<core.WithRawResponse<Rulebricks.ContextBatchResponse>> {
+        const { slug, include, body: _body } = request;
+        const _queryParams: Record<string, unknown> = {
+            include,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -684,12 +607,16 @@ export class ContextsClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.RulebricksEnvironment.Default,
-                `contexts/${core.url.encodePathParam(slug)}/${core.url.encodePathParam(instance)}/flows/${core.url.encodePathParam(flowSlug)}`,
+                `contexts/batch/${core.url.encodePathParam(slug)}`,
             ),
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             requestType: "json",
             body: _body,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
@@ -699,7 +626,7 @@ export class ContextsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Rulebricks.SolveContextFlowResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Rulebricks.ContextBatchResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -709,8 +636,18 @@ export class ContextsClient {
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
+                case 402:
+                    throw new Rulebricks.PaymentRequiredError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Rulebricks.NotFoundError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 413:
+                    throw new Rulebricks.ContentTooLargeError(
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
@@ -728,11 +665,6 @@ export class ContextsClient {
             }
         }
 
-        return handleNonStatusCodeError(
-            _response.error,
-            _response.rawResponse,
-            "POST",
-            "/contexts/{slug}/{instance}/flows/{flowSlug}",
-        );
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/contexts/batch/{slug}");
     }
 }

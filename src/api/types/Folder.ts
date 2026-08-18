@@ -7,10 +7,22 @@ export interface Folder {
     name?: string | undefined;
     /** Description of the folder. */
     description?: string | undefined;
+    /** The type of assets the folder organizes. */
+    type?: Folder.Type | undefined;
     /** Timestamp of when the folder was created. */
     created_at?: string | undefined;
     /** Timestamp of when the folder was last updated. */
     updated_at?: string | undefined;
     /** User groups that can view this folder. */
     user_groups?: string[] | undefined;
+}
+
+export namespace Folder {
+    /** The type of assets the folder organizes. */
+    export const Type = {
+        Rule: "rule",
+        Flow: "flow",
+        Context: "context",
+    } as const;
+    export type Type = (typeof Type)[keyof typeof Type];
 }

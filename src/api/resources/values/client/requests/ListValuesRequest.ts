@@ -7,8 +7,20 @@
  *     }
  */
 export interface ListValuesRequest {
-    /** Query all dynamic values containing a specific name */
+    /** Query all vocabulary values containing a specific name */
     name?: string;
+    /** Only return values whose name starts with this collection prefix (e.g. 'Countries.'). */
+    prefix?: string;
+    /** Only return values of this type (string, number, boolean, list, date, function). */
+    type?: string;
+    /** Page size (default 100, max 1000). Providing limit or cursor switches the response to the paginated { data, next_cursor } envelope. */
+    limit?: number;
+    /** Opaque pagination cursor from a previous page's next_cursor. */
+    cursor?: string;
+    /** Filter results by user group name or ID. The value is validated against workspace groups. Admin/unrestricted API keys can request any group-specific view; restricted API keys may only filter to one of their assigned groups and receive a 403 when filtering outside those groups. */
+    user_group?: string;
     /** Comma-separated list of additional data to include. Use 'usage' to include which rules reference each value. */
     include?: string;
+    /** By default, payloads containing value-to-value references are returned materialized (references replaced with their resolved values). Pass 'false' to return stored payloads as-is, with { "$rb": "globalValue", "id": "..." } reference markers intact, so the reference graph round-trips. */
+    resolve?: boolean;
 }

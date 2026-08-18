@@ -4,6 +4,8 @@ import { AssetsClient } from "./api/resources/assets/client/Client.js";
 import { ContextsClient } from "./api/resources/contexts/client/Client.js";
 import { DecisionsClient } from "./api/resources/decisions/client/Client.js";
 import { FlowsClient } from "./api/resources/flows/client/Client.js";
+import { InfraClient } from "./api/resources/infra/client/Client.js";
+import { ObjectsClient } from "./api/resources/objects/client/Client.js";
 import { RulesClient } from "./api/resources/rules/client/Client.js";
 import { TestsClient } from "./api/resources/tests/client/Client.js";
 import { UsersClient } from "./api/resources/users/client/Client.js";
@@ -21,11 +23,13 @@ export declare namespace RulebricksClient {
 export class RulebricksClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<RulebricksClient.Options>;
     protected _rules: RulesClient | undefined;
+    protected _infra: InfraClient | undefined;
     protected _flows: FlowsClient | undefined;
     protected _decisions: DecisionsClient | undefined;
     protected _users: UsersClient | undefined;
     protected _assets: AssetsClient | undefined;
     protected _values: ValuesClient | undefined;
+    protected _objects: ObjectsClient | undefined;
     protected _contexts: ContextsClient | undefined;
     protected _tests: TestsClient | undefined;
 
@@ -35,6 +39,10 @@ export class RulebricksClient {
 
     public get rules(): RulesClient {
         return (this._rules ??= new RulesClient(this._options));
+    }
+
+    public get infra(): InfraClient {
+        return (this._infra ??= new InfraClient(this._options));
     }
 
     public get flows(): FlowsClient {
@@ -55,6 +63,10 @@ export class RulebricksClient {
 
     public get values(): ValuesClient {
         return (this._values ??= new ValuesClient(this._options));
+    }
+
+    public get objects(): ObjectsClient {
+        return (this._objects ??= new ObjectsClient(this._options));
     }
 
     public get contexts(): ContextsClient {

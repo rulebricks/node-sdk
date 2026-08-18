@@ -23,8 +23,9 @@ export class ObjectsClient {
     }
 
     /**
-     * Retrieve all contexts for the authenticated user.
+     * Retrieve all contexts for the authenticated user. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, by user group name or ID when the API key has access to that group, or by name.
      *
+     * @param {Rulebricks.contexts.ListObjectsRequest} request
      * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.InternalServerError}
@@ -33,14 +34,22 @@ export class ObjectsClient {
      *     await client.contexts.objects.list()
      */
     public list(
+        request: Rulebricks.contexts.ListObjectsRequest = {},
         requestOptions?: ObjectsClient.RequestOptions,
     ): core.HttpResponsePromise<Rulebricks.ContextListResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__list(request, requestOptions));
     }
 
     private async __list(
+        request: Rulebricks.contexts.ListObjectsRequest = {},
         requestOptions?: ObjectsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.ContextListResponse>> {
+        const { folder, user_group: userGroup, name } = request;
+        const _queryParams: Record<string, unknown> = {
+            folder,
+            user_group: userGroup,
+            name,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -56,7 +65,11 @@ export class ObjectsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -93,21 +106,26 @@ export class ObjectsClient {
      * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.ConflictError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
      *     await client.contexts.objects.create({
      *         name: "Customer",
      *         description: "Represents a customer in the system",
-     *         schema: [{
-     *                 key: "email",
-     *                 name: "Email",
-     *                 type: "string"
-     *             }, {
-     *                 key: "age",
-     *                 name: "Age",
-     *                 type: "number"
-     *             }],
+     *         schema: {
+     *             base: [{
+     *                     key: "email",
+     *                     name: "Email",
+     *                     type: "string",
+     *                     required: true
+     *                 }, {
+     *                     key: "age",
+     *                     name: "Age",
+     *                     type: "number"
+     *                 }],
+     *             derived: []
+     *         },
      *         identity_fact: "email"
      *     })
      */
@@ -155,6 +173,11 @@ export class ObjectsClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Rulebricks.ConflictError(
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );

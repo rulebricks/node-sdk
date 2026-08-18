@@ -21,6 +21,8 @@ export interface ExportManifestRequest {
     manifest_description?: string;
     /** If true, returns a preview of what would be exported without the full data. */
     preview_only?: boolean;
+    /** If true, the manifest in the response is returned in compressed form: the JSON array produced by the compress-json library instead of a plain object. Compressed manifests are substantially smaller, can be saved directly as a .rbm file, and are accepted by the import endpoint as-is. Intended for raw HTTP usage and file tooling; typed SDK clients should omit this flag, since the generated response type models the manifest as an object. */
+    compress?: boolean;
 }
 
 export namespace ExportManifestRequest {

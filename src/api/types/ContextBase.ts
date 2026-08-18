@@ -12,25 +12,22 @@ export interface ContextBase {
     slug?: string | undefined;
     /** The description of the context. */
     description?: string | undefined;
-    /** When true, bound rules and flows automatically execute when their inputs are satisfied. When false, users must manually call /solve or /flows endpoints. */
+    /** When true, bound rules and flows automatically execute when their inputs are satisfied. When false, callers must execute them explicitly via /contexts/{slug}/{instance}/solve/{ruleSlug} or /contexts/{slug}/{instance}/flows/{flowSlug}. */
     auto_execute_decisions?: boolean | undefined;
     /** Time-to-live in seconds for live context instances. Instances expire after this duration. */
     ttl_seconds?: (number | null) | undefined;
     /** Maximum number of history entries to retain per field. */
     history_limit?: number | undefined;
-    /** How to handle fields that don't match the schema: 'ignore' filters them out, 'reject' returns an error. */
+    /** How to handle submitted fields that don't match the schema: `ignore` drops them, `reject` fails the request (or batch item), and `store` persists them alongside declared facts. */
     on_schema_mismatch?: ContextBase.OnSchemaMismatch | undefined;
-    /** Webhook URL called when a rule or flow successfully solves for a live context. */
-    webhook_on_solve?: (string | null) | undefined;
-    /** Webhook URL called when a live context expires due to TTL. */
-    webhook_on_expire?: (string | null) | undefined;
 }
 
 export namespace ContextBase {
-    /** How to handle fields that don't match the schema: 'ignore' filters them out, 'reject' returns an error. */
+    /** How to handle submitted fields that don't match the schema: `ignore` drops them, `reject` fails the request (or batch item), and `store` persists them alongside declared facts. */
     export const OnSchemaMismatch = {
         Ignore: "ignore",
         Reject: "reject",
+        Store: "store",
     } as const;
     export type OnSchemaMismatch = (typeof OnSchemaMismatch)[keyof typeof OnSchemaMismatch];
 }

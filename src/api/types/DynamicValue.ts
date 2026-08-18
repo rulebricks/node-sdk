@@ -3,23 +3,25 @@
 import type * as Rulebricks from "../index.js";
 
 export interface DynamicValue {
-    /** Unique identifier for the dynamic value. */
+    /** Unique identifier for the vocabulary value. */
     id: string;
-    /** Name of the dynamic value (may include dot notation for nested properties). */
+    /** Name of the vocabulary value (may include dot notation for nested properties). */
     name: string;
     /** Type identifier for the value (e.g., 'string', 'number', 'boolean', 'list', 'function', etc.) */
     type: string;
-    /** The actual value - can be any valid JSON type */
+    /** The actual value - can be any valid JSON type. Materialized by default when the payload contains value-to-value references; with resolve=false the stored payload is returned as-is, with ValueReference markers intact. */
     value?: DynamicValue.Value | undefined;
-    /** Rules that use this dynamic value (only included when 'include=usage' parameter is used). */
+    /** Rules that use this vocabulary value (only included when 'include=usage' parameter is used). */
     usages?: Rulebricks.RuleUsage[] | undefined;
     /** User groups assigned to this value. */
     user_groups?: string[] | undefined;
+    /** Arbitrary metadata attached to this value (set via metadata_by_name on writes). System-managed values carry provenance here (e.g. the object that generated them). */
+    metadata?: Record<string, unknown> | undefined;
 }
 
 export namespace DynamicValue {
     /**
-     * The actual value - can be any valid JSON type
+     * The actual value - can be any valid JSON type. Materialized by default when the payload contains value-to-value references; with resolve=false the stored payload is returned as-is, with ValueReference markers intact.
      */
     export type Value = string | number | boolean | unknown[] | Record<string, unknown>;
 }

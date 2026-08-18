@@ -56,8 +56,8 @@ export class Vocabulary {
             return cachedValue;
         }
 
-        const values = await this.workspace.values.list();
-        const value = values.find((v: DynamicValueModel) => v.name === name);
+        const values = await this.workspace.values.list({ name });
+        const value = (values as any).find((v: DynamicValueModel) => v.name === name);
 
         if (!value) {
             throw new VocabularyValueNotFoundError(`Vocabulary value '${name}' not found`);

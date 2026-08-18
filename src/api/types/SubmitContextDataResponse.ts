@@ -8,7 +8,7 @@ import type * as Rulebricks from "../index.js";
 export interface SubmitContextDataResponse {
     /** Combined identifier in format 'contextSlug:instanceId'. */
     context?: string | undefined;
-    /** The merged state after submitting data and any auto-executed rules/flows. */
+    /** The merged state after submitting data and any auto-executed rules/flows. Includes derived facts inline (unlike GET, which reports them separately under `derived`). */
     state?: Record<string, unknown> | undefined;
     /** Whether all required fields are present ('complete') or some are missing ('pending'). */
     status?: SubmitContextDataResponse.Status | undefined;
@@ -20,8 +20,8 @@ export interface SubmitContextDataResponse {
     is_new?: boolean | undefined;
     /** When the instance will expire based on context TTL. */
     expires_at?: (string | null) | undefined;
-    /** Results from auto-executed rules/flows and pending evaluation cascades. */
-    cascaded?: Rulebricks.CascadeResult[] | undefined;
+    /** Results from auto-executed rules/flows and pending evaluation cascades, plus summaries when a relationship change re-evaluated dependent contexts. */
+    cascaded?: SubmitContextDataResponse.Cascaded.Item[] | undefined;
 }
 
 export namespace SubmitContextDataResponse {
@@ -31,4 +31,9 @@ export namespace SubmitContextDataResponse {
         Pending: "pending",
     } as const;
     export type Status = (typeof Status)[keyof typeof Status];
+    export type Cascaded = Cascaded.Item[];
+
+    export namespace Cascaded {
+        export type Item = Rulebricks.CascadeResult | Rulebricks.ContextCascadeSummary;
+    }
 }
