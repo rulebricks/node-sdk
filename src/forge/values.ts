@@ -56,21 +56,44 @@ export class Vocabulary {
             return cachedValue;
         }
 
-        const values = await this.workspace.values.list({ name });
-        const value = (values as any).find((v: DynamicValueModel) => v.name === name);
+        let cursor: string | undefined;
+        let value: DynamicValueModel | undefined;
+        const seenCursors = new Set<string>();
+
+        while (true) {
+            const response = await this.workspace.values.list({
+                name,
+                limit: 1000,
+                ...(cursor ? { cursor } : {}),
+            });
+            const values = Array.isArray(response) ? response : Array.isArray(response.data) ? response.data : [];
+
+            value = values.find((candidate: DynamicValueModel) => candidate.name === name);
+            if (value || Array.isArray(response)) {
+                break;
+            }
+
+            const nextCursor = response.next_cursor || undefined;
+            if (!nextCursor || seenCursors.has(nextCursor)) {
+                break;
+            }
+
+            seenCursors.add(nextCursor);
+            cursor = nextCursor;
+        }
 
         if (!value) {
             throw new VocabularyValueNotFoundError(`Vocabulary value '${name}' not found`);
         }
 
-        try {
-            const valueType = value.type || "string";
-            const vocabularyValue = new VocabularyValue(value.id || "", name, valueType as VocabularyValueType);
-            this.cache.set(name, vocabularyValue);
-            return vocabularyValue;
-        } catch (error) {
+        const valueType = value.type || "string";
+        if (!Object.values(VocabularyValueType).includes(valueType as VocabularyValueType)) {
             throw new Error(`Invalid type '${value.type}' for vocabulary value '${name}'`);
         }
+
+        const vocabularyValue = new VocabularyValue(value.id || "", name, valueType as VocabularyValueType);
+        this.cache.set(name, vocabularyValue);
+        return vocabularyValue;
     }
 
     static async set(

@@ -6,7 +6,7 @@
 export interface WorkspaceObject {
     /** Unique identifier for the object. */
     id: string;
-    /** Display name (unique in practice per workspace). */
+    /** Display name (unique in practice per workspace). Changing it does not move managed collection paths, which derive from schema field keys. */
     name: string;
     /** The object's JSON Schema, as a string. */
     content: string;
@@ -14,12 +14,31 @@ export interface WorkspaceObject {
     schema_type?: (string | null) | undefined;
     /** Original import format ('json', 'csv', or 'ddl'). */
     source_format?: (string | null) | undefined;
-    /** Flattened field descriptors derived from the schema. */
-    parsed_fields?: Record<string, unknown>[] | undefined;
+    /** Flattened field descriptors derived from the schema. Fields inside arrays of objects use an item-relative key (for example, 'status'), a scope naming the containing array (for example, 'boss'), and a schemaPath for locating the field in the source schema (for example, 'boss[].status'). The object remains a single stored API resource. */
+    parsed_fields?: WorkspaceObject.ParsedFields.Item[] | undefined;
     /** User groups this object (and every value it generates) is visible to. Empty means workspace-wide. */
     user_groups?: string[] | undefined;
     /** Present when the object is archived. */
     archived_at?: string | undefined;
     created_at?: string | undefined;
     updated_at?: string | undefined;
+}
+
+export namespace WorkspaceObject {
+    export type ParsedFields = ParsedFields.Item[];
+
+    export namespace ParsedFields {
+        export interface Item {
+            /** Rule-facing field key. Array-item fields use a key relative to their scope and never include [] notation. */
+            key?: string | undefined;
+            /** Containing array path for a derived item field. Omitted for root fields. */
+            scope?: (string | null) | undefined;
+            /** Source-schema path used for editing and enum collection derivation; may include [] markers. */
+            schemaPath?: (string | null) | undefined;
+            /** Display-only, fully qualified label for an array-item scope, including the stored object name and every nesting level (for example, 'Inventory Warehouses Cars'). It does not identify a stored object or control managed collection paths; those derive from schema field keys/schemaPath. */
+            derivedObjectName?: (string | null) | undefined;
+            /** Accepts any additional properties */
+            [key: string]: any;
+        }
+    }
 }

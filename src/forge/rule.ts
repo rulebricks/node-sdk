@@ -312,7 +312,7 @@ export class Rule {
     private publishedRequestSchema: any[] | null = null;
     private publishedResponseSchema: any[] | null = null;
     private publishedConditions: any[] | null = null;
-    private publishedGroups: Record<string, any> | null = {};
+    private publishedGroups: Record<string, any> | null = null;
 
     private history: any[] = [];
     private form: any | null = null;
@@ -674,9 +674,11 @@ export class Rule {
         if (!this.workspace) {
             throw new Error("A Rulebricks client is required to load a rule from the workspace");
         }
-        const ruleData = await this.workspace.assets.rules.pull({ id: ruleId });
+        const workspace = this.workspace;
+        const ruleData = await workspace.assets.rules.pull({ id: ruleId });
         const rule = Rule.fromJSON(ruleData);
         Object.assign(this, rule);
+        this.workspace = workspace;
         return this;
     }
 
@@ -711,7 +713,7 @@ export class Rule {
         };
 
         const fields = Object.entries(this.fields).map(([name, field]) => ({
-            name: caseAndSpace(name),
+            name: field.name === name ? caseAndSpace(name) : field.name,
             key: field.key || name,
             type: field.type,
             description: field.description,
@@ -720,7 +722,7 @@ export class Rule {
         }));
 
         const responseFields = Object.entries(this.responseFields).map(([name, field]) => ({
-            name: caseAndSpace(name),
+            name: field.name === name ? caseAndSpace(name) : field.name,
             key: field.key || name,
             type: field.type,
             description: field.description,
@@ -728,7 +730,7 @@ export class Rule {
             show: true,
         }));
 
-        return {
+        const ruleData: RuleImportPayload = {
             id: this.id,
             name: this.name,
             description: this.description,
@@ -743,19 +745,31 @@ export class Rule {
             responseSchema: responseFields,
             conditions: this.conditions,
             testSuite: this.testSuite.map((test) => test.toDict()),
-            published_requestSchema: this.publishedRequestSchema,
-            published_responseSchema: this.publishedResponseSchema,
-            published_conditions: this.publishedConditions,
-            published_groups: this.publishedGroups,
             form: this.form,
             history: this.history,
             published: this.published,
             sampleRequest: sampleRequest,
             sampleResponse: sampleResponse,
-            testRequest: this.testRequest,
+            testRequest:
+                this.testRequest && Object.keys(this.testRequest).length > 0 ? this.testRequest : sampleRequest,
             groups: this.groups,
             no_conditions: this.conditions.length,
         };
+
+        if (this.publishedRequestSchema !== null) {
+            ruleData.published_requestSchema = this.publishedRequestSchema;
+        }
+        if (this.publishedResponseSchema !== null) {
+            ruleData.published_responseSchema = this.publishedResponseSchema;
+        }
+        if (this.publishedConditions !== null) {
+            ruleData.published_conditions = this.publishedConditions;
+        }
+        if (this.publishedGroups !== null) {
+            ruleData.published_groups = this.publishedGroups;
+        }
+
+        return ruleData;
     }
 
     toJSON(): string {
@@ -775,24 +789,37 @@ export class Rule {
         const jsonData = typeof data === "string" ? JSON.parse(data) : data;
         const rule = new Rule();
 
-        rule.id = jsonData.id;
-        rule.name = jsonData.name;
-        rule.description = jsonData.description;
-        rule.folderId = jsonData.tag;
-        rule.slug = jsonData.slug;
-        rule.createdAt = jsonData.createdAt;
-        rule.updatedAt = jsonData.updatedAt;
-        rule.updatedBy = jsonData.updatedBy;
-        rule.settings = jsonData.settings;
-        rule.accessGroups = jsonData.accessGroups;
-        rule.conditions = jsonData.conditions;
-        rule.publishedRequestSchema = jsonData.publishedRequestSchema || null;
-        rule.publishedResponseSchema = jsonData.publishedResponseSchema || null;
-        rule.publishedConditions = jsonData.publishedConditions || null;
-        rule.publishedGroups = jsonData.publishedGroups || {};
-        rule.form = jsonData.form || null;
+        rule.id = jsonData.id ?? rule.id;
+        rule.name = jsonData.name ?? rule.name;
+        rule.description = jsonData.description ?? rule.description;
+        rule.folderId = jsonData.tag ?? null;
+        rule.slug = jsonData.slug ?? rule.slug;
+        rule.createdAt = jsonData.createdAt ?? rule.createdAt;
+        rule.updatedAt = jsonData.updatedAt ?? rule.updatedAt;
+        rule.updatedBy = jsonData.updatedBy ?? rule.updatedBy;
+        rule.settings = jsonData.settings || rule.settings;
+        rule.accessGroups = jsonData.accessGroups || [];
+        rule.conditions = jsonData.conditions || [];
+
+        const readPublishedSnapshot = (snakeCaseKey: string, camelCaseKey: string): any => {
+            if (Object.prototype.hasOwnProperty.call(jsonData, snakeCaseKey)) {
+                return jsonData[snakeCaseKey] ?? null;
+            }
+            if (Object.prototype.hasOwnProperty.call(jsonData, camelCaseKey)) {
+                return jsonData[camelCaseKey] ?? null;
+            }
+            return null;
+        };
+
+        rule.publishedRequestSchema = readPublishedSnapshot("published_requestSchema", "publishedRequestSchema");
+        rule.publishedResponseSchema = readPublishedSnapshot("published_responseSchema", "publishedResponseSchema");
+        rule.publishedConditions = readPublishedSnapshot("published_conditions", "publishedConditions");
+        rule.publishedGroups = readPublishedSnapshot("published_groups", "publishedGroups");
+        rule.form = jsonData.form ?? null;
         rule.history = jsonData.history || [];
-        rule.published = jsonData.published;
+        rule.published = jsonData.published ?? false;
+        rule.sampleRequest = jsonData.sampleRequest || {};
+        rule.sampleResponse = jsonData.sampleResponse || {};
         rule.testRequest = jsonData.testRequest || {};
         rule.groups = jsonData.groups || {};
 
@@ -805,31 +832,55 @@ export class Rule {
             return titleCase.replace(/_/g, " ").replace(/[^a-zA-Z0-9 ]/g, "");
         };
 
+        const hydrateField = (fieldData: any): Field | null => {
+            const key = fieldData.key ?? fieldData.name;
+            if (typeof key !== "string") {
+                return null;
+            }
+
+            const name = fieldData.name || caseAndSpace(key);
+            const description = fieldData.description || "";
+            let field: Field;
+
+            switch (fieldData.type) {
+                case RuleType.BOOLEAN:
+                    field = new BooleanField(name, description, fieldData.defaultValue);
+                    break;
+                case RuleType.NUMBER:
+                    field = new NumberField(name, description, fieldData.defaultValue);
+                    break;
+                case RuleType.STRING:
+                    field = new StringField(name, description, fieldData.defaultValue);
+                    break;
+                case RuleType.DATE:
+                    field = new DateField(name, description, fieldData.defaultValue);
+                    break;
+                case RuleType.LIST:
+                    field = new ListField(name, description, fieldData.defaultValue);
+                    break;
+                default:
+                    return null;
+            }
+
+            return Object.assign(field, { key });
+        };
+
         // Convert request schema to fields
-        jsonData.requestSchema.forEach((fieldData: any) => {
-            const field = {
-                key: fieldData.key,
-                // start case and replace underscores and any special characters with spaces
-                name: fieldData.name || caseAndSpace(fieldData.key),
-                type: fieldData.type,
-                description: fieldData.description,
-                defaultValue: fieldData.defaultValue,
-                operators: {},
-            } as Field;
-            rule.fields[fieldData.name] = field;
+        const requestSchema = Array.isArray(jsonData.requestSchema) ? jsonData.requestSchema : [];
+        requestSchema.forEach((fieldData: any) => {
+            const field = hydrateField(fieldData);
+            if (field) {
+                rule.fields[field.key as string] = field;
+            }
         });
 
         // Convert response schema to fields
-        jsonData.responseSchema.forEach((fieldData: any) => {
-            const field = {
-                key: fieldData.key,
-                name: fieldData.name || caseAndSpace(fieldData.key),
-                type: fieldData.type,
-                description: fieldData.description,
-                defaultValue: fieldData.defaultValue,
-                operators: {},
-            } as Field;
-            rule.responseFields[fieldData.name] = field;
+        const responseSchema = Array.isArray(jsonData.responseSchema) ? jsonData.responseSchema : [];
+        responseSchema.forEach((fieldData: any) => {
+            const field = hydrateField(fieldData);
+            if (field) {
+                rule.responseFields[field.key as string] = field;
+            }
         });
 
         // Convert test suite
@@ -871,9 +922,7 @@ export class Rule {
             // Add request conditions
             Object.keys(this.fields).forEach((fieldName) => {
                 const cond = condition.request[fieldName];
-                row.push(
-                    cond ? `${cond.op} ${cond.args.map((arg) => this.formatTableValue(arg)).join(", ")}` : "-"
-                );
+                row.push(cond ? `${cond.op} ${cond.args.map((arg) => this.formatTableValue(arg)).join(", ")}` : "-");
             });
 
             // Add response

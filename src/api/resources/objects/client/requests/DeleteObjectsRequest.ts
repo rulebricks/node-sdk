@@ -11,6 +11,6 @@ import type * as Rulebricks from "../../../../index.js";
 export interface DeleteObjectsRequest {
     /** Object ID or exact name */
     objectId: string;
-    /** What happens to the values this object generated: 'archive' (default) or 'detach'. */
+    /** What happens to generated values: 'archive' (default) permanently deletes unused values and archives referenced values; 'detach' retains all values as active ordinary values. */
     values?: Rulebricks.DeleteObjectsRequestValues;
 }

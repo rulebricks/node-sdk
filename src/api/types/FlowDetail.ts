@@ -7,6 +7,7 @@ export interface FlowDetail extends Rulebricks.FlowBase {
     published?: boolean | undefined;
     /** The date this flow was last updated. */
     updated_at?: string | undefined;
+    labels?: Rulebricks.AssetLabels | undefined;
     /** The origin rule that this flow starts from. Flows execute starting from this rule's outputs. */
     origin_rule?: (FlowDetail.OriginRule | null) | undefined;
     /** The context this flow is bound to (via its origin rule). Flows inherit context binding from their origin rule. */

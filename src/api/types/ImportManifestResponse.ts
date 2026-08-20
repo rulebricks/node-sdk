@@ -7,7 +7,7 @@ export interface ImportManifestResponse {
     created?: ImportManifestResponse.Created.Item[] | undefined;
     /** Assets that were updated during import. */
     updated?: ImportManifestResponse.Updated.Item[] | undefined;
-    /** Assets that were skipped during import. */
+    /** Assets that were skipped during import. Object-managed values are listed here with a reason such as 'Collection is managed by a workspace object' or 'Value is managed by a workspace object'; they do not cause a whole-import 409. */
     skipped?: ImportManifestResponse.Skipped.Item[] | undefined;
     /** Any errors encountered during import. */
     errors?: ImportManifestResponse.Errors.Item[] | undefined;

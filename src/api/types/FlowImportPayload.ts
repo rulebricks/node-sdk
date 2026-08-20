@@ -10,6 +10,7 @@ export interface FlowImportPayload {
     name: string;
     /** Optional flow description. */
     description?: (string | null) | undefined;
+    labels?: Rulebricks.AssetLabels | undefined;
     /** The flow's nodes. Exactly one must be an `origin`. */
     nodes: Rulebricks.RulebricksFlowNode[];
     /** Property and control connections between node refs. */

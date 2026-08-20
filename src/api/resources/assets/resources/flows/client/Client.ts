@@ -23,7 +23,7 @@ export class FlowsClient {
     }
 
     /**
-     * List all flows in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, by user group name or ID when the API key has access to that group, or by name.
+     * List all flows in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, labels, user group name or ID when the API key has access to that group, or by name.
      *
      * @param {Rulebricks.assets.ListFlowsRequest} request
      * @param {FlowsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -44,9 +44,10 @@ export class FlowsClient {
         request: Rulebricks.assets.ListFlowsRequest = {},
         requestOptions?: FlowsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.FlowListResponse>> {
-        const { folder, user_group: userGroup, name } = request;
+        const { folder, labels, user_group: userGroup, name } = request;
         const _queryParams: Record<string, unknown> = {
             folder,
+            labels,
             user_group: userGroup,
             name,
         };
@@ -68,6 +69,7 @@ export class FlowsClient {
             queryString: core.url
                 .queryBuilder()
                 .addMany(_queryParams)
+                .add("labels", _queryParams.labels, { style: "comma" })
                 .mergeAdditional(requestOptions?.queryParams)
                 .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,

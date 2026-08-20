@@ -31,6 +31,8 @@ export class ValuesClient {
      * @param {Rulebricks.ListValuesRequest} request
      * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
@@ -93,6 +95,16 @@ export class ValuesClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Rulebricks.BadRequestError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Rulebricks.NotFoundError(
                         _response.error.body as Rulebricks.Error_,
@@ -116,13 +128,14 @@ export class ValuesClient {
     }
 
     /**
-     * Update existing vocabulary values or add new ones for the authenticated user. Supports both flat and nested object structures. Nested objects are automatically flattened using dot notation with keys preserved exactly as sent (e.g. nested 'user_profile.first_name' becomes the value name 'user_profile.first_name'). Writes are set-based upserts keyed by value name - existing values keep their ids, so rule references stay valid - and each call is idempotent, so retrying a failed request is always safe. Imports of any size go through this endpoint (POST /values/bulk is an equivalent alias): drive large dictionaries as a sequence of chunked calls, each bounded by your deployment's request body limit. Payloads may compose values from other values with reference markers: { "$ref": "<value name>" } references a value by name (existing values first, then values created by the same request), and { "$rb": "globalValue", "id": "<value id>" } references by id. A scalar payload may be a single reference; list payloads may mix literal items and references. References are validated (existence, type match, cycles) before anything is written. Workspaces at or below the catalog threshold receive the full value list back (legacy behavior); larger workspaces receive summary counts ({ created, updated, processed }).
+     * Update existing vocabulary values or add new ones for the authenticated user. Supports both flat and nested object structures.
      *
      * @param {Rulebricks.UpdateValuesRequest} request
      * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
      * @throws {@link Rulebricks.ForbiddenError}
+     * @throws {@link Rulebricks.ConflictError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
@@ -238,6 +251,8 @@ export class ValuesClient {
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Rulebricks.ConflictError(_response.error.body as unknown, _response.rawResponse);
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,
@@ -262,7 +277,9 @@ export class ValuesClient {
      * @param {ValuesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.NotFoundError}
+     * @throws {@link Rulebricks.ConflictError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
@@ -322,11 +339,18 @@ export class ValuesClient {
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Rulebricks.NotFoundError(
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Rulebricks.ConflictError(_response.error.body as unknown, _response.rawResponse);
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,
@@ -430,10 +454,7 @@ export class ValuesClient {
                         _response.rawResponse,
                     );
                 case 409:
-                    throw new Rulebricks.ConflictError(
-                        _response.error.body as Rulebricks.Error_,
-                        _response.rawResponse,
-                    );
+                    throw new Rulebricks.ConflictError(_response.error.body as unknown, _response.rawResponse);
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,

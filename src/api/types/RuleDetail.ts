@@ -7,6 +7,7 @@ export interface RuleDetail extends Rulebricks.RuleBase {
     created_at?: string | undefined;
     /** The date this rule was last updated. */
     updated_at?: string | undefined;
+    labels?: Rulebricks.AssetLabels | undefined;
     /** Whether the rule is currently published. */
     published?: boolean | undefined;
     /** The number of condition rows configured for the rule. Uses the published condition count when the rule is published, otherwise the draft condition count. */

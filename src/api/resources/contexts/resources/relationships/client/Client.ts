@@ -189,10 +189,7 @@ export class RelationshipsClient {
                         _response.rawResponse,
                     );
                 case 409:
-                    throw new Rulebricks.ConflictError(
-                        _response.error.body as Rulebricks.Error_,
-                        _response.rawResponse,
-                    );
+                    throw new Rulebricks.ConflictError(_response.error.body as unknown, _response.rawResponse);
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,

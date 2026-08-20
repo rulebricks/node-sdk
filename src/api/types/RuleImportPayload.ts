@@ -16,6 +16,7 @@ export interface RuleImportPayload {
     name?: string | undefined;
     /** Rule description. */
     description?: string | undefined;
+    labels?: Rulebricks.AssetLabels | undefined;
     /** Creation timestamp. */
     createdAt?: string | undefined;
     /** Last update timestamp. */

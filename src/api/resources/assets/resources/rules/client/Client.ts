@@ -386,10 +386,7 @@ export class RulesClient {
                         _response.rawResponse,
                     );
                 case 409:
-                    throw new Rulebricks.ConflictError(
-                        _response.error.body as Rulebricks.Error_,
-                        _response.rawResponse,
-                    );
+                    throw new Rulebricks.ConflictError(_response.error.body as unknown, _response.rawResponse);
                 case 422:
                     throw new Rulebricks.UnprocessableEntityError(
                         _response.error.body as Rulebricks.Error_,
@@ -413,7 +410,7 @@ export class RulesClient {
     }
 
     /**
-     * List all rules in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, by user group name or ID when the API key has access to that group, or by name.
+     * List all rules in the organization. Results are scoped to the API key holder's user groups. Optionally filter by folder name or ID, labels, user group name or ID when the API key has access to that group, or by name.
      *
      * @param {Rulebricks.assets.ListRulesRequest} request
      * @param {RulesClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -437,9 +434,10 @@ export class RulesClient {
         request: Rulebricks.assets.ListRulesRequest = {},
         requestOptions?: RulesClient.RequestOptions,
     ): Promise<core.WithRawResponse<Rulebricks.RuleListResponse>> {
-        const { folder, user_group: userGroup, name } = request;
+        const { folder, labels, user_group: userGroup, name } = request;
         const _queryParams: Record<string, unknown> = {
             folder,
+            labels,
             user_group: userGroup,
             name,
         };
@@ -461,6 +459,7 @@ export class RulesClient {
             queryString: core.url
                 .queryBuilder()
                 .addMany(_queryParams)
+                .add("labels", _queryParams.labels, { style: "comma" })
                 .mergeAdditional(requestOptions?.queryParams)
                 .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,

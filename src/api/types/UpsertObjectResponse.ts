@@ -3,6 +3,8 @@
 import type * as Rulebricks from "../index.js";
 
 export interface UpsertObjectResponse {
+    /** Present and true for a dry-run response; no object or managed values were written. */
+    dry_run?: boolean | undefined;
     /** True when the object was created by this call. */
     created?: boolean | undefined;
     object?: Rulebricks.WorkspaceObject | undefined;

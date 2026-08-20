@@ -98,7 +98,7 @@ export class AssetsClient {
     }
 
     /**
-     * Import rules, flows, contexts, and values from an Rulebricks manifest file (*.rbm). Both plain manifests and compressed ones (the compress-json array form produced by exporting with `compress: true`) are accepted and detected automatically. Run Flow (subflow) references between flows in the manifest are resolved to the slugs, IDs, and published versions the flows receive in this workspace.
+     * Import rules, flows, contexts, and values from an Rulebricks manifest file (*.rbm).
      *
      * @param {Rulebricks.ImportManifestRequest} request
      * @param {AssetsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -111,12 +111,12 @@ export class AssetsClient {
      *         manifest: {
      *             version: "1.0",
      *             rules: [{
-     *                     "name": "Pricing Rule",
-     *                     "slug": "pricing-rule"
+     *                     name: "Pricing Rule",
+     *                     slug: "pricing-rule"
      *                 }],
      *             flows: [{
-     *                     "name": "Onboarding Flow",
-     *                     "slug": "onboarding-flow"
+     *                     name: "Onboarding Flow",
+     *                     slug: "onboarding-flow"
      *                 }],
      *             entities: [{
      *                     "name": "Customer",

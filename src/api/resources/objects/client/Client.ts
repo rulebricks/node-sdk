@@ -26,10 +26,11 @@ export class ObjectsClient {
     }
 
     /**
-     * Lists the workspace's objects (JSON Schemas). Results are scoped to the API key holder's user groups, matching the visibility model of values, rules, and flows: group-restricted keys only see objects whose user_groups overlap theirs.
+     * Lists the workspace's objects (JSON Schemas). The provided API key must have permission to view vocabulary values. Results are scoped to the API key holder's user groups.
      *
      * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
@@ -70,6 +71,11 @@ export class ObjectsClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,
@@ -88,21 +94,24 @@ export class ObjectsClient {
     }
 
     /**
-     * Creates or updates an object by ID or name and syncs enum values it generates. Objects help workspace admins programmatically determine multiple collections of values based on Rulebricks' contracts with external systems from a single JSON Schema source.
+     * Creates or updates an object by ID or name and syncs enum values it generates. `content` and at least one of `id` or `name` are required. Objects help workspace admins programmatically determine multiple collections of values based on Rulebricks' contracts with external systems from a single JSON Schema source. Renaming the object's display name does not move its managed collection paths: those paths derive from schema field keys. When a schema field key itself is renamed, `field_rename` can preserve the generated values' identities.
      *
      * @param {Rulebricks.UpsertObjectRequest} request
      * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Rulebricks.BadRequestError}
      * @throws {@link Rulebricks.ForbiddenError}
+     * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.ConflictError}
      * @throws {@link Rulebricks.InternalServerError}
      *
      * @example
      *     await client.objects.upsert({
-     *         name: "Claim",
-     *         content: "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"countryCode\": { \"type\": \"string\", \"title\": \"Country Code\", \"enum\": [\"US\", \"CA\", \"GB\"] }\n  }\n}",
-     *         user_groups: ["underwriting"]
+     *         "name": "Claim",
+     *         "content": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"countryCode\": { \"type\": \"string\", \"title\": \"Country Code\", \"enum\": [\"US\", \"CA\", \"GB\"] }\n  }\n}",
+     *         "user_groups": [
+     *             "underwriting"
+     *         ]
      *     })
      */
     public upsert(
@@ -157,11 +166,13 @@ export class ObjectsClient {
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
-                case 409:
-                    throw new Rulebricks.ConflictError(
+                case 404:
+                    throw new Rulebricks.NotFoundError(
                         _response.error.body as Rulebricks.Error_,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Rulebricks.ConflictError(_response.error.body as unknown, _response.rawResponse);
                 case 500:
                     throw new Rulebricks.InternalServerError(
                         _response.error.body as Rulebricks.Error_,
@@ -180,11 +191,12 @@ export class ObjectsClient {
     }
 
     /**
-     * Fetches one object by ID or exact name.
+     * Fetches one object by ID or exact name. The provided API key must have permission to view vocabulary values.
      *
      * @param {Rulebricks.GetObjectsRequest} request
      * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Rulebricks.ForbiddenError}
      * @throws {@link Rulebricks.NotFoundError}
      * @throws {@link Rulebricks.InternalServerError}
      *
@@ -233,6 +245,11 @@ export class ObjectsClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 403:
+                    throw new Rulebricks.ForbiddenError(
+                        _response.error.body as Rulebricks.Error_,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Rulebricks.NotFoundError(
                         _response.error.body as Rulebricks.Error_,
@@ -256,7 +273,7 @@ export class ObjectsClient {
     }
 
     /**
-     * Deletes the object. Its generated values always lose their management lock; by default they are also archived (published rules keep resolving them by id). Pass values=detach to keep them active as ordinary, hand-editable values instead. Requires the manage objects entitlement.
+     * Deletes the object. By default, unused values are permanently deleted while values referenced by draft, current, or historical rules, flows, or other vocabulary values are archived. Pass values=detach to keep every generated value active as an ordinary, hand-editable value.
      *
      * @param {Rulebricks.DeleteObjectsRequest} request
      * @param {ObjectsClient.RequestOptions} requestOptions - Request-specific configuration.
